@@ -1,7 +1,8 @@
 phase: 2
 name: 캐릭터 & AI
-status: pending
+status: ready
 started_at: null
 completed_at: null
-blockers:
-  - NPC 프리셋 종류 및 프롬프트 미결
+blockers: []
+decisions:
+  npc_presets: "확정 (2026-04-05 hyeonseok 승인) — 전사형/도주형/광전사형 3종"
