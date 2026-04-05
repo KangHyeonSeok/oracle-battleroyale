@@ -1,0 +1,7 @@
+phase: 5
+name: 클라이언트 Godot
+status: pending
+started_at: null
+completed_at: null
+blockers:
+  - 콜로세움 맵 크기/벽 배치 미결 (Phase 3 연동)

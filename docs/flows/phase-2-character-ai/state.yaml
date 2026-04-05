@@ -1,0 +1,7 @@
+phase: 2
+name: 캐릭터 & AI
+status: pending
+started_at: null
+completed_at: null
+blockers:
+  - NPC 프리셋 종류 및 프롬프트 미결

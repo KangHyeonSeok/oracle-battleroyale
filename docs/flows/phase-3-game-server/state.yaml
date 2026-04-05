@@ -1,0 +1,8 @@
+phase: 3
+name: 게임 서버 코어
+status: pending
+started_at: null
+completed_at: null
+blockers:
+  - 콜로세움 맵 크기 미결
+  - 기본 전투 수치 미결
