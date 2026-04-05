@@ -1,6 +1,6 @@
 phase: 3
 name: 게임 서버 코어
-status: pending
+status: queued
 started_at: null
 completed_at: null
 blockers:

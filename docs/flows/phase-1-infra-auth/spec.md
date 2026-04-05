@@ -1,3 +1,13 @@
+---
+specId: phase-1-infra-auth
+title: 인프라 & 인증
+status: queued
+runnerProfile: developer
+runnerExecution: assistant
+createdAt: 2026-04-05
+updatedAt: 2026-04-05
+---
+
 # Phase 1: 인프라 & 인증
 
 ## 목표

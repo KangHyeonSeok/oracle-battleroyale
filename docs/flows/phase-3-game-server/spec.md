@@ -1,3 +1,14 @@
+---
+specId: phase-3-game-server
+title: 게임 서버 코어
+status: queued
+runnerProfile: developer
+runnerExecution: assistant
+createdAt: 2026-04-05
+updatedAt: 2026-04-05
+dependsOn: phase-1-infra-auth
+---
+
 # Phase 3: 게임 서버 코어
 
 ## 목표

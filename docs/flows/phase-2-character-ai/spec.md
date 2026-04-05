@@ -1,3 +1,14 @@
+---
+specId: phase-2-character-ai
+title: 캐릭터 & AI
+status: queued
+runnerProfile: developer
+runnerExecution: assistant
+createdAt: 2026-04-05
+updatedAt: 2026-04-05
+dependsOn: phase-1-infra-auth
+---
+
 # Phase 2: 캐릭터 & AI
 
 ## 목표

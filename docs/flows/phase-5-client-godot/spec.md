@@ -1,3 +1,14 @@
+---
+specId: phase-5-client-godot
+title: 클라이언트 (Godot)
+status: queued
+runnerProfile: developer
+runnerExecution: assistant
+createdAt: 2026-04-05
+updatedAt: 2026-04-05
+dependsOn: phase-3-game-server
+---
+
 # Phase 5: 클라이언트 (Godot)
 
 ## 목표

@@ -1,3 +1,16 @@
+---
+specId: phase-4-oracle-system
+title: 신탁 시스템
+status: queued
+runnerProfile: developer
+runnerExecution: assistant
+createdAt: 2026-04-05
+updatedAt: 2026-04-05
+dependsOn:
+  - phase-2-character-ai
+  - phase-3-game-server
+---
+
 # Phase 4: 신탁 시스템
 
 ## 목표
