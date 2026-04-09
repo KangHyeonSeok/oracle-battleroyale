@@ -1,0 +1,73 @@
+name: Godot Web Export & Vercel Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'client/**'
+  workflow_dispatch:
+
+jobs:
+  export-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot 4.x headless
+        run: |
+          GODOT_VERSION="4.3"
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" -O godot.zip
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+          chmod +x /usr/local/bin/godot
+
+      - name: Install Godot Web export templates
+        run: |
+          GODOT_VERSION="4.3"
+          TEMPLATES_DIR="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "${TEMPLATES_DIR}"
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" -O templates.tpz
+          unzip -q templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates/* "${TEMPLATES_DIR}/"
+
+      - name: Export Godot project to Web
+        working-directory: client
+        run: |
+          mkdir -p build/web
+          godot --headless --export-release "Web" build/web/index.html
+          ls -lh build/web/
+
+      - name: Verify .wasm output
+        working-directory: client
+        run: |
+          test -f build/web/index.wasm || (echo "ERROR: index.wasm not found" && exit 1)
+          echo "Web export successful: $(du -sh build/web/)"
+
+      - name: Deploy to Vercel
+        id: vercel_deploy
+        working-directory: client
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install -g vercel@latest
+          DEPLOY_URL=$(vercel deploy --prod --yes \
+            --token "$VERCEL_TOKEN" \
+            --local-config vercel.json 2>&1 | grep -E '^https://' | tail -1)
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack on deploy
+        if: success()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          DEPLOY_URL="${{ steps.vercel_deploy.outputs.deploy_url }}"
+          curl -s -X POST "https://slack.com/api/chat.postMessage" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"channel\": \"C0ANSP7FU91\",
+              \"text\": \"✅ oracle-battleroyale 배포 완료\ncommit: \`${SHORT_SHA}\`\nURL: ${DEPLOY_URL}\"
+            }"
