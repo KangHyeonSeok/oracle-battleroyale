@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="16" fill="#0d0d1a"/>
+  <circle cx="64" cy="64" r="50" fill="#12122a" stroke="#c0392b" stroke-width="3"/>
+  <circle cx="64" cy="64" r="38" fill="none" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <text x="64" y="80" font-size="42" text-anchor="middle" fill="#e74c3c">⚔</text>
+</svg>

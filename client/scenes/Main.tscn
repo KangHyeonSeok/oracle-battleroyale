@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmainscene01"]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/Arena.gd" id="2_arena"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Arena" type="Node2D" parent="."]
+script = ExtResource("2_arena")
+
+[node name="CharactersLayer" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(400, 400)
+zoom = Vector2(1, 1)

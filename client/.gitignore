@@ -1,0 +1,8 @@
+# Godot build artifacts
+build/
+.godot/
+*.import
+
+# OS files
+.DS_Store
+Thumbs.db
