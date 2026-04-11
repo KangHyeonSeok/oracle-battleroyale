@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "17000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL:-https://oracle.hyeonseok.uk/auth/google/callback}
+      SESSION_SECRET: ${SESSION_SECRET:-dev_session_secret_change_me}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: oracle_battleroyale
+      POSTGRES_USER: oracle
+      POSTGRES_PASSWORD: oracle_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-https://oracle-battleroyale.vercel.app}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    command: ["node", "src/db/migrate.js"]
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: oracle_battleroyale
+      POSTGRES_USER: oracle
+      POSTGRES_PASSWORD: oracle_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - migrate
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: oracle_battleroyale
+      POSTGRES_USER: oracle
+      POSTGRES_PASSWORD: oracle_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oracle -d oracle_battleroyale"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

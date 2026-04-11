@@ -43,6 +43,12 @@ jobs:
           test -f build/web/index.wasm || (echo "ERROR: index.wasm not found" && exit 1)
           echo "Web export successful: $(du -sh build/web/)"
 
+      - name: Inject WS_URL into index.html
+        working-directory: client
+        run: |
+          sed -i 's|</head>|<script>window.WS_URL="wss://oracle.hyeonseok.uk/ws";</script>\n</head>|' build/web/index.html
+          echo "WS_URL injected into index.html"
+
       - name: Deploy to Vercel
         id: vercel_deploy
         working-directory: client
