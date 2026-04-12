@@ -1,0 +1,10 @@
+specId: spectator-mode
+status: draft
+lastError: null
+retryCount: 0
+createdAt: 2026-04-13T00:00:00.000Z
+updatedAt: 2026-04-13T00:00:00.000Z
+notes: |
+  2026-04-13 태연 신규 스펙 초안:
+  - 배틀로얄 게임의 자연스러운 미구현 기능 (관전 모드)
+  - match-history 완료 후 다음 구현 대상으로 검토 권장

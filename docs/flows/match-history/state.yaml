@@ -10,3 +10,8 @@ notes: |
   - spec.md AC7(빈 기록 상태), 엣지케이스(404/403/401) 보강 완료
   2026-04-13 09:30 runner 시작 → in-flight 전환
   2026-04-13 10:00 spec.md status 동기화 완료 (queued → in-flight)
+  2026-04-13 태연 스케줄 재검토:
+  - CharacterListScreen.gd에 "경기 기록" 버튼(AC6) 미구현 확인
+  - Main.gd에 match_history/match_detail 화면 라우팅 미구현 확인
+  - server/src/history/ 디렉토리 미생성 확인
+  - 구현 갭 전체 스펙 AC와 일치 → runner 완료 대기 유지

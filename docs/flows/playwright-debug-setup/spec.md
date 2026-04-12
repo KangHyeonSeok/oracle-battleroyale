@@ -1,7 +1,7 @@
 ---
 specId: playwright-debug-setup
 title: Playwright UI 테스트 + JavaScript Debug Bridge
-status: queued
+status: in-flight
 runnerProfile: developer
 runnerExecution: assistant
 createdAt: 2026-04-12
