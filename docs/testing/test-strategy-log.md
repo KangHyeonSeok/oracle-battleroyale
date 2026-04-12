@@ -165,3 +165,54 @@
 **권장 즉시 액션**: P0-1·P0-2는 구현 범위가 작음 (각 10줄 내외). hyeonseok 확인 후 DevourerKing 착수 지시 필요.
 
 ---
+
+## 2026-04-13 점검 4회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js/Express (26 모듈, ~3,300 LOC) / 클라이언트: Godot 4.x WebAssembly (14 스크립트)
+
+| 구분 | 상태 | 비고 |
+|------|------|------|
+| 단위 — 전투 로직 (`combat.test.js`, 17건) | ✅ 통과 | 커스텀 assert harness, 1,329 LOC |
+| 단위 — 포인트 시스템 (`points.test.js`, 18건) | ✅ 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 (`matchmaker.test.js`, 18건+) | ✅ 통과 | Node.js assert |
+| 통합 — E2E 플로우 (`e2e-flow.test.js`, 7단계) | ✅ 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 (`load-32players.test.js`, p99<1,000ms) | ✅ 통과 | 실측 p99 ≈ 9.6ms |
+| 비용 검증 — Gemini (`gemini-cost.test.js`, $0.005/게임 한도) | ✅ 통과 | 정적 계산 |
+| `npm test` 스크립트 | ❌ 미정의 | **P0-1 — 4회차 연속 미해결** |
+| CI 서버 테스트 워크플로 | ❌ 미포함 | **P0-2 — 4회차 연속 미해결** |
+| 실 WebSocket 통합 테스트 | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | ❌ 부재 | P1-2 미착수 (migrations/ 7개 파일) |
+| Godot 클라이언트 / Playwright E2E | ❌ 부재 | P2-1 미착수 |
+
+### 발견한 문제점 (1~3회차 대비 변동 없음)
+
+1. **`npm test` 미정의** — 6개 테스트 파일 개별 `node` 실행만 가능. 집계·파이프라인 연동 불가 (P0-1)
+2. **CI 서버 테스트 워크플로 미생성** — `.github/workflows/`에 클라이언트 export 워크플로만 존재. PR merge gate 없음 (P0-2)
+3. **스텁 기반 통합 테스트** — PostgreSQL, Redis, Gemini API 모두 모킹. 스키마 변경·API 포맷 변화 무방비 (P1)
+4. **WebSocket 프로토콜 실 검증 없음** — `ws/server.js` 메시지 핸들러(queue_join, oracle_send 등) 실 연결 테스트 없음 (P1-1)
+5. **Godot 클라이언트 테스트 완전 부재** — WebAssembly 빌드 스모크·UI·WS 시나리오 모두 없음 (P2-1)
+6. **커스텀 assert harness** — `combat.test.js`, `points.test.js`는 자체 pass/fail 카운터 사용. CI 표준 출력 파싱 불가 (P1-3)
+
+### 개선 제안 상태 (4회차 기준)
+
+| 우선순위 | 작업 | 상태 | 구현 규모 |
+|----------|------|------|-----------|
+| P0-1 | `package.json`에 `"test": "node --test test/**/*.test.js"` 추가 | ⏳ DevourerKing 핸드오프 대기 | ~1줄 |
+| P0-2 | `.github/workflows/server-test.yml` 생성 (push/PR 트리거) | ⏳ DevourerKing 핸드오프 대기 | ~20줄 |
+| P1-1 | 실 WebSocket 통합 테스트 (`ws` 클라이언트 + `redis-memory-server`) | 🔲 미착수 | ~100줄 |
+| P1-2 | `pg-mem` 활용 마이그레이션 스모크 테스트 (7개 SQL 파일) | 🔲 미착수 | ~60줄 |
+| P1-3 | 커스텀 assert → `node:test` 표준화 | 🔲 미착수 | ~50줄 변경 |
+| P2-1 | Playwright E2E: 로그인→캐릭터 생성→신탁 전송 시나리오 | 🔲 미착수 | 별도 스펙 필요 |
+| P2-2 | Gemini 응답 계약 테스트 (zod 스키마 선언) | 🔲 미착수 | ~30줄 |
+| P2-3 | 부하 테스트 CI 기준선 등록 (p95 < 1,000ms) | 🔲 미착수 | CI 워크플로 확장 |
+
+### 4회차 진단 요약
+
+P0 항목이 4회 연속 미해결 상태. 구현 규모가 각각 1~20줄로 매우 작음에도 착수되지 않고 있어 **hyeonseok 의사결정이 블로커**임. 다음 액션:
+
+- hyeonseok에게 P0-1·P0-2 DevourerKing 착수 승인 요청
+- 승인 시 즉시 핸드오프 문서 작성 가능 (입력/출력/검증 기준 준비됨)
+
+---
