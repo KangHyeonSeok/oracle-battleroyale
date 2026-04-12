@@ -143,6 +143,7 @@ func _on_leaderboard_response(result, code, headers, body):
 | AC4 | LeaderboardScreen에서 1위 항목이 accent-gold 배지로 표시됨 |
 | AC5 | 로그인 플레이어 행이 accent-purple border로 강조 표시됨 |
 | AC6 | CharacterListScreen의 "랭킹 보기" 버튼이 LeaderboardScreen으로 이동하고, "돌아가기" 버튼이 목록으로 복귀함 |
+| AC7 | **[미구현 갭]** `Main.gd`에서 `leaderboard_requested` 시그널을 연결하고 `LeaderboardScreen` 인스턴스를 초기화하여 `_show_screen("leaderboard")` 라우팅이 동작함 |
 
 ---
 

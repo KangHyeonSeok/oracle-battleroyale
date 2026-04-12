@@ -1,18 +1,22 @@
 specId: oracle-cooldown
-status: in-flight
+status: done
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T00:00:00.000Z
-updatedAt: 2026-04-13T05:00:00.000Z
+updatedAt: 2026-04-13T00:00:00.000Z
+completedAt: 2026-04-13T00:00:00.000Z
 notes: |
   2026-04-13 태연 신규 draft:
   - 신탁 스팸 방지 및 Gemini 비용 제어 목적
-  - 서버 메모리 Map 기반 30초 쿨다운
-  - match-history runner 완료 후 다음 구현 대상으로 검토 권장
+  - 서버 메모리 Map 기반 30초 쿨다운으로 초안 작성
   2026-04-13 태연 스케줄: draft → queued 전환
   - dependsOn phase-4-oracle-system: done 확인
-  - runner 시작 대상으로 전환
-  2026-04-13 태연 스케줄 스펙 보강:
-  - 엣지케이스 2건 추가:
-    - 쿨다운 중 WS 재연결 → 기존 타임스탬프로 재검증 (재연결해도 쿨다운 유지)
-    - 포인트 부족 거부 시 쿨다운 Map 갱신 없음 (전송 실패이므로 타이머 미시작)
+  2026-04-13 태연 스케줄 스펙 보강: 엣지케이스 2건 추가
+  2026-04-13 태연 스케줄 구현 검증 → done:
+  - 실제 구현은 server/src/oracle/routes.js (POST /oracle) Redis 기반으로 완료됨
+  - COOLDOWN_TTL_SECONDS = 60 (spec draft 30s와 다름 → spec 업데이트 완료)
+  - 쿨다운 키: oracle:cooldown:{userId}:{matchId} Redis TTL
+  - 초과 시 HTTP 429 + 잔여 초 응답 (AC1, AC5 충족)
+  - 클라이언트: GameState.oracle_cooldown_remaining + OraclePanel._refresh_button() (AC2, AC3 충족)
+  - matchId별 독립 키로 AC4 충족
+  - spec.md를 실제 구현 기반으로 업데이트 완료

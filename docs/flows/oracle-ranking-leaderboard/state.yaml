@@ -15,3 +15,9 @@ notes: |
     - 비로그인 시 내 순위 강조 없음 처리
     - displayName NULL fallback "(이름 없음)"
   - 제약에 LEFT JOIN 필수, tiebreak 정렬 기준 명시 추가
+  2026-04-13 태연 스케줄 구현 갭 발견:
+  - 서버: leaderboard.js + routes.js + migration 007 완료 ✓
+  - LeaderboardScreen.gd 존재 ✓
+  - CharacterListScreen.gd: "랭킹 🏆" 버튼 + leaderboard_requested 시그널 ✓
+  - Main.gd: leaderboard_requested 시그널 미연결, LeaderboardScreen 미초기화 ✗
+  - → AC7 추가 (Main.gd 연결 필수), status ready 유지 (구현 대기 중)
