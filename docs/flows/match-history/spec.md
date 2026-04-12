@@ -1,12 +1,12 @@
 ---
 specId: match-history
 title: 경기 기록 조회
-status: queued
+status: in-flight
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant
 createdAt: 2026-04-12
-updatedAt: 2026-04-12
+updatedAt: 2026-04-13
 dependsOn:
   - phase-3-game-server
   - oracle-ui-screens

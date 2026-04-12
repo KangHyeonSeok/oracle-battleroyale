@@ -3,10 +3,10 @@ status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T00:00:00.000Z
-updatedAt: 2026-04-13T09:30:00.000Z
+updatedAt: 2026-04-13T10:00:00.000Z
 notes: |
-  in-flight → queued 정정 (2026-04-13 태연 스펙 리뷰).
-  server/src/history/ 폴더 미존재, Godot 화면 미구현 확인.
-  spec.md AC7(빈 기록 상태), 에러 처리 엣지케이스 보강 완료.
-  runner 실행 대기 중.
-  queued → in-flight (2026-04-13 태연 runner 시작).
+  2026-04-13 09:00 태연 스펙 리뷰:
+  - server/src/history/ 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재 확인
+  - spec.md AC7(빈 기록 상태), 엣지케이스(404/403/401) 보강 완료
+  2026-04-13 09:30 runner 시작 → in-flight 전환
+  2026-04-13 10:00 spec.md status 동기화 완료 (queued → in-flight)

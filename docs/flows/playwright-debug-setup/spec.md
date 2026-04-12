@@ -5,7 +5,7 @@ status: queued
 runnerProfile: developer
 runnerExecution: assistant
 createdAt: 2026-04-12
-updatedAt: 2026-04-12
+updatedAt: 2026-04-13
 dependsOn: phase-5-client-godot
 ---
 
@@ -34,6 +34,9 @@ AI 파트너(태연)가 배포된 oracle-battleroyale 웹 클라이언트의 현
 ## 구현 상세
 
 ### 1. Main.gd — JavaScript Debug Bridge
+
+`_show_screen()` 함수는 `client/scripts/Main.gd:172` 에 위치. 현재 char_list/char_create/match_wait/arena/result 5개 화면을 처리함.
+`_on_ws_connected()`는 `:182`, `_on_ws_disconnected()`는 `:187` 에 위치.
 
 `_show_screen()` 함수 끝에 추가:
 ```gdscript
