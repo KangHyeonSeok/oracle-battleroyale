@@ -21,3 +21,9 @@ notes: |
   2026-04-13 태연 스케줄 재검토 #3:
   - GET /history에 status='done' 필터 및 ended_at DESC 정렬 명시
   - 엣지케이스: 캐릭터 삭제 후 기록 → LEFT JOIN + "(삭제됨)" 처리 추가
+  2026-04-13 태연 스케줄 재검토 #4:
+  - GET /history/:matchId 응답에 oracleCount 필드 및 oracle 100개 limit 추가
+  - oracles[].isMe 필드 추가 (내 신탁 구분)
+  - 엣지케이스: oracle 없음, oracle 100개 초과 2건 추가
+  - MatchDetailScreen: isMe 강조, 신탁 없음 빈 상태 메시지 추가
+  - AC8(isMe 강조), AC9(oracleCount) 추가 → 총 9개 AC

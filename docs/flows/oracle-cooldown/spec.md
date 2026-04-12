@@ -99,6 +99,8 @@ for (const key of cooldownMap.keys()) {
 | 관전자가 oracle 전송 시도 | spectate.js 핸들러에서 무시 (기존 AC3) — 쿨다운 Map 갱신 없음 | 없음 |
 | `remainingMs` 값 음수 반환 시 | max(0, remainingMs)로 clamp | 즉시 버튼 활성화 |
 | 서버 응답 지연으로 클라이언트 쿨다운 먼저 만료 | 서버가 최종 판단, 클라이언트 카운트다운은 UX 힌트 역할 | 재전송 시 서버 재확인 |
+| 쿨다운 중 플레이어 WS 재연결 | 재연결 후 첫 oracle 수신 시 `cooldownMap`의 기존 타임스탬프로 재검증 — 30초 미경과 시 동일하게 차단 | 재연결 시 쿨다운 상태 서버에서 재수신 (WS 재연결 시 `oracle_cooldown` 잔여시간 브로드캐스트 없음 → 클라이언트는 재전송 시도 후 서버 응답으로 확인) |
+| 포인트 부족으로 oracle 거부된 경우 | oracle-point-system에서 처리 (별도 오류 코드 `oracle_insufficient_points`) — 쿨다운 Map 갱신 없음 (전송 실패이므로) | 포인트 부족 오류 별도 표시, 쿨다운 타이머 시작하지 않음 |
 
 ---
 

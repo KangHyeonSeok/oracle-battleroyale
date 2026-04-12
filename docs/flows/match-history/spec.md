@@ -68,6 +68,8 @@ dependsOn:
 
 ### `GET /history/:matchId`
 - 특정 경기 상세: 전체 참가자 순위표 + 신탁 메시지 목록 (시간순)
+- `oracle_messages`가 많을 수 있으므로 최대 100개로 제한 (MVP 단계)
+- 본인이 참가하지 않은 matchId 접근 시 HTTP 403 반환 (참가 여부는 `match_participants`로 검증)
 - 응답 형식:
 
 ```json
@@ -81,14 +83,19 @@ dependsOn:
   "oracles": [
     {
       "senderName": "플레이어A",
+      "isMe": false,
       "content": "공격해라",
       "credulity": 0.82,
       "actionResult": "오리온이 돌진했다",
       "sentAt": "ISO8601"
     }
-  ]
+  ],
+  "oracleCount": 7
 }
 ```
+
+- `oracles[].isMe`: 로그인 계정의 신탁 메시지 여부 (클라이언트 강조 표시용)
+- `oracleCount`: 총 신탁 메시지 수 (100개 limit 초과 시에도 총 수 표시)
 
 ---
 
@@ -129,6 +136,8 @@ dependsOn:
   - 내 캐릭터 행: accent-purple 하이라이트
   - 1등 행: accent-gold 하이라이트
 - 우측 패널: 신탁 메시지 피드 (시간순, 각 메시지에 credulity % + action_result)
+  - `isMe=true` 메시지: accent-purple 배경으로 구분
+  - 신탁 메시지 없을 때: "이 경기에서 신탁이 사용되지 않았습니다" 표시
 
 ---
 
@@ -141,6 +150,8 @@ dependsOn:
 5. **AC5** — 1등 달성 경기 카드는 accent-gold 강조 표시, 내 참가자 행은 accent-purple 강조 표시
 6. **AC6** — CharacterListScreen에 "경기 기록" 버튼 추가 → MatchHistoryScreen 진입 가능
 7. **AC7** — 경기 기록이 없을 때 "아직 경기 기록이 없습니다" 빈 상태 메시지 표시 (목록 대신)
+8. **AC8** — MatchDetailScreen 신탁 피드에서 내가 보낸 신탁(`isMe=true`)이 accent-purple 배경으로 구분 표시
+9. **AC9** — `GET /history/:matchId` 응답에 `oracleCount` 필드 포함 (oracle_messages 총 수)
 
 ---
 
@@ -153,6 +164,8 @@ dependsOn:
 | 본인이 참가하지 않은 matchId 접근 | HTTP 403 `{ "error": "forbidden" }` | 동일 처리 |
 | 세션 미인증 | HTTP 401 | Main.gd → LoginScreen 리다이렉트 (기존 auth 미들웨어 동작) |
 | 캐릭터 삭제 후 기록 조회 | 삭제된 캐릭터는 `characters` LEFT JOIN으로 처리, name=`"(삭제됨)"`, class=`""` 반환 | UI에서 이탤릭체·dimmed 색상으로 표시 |
+| oracle_messages 없는 경기 | `"oracles": [], "oracleCount": 0` 반환 | "이 경기에서 신탁이 사용되지 않았습니다" 메시지 표시 |
+| oracle_messages 100개 초과 | 시간순 최신 100개만 반환, `oracleCount`에 실제 총 수 포함 | 피드 상단에 "총 N건 중 최근 100건 표시" 안내 문구 |
 
 ---
 

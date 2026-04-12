@@ -1,4 +1,17 @@
-status: done
+specId: oracle-ranking-leaderboard
+status: ready
 lastError: null
 retryCount: 0
-updatedAt: 2026-04-12T04:35:44.283Z
+createdAt: 2026-04-12T04:35:44.283Z
+updatedAt: 2026-04-13T00:00:00.000Z
+notes: |
+  2026-04-12 초안 작성 (draft): 기본 구조, AC, 파일 목록 포함
+  2026-04-13 태연 스케줄 재검토:
+  - state.yaml status=done 오기 발견 (spec=draft와 불일치) → ready로 수정
+  - spec.md draft→ready 전환: 엣지케이스 5개 추가
+    - 빈 리더보드(경기 미진행) 처리
+    - oracle_points 동점 tiebreak 기준 (total_wins DESC → created_at ASC)
+    - player_stats 행 없는 계정 LEFT JOIN 처리 명시
+    - 비로그인 시 내 순위 강조 없음 처리
+    - displayName NULL fallback "(이름 없음)"
+  - 제약에 LEFT JOIN 필수, tiebreak 정렬 기준 명시 추가
