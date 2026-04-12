@@ -1,7 +1,7 @@
 ---
 specId: oracle-cooldown
 title: 신탁 쿨다운 (Oracle Rate Limit)
-status: draft
+status: queued
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant

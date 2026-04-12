@@ -1,5 +1,5 @@
 specId: oracle-cooldown
-status: draft
+status: queued
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T00:00:00.000Z
@@ -9,3 +9,6 @@ notes: |
   - 신탁 스팸 방지 및 Gemini 비용 제어 목적
   - 서버 메모리 Map 기반 30초 쿨다운
   - match-history runner 완료 후 다음 구현 대상으로 검토 권장
+  2026-04-13 태연 스케줄: draft → queued 전환
+  - dependsOn phase-4-oracle-system: done 확인
+  - runner 시작 대상으로 전환
