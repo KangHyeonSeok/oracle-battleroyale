@@ -2,6 +2,50 @@
 
 ---
 
+## 2026-04-13 점검 5회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js v22.22.2 / Express (24 모듈) / 클라이언트: Godot 4.x WebAssembly
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p95 통과 | 실측 CPU+I/O ≈ 6.9ms |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ 통과 | 헤드룸 112 오라클 호출 |
+| `npm test` 스크립트 | `package.json` | ❌ 미정의 | **P0-1 — 5회차 연속 미해결** |
+| CI 서버 테스트 워크플로 | `.github/workflows/` | ❌ 미포함 | **P0-2 — 5회차 연속 미해결** |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | — | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | — | ❌ 부재 | P2-1 미착수 |
+
+### 발견한 문제점 (1~4회차 대비 변동 없음)
+
+1. **`npm test` 미정의** — 6개 파일 개별 `node` 실행만 가능. 집계·파이프라인 연동 불가 (P0-1)
+2. **CI 서버 테스트 워크플로 미생성** — PR merge gate 없음 (P0-2)
+3. **스텁 기반 통합 테스트** — PostgreSQL, Redis, Gemini 모두 모킹 (P1)
+4. **WebSocket 프로토콜 실 검증 없음** — `ws/server.js` 메시지 핸들러 실 연결 테스트 없음 (P1-1)
+5. **Godot 클라이언트 테스트 완전 부재** (P2-1)
+6. **커스텀 assert harness** — CI 표준 출력 파싱 불가 (P1-3)
+
+### 개선 제안 상태 (5회차 기준)
+
+| 우선순위 | 작업 | 상태 | 규모 |
+|----------|------|------|------|
+| P0-1 | `package.json` `"test"` 스크립트 추가 | ⏳ hyeonseok 확인 대기 | ~1줄 |
+| P0-2 | `server-test.yml` GitHub Actions 생성 | ⏳ hyeonseok 확인 대기 | ~20줄 |
+| P1-1 | 실 WS 통합 테스트 (`redis-memory-server` 활용) | 🔲 미착수 | ~100줄 |
+| P1-2 | `pg-mem` 마이그레이션 스모크 테스트 | 🔲 미착수 | ~60줄 |
+| P1-3 | 커스텀 assert → `node:test` 표준화 | 🔲 미착수 | ~50줄 |
+| P2-1~3 | Playwright E2E / Gemini 계약 / 부하 CI 기준선 | 🔲 미착수 | 별도 스펙 필요 |
+
+**5회차 진단**: P0-1·P0-2는 구현 규모가 각 1~20줄로 매우 작음. 5회 연속 미해결로 hyeonseok 착수 승인이 유일한 블로커.
+
+---
+
 ## 2026-04-13 점검 (태연 자동 점검)
 
 ### 현재 테스트 커버리지 상태
