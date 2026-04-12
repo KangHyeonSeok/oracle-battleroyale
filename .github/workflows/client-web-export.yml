@@ -58,9 +58,8 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           npm install -g vercel@latest
-          vercel deploy --prod --yes \
-            --token "$VERCEL_TOKEN" \
-            --local-config client/vercel.json 2>&1 | tee /tmp/vercel_output.txt
+          vercel deploy client/build/web --prod --yes \
+            --token "$VERCEL_TOKEN" 2>&1 | tee /tmp/vercel_output.txt
           VERCEL_EXIT=${PIPESTATUS[0]}
           DEPLOY_URL=$(grep -oP 'https://[^\s]+' /tmp/vercel_output.txt | grep -v 'vercel.com/KangHyeonSeok' | tail -1)
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
