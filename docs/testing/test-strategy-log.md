@@ -2,6 +2,54 @@
 
 ---
 
+## 2026-04-13 점검 7회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js v22.22.2 / Express (25 모듈) / 클라이언트: Godot 4.3 WebAssembly (14 스크립트)
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p99 < 1,000ms | 실측 p99 ≈ 5ms 수준 |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ $0.005/게임 한도 내 | 정적 계산 |
+| `npm test` 스크립트 | `package.json` | ❌ 미정의 | **P0-1 — 7회차 연속 미해결** |
+| CI 서버 테스트 워크플로 | `.github/workflows/` | ❌ 미포함 | **P0-2 — 7회차 연속 미해결** |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (7개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | — | ❌ 부재 | P2-1 미착수 |
+
+### 발견한 문제점 (6회차 대비 변동 없음)
+
+1. **`npm test` 미정의** — 6개 테스트 파일을 개별 `node`로만 실행 가능. CI 집계 불가 (P0-1)
+2. **CI 서버 테스트 워크플로 미생성** — `client-web-export.yml`만 존재. PR merge gate 없음 (P0-2)
+3. **스텁 기반 통합 테스트** — PostgreSQL, Redis, Gemini 모두 모킹. 실 서비스 회귀 감지 불가 (P1)
+4. **WebSocket 프로토콜 실 검증 없음** — `ws/server.js` 핸들러(queue_join, oracle_send 등) 실 연결 미검증 (P1-1)
+5. **Godot 클라이언트 테스트 완전 부재** — 14개 GDScript 파일 무검증 (P2-1)
+6. **커스텀 assert harness** — `combat.test.js`, `points.test.js` CI 표준 출력 파싱 불가 (P1-3)
+7. **최신 커밋 `oracle-cooldown` 플로우 추가** — `feat(oracle-cooldown): draft → queued 전환` (eb6c118). 신탁 쿨다운 로직이 queued 상태로 구현 대기 중이나, 해당 기능에 대한 테스트 계획 없음.
+
+### 개선 제안 상태 (7회차 기준)
+
+| 우선순위 | 작업 | 상태 | 구현 규모 |
+|----------|------|------|-----------|
+| P0-1 | `package.json`에 `"test": "node --test test/**/*.test.js"` 추가 | ⏳ hyeonseok 착수 승인 대기 | ~1줄 |
+| P0-2 | `.github/workflows/server-test.yml` 생성 (push/PR 트리거) | ⏳ hyeonseok 착수 승인 대기 | ~20줄 |
+| P1-1 | 실 WebSocket 통합 테스트 (`ws` 클라이언트 + `redis-memory-server`) | 🔲 미착수 | ~100줄 |
+| P1-2 | `pg-mem` 마이그레이션 스모크 테스트 (7개 SQL 순서 적용) | 🔲 미착수 | ~60줄 |
+| P1-3 | 커스텀 assert → `node:test` 표준화 | 🔲 미착수 | ~50줄 |
+| P1-4 | `oracle-cooldown` 쿨다운 로직 단위 테스트 | 🔲 신규 — 구현 완료 후 즉시 필요 | ~40줄 |
+| P2-1 | Playwright E2E: 로그인→캐릭터 생성→신탁 전송 자동화 | 🔲 미착수 | 별도 스펙 필요 |
+| P2-2 | Gemini 응답 계약 테스트 (zod 스키마) | 🔲 미착수 | ~30줄 |
+| P2-3 | 부하 테스트 CI 기준선 등록 (p95 < 1,000ms) | 🔲 미착수 | CI 워크플로 확장 |
+
+**7회차 진단**: P0-1·P0-2는 각각 1~20줄 규모로 7회 연속 미해결. hyeonseok 착수 승인이 유일한 블로커. 신규: `oracle-cooldown` 기능이 queued 진입 → 구현 완료 시점에 맞춰 P1-4(쿨다운 단위 테스트) 선제 준비 권장.
+
+---
+
 ## 2026-04-13 점검 6회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
 
 ### 현재 테스트 커버리지 상태
