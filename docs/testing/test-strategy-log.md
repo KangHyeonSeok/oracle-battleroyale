@@ -62,3 +62,65 @@
 4. **P2-1**: Playwright 세팅은 Godot 클라이언트 Phase 5 완료 후 진행
 
 ---
+
+## 2026-04-13 점검 2회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js/Express (24 모듈, 3,264 LOC) / 클라이언트: Godot 4.x WebAssembly (13 스크립트, 2,418 LOC)
+
+| 구분 | 파일 | 실행 가능 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ node 직접 실행 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ node 직접 실행 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ node 직접 실행 | Node.js assert 사용 |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ node 직접 실행 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ node 직접 실행 | p95 < 1,000ms SLA |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ node 직접 실행 | 정적 계산, 실 API 호출 없음 |
+| `npm test` 스크립트 | `package.json` | ❌ 미정의 | start/dev/migrate만 존재 |
+| CI 서버 테스트 | `.github/workflows/` | ❌ 미포함 | 클라이언트 export/deploy만 자동화 |
+| 실 WebSocket 통합 | — | ❌ 부재 | queue_join, oracle_send 프로토콜 미검증 |
+| DB 마이그레이션 검증 | `migrations/*.sql` (7개) | ❌ 부재 | 스키마 정합성 테스트 없음 |
+| Godot 클라이언트 | — | ❌ 부재 | UI, WS 송수신, WebAssembly 렌더링 무검증 |
+| Playwright E2E | — | ❌ 부재 | `playwright-debug-setup` 스펙 존재하나 미실행 |
+
+### 발견한 문제점 (1회차 대비 변경 없음, 상태 유지)
+
+1. **테스트 러너 미정의**: `npm test` 스크립트 없음 → 6개 파일을 개별 `node`로만 실행 가능, 집계 불가
+2. **CI 파이프라인 서버 테스트 제외**: `server-test.yml` 워크플로 미생성 상태. PR merge gate 없음
+3. **스텁 기반 통합 테스트**: DB(PostgreSQL), Redis, Gemini 모두 모킹 — 마이그레이션 스키마 변경·Redis 연결·Gemini 응답 포맷 변화에 무방비
+4. **WebSocket 프로토콜 무검증**: `ws/server.js` 메시지 핸들러 실 연결 테스트 없음. 프로토콜 변경 시 회귀 감지 불가
+5. **Godot 클라이언트 테스트 완전 부재**: WebAssembly 빌드 후 스모크 테스트·UI 렌더링·WS 시나리오 모두 없음
+6. **커스텀 assert harness**: `combat.test.js`, `points.test.js`는 자체 pass/fail 카운터 사용 — CI 결과 파싱 어려움
+
+### 개선 제안 (우선순위 재확인)
+
+#### P0 — 즉시 (미해결, DevourerKing 핸드오프 권장)
+
+| # | 작업 | 완료 기준 |
+|---|------|----------|
+| P0-1 | `package.json`에 `"test": "node --test test/**/*.test.js"` 추가 | `npm test`로 6개 파일 일괄 실행·통과 |
+| P0-2 | `.github/workflows/server-test.yml` 생성 (push/PR 트리거) | GitHub Actions에서 서버 테스트 자동 실행 확인 |
+
+#### P1 — 단기 2주 (미착수)
+
+| # | 작업 | 완료 기준 |
+|---|------|----------|
+| P1-1 | 실 WebSocket 통합 테스트 (`ws` 클라이언트 + `redis-memory-server`) | queue_join→oracle_send→game_over 시나리오 통과 |
+| P1-2 | `pg-mem` 활용 마이그레이션 스모크 테스트 | 7개 migration 파일 순서 적용 후 스키마 검증 통과 |
+| P1-3 | 커스텀 assert → `node:test` 표준화 | CI 결과 JUnit/TAP 형식 출력 가능 |
+
+#### P2 — 중기 1개월 (미착수)
+
+| # | 작업 | 완료 기준 |
+|---|------|----------|
+| P2-1 | Playwright E2E: Godot WebAssembly ↔ 서버 시나리오 | 로그인→캐릭터 생성→신탁 전송 자동 통과 |
+| P2-2 | Gemini 응답 계약 테스트 (zod 스키마 선언) | API 응답 포맷 변경 시 즉시 실패 |
+| P2-3 | 부하 테스트 CI 기준선 등록 | p95 < 1,000ms 회귀 감지 자동화 |
+
+### 다음 액션
+
+- **P0-1, P0-2** DevourerKing 핸드오프 대기 — hyeonseok 확인 후 착수 여부 결정 권장
+- 1회차 대비 신규 이슈 없음. 6개 테스트 파일 수동 실행 시 모두 통과 상태 유지
+
+---
