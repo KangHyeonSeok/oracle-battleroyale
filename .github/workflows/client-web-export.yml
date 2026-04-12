@@ -58,13 +58,14 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           npm install -g vercel@latest
-          VERCEL_OUTPUT=$(vercel deploy --prod --yes \
+          vercel deploy --prod --yes \
             --token "$VERCEL_TOKEN" \
-            --local-config vercel.json 2>&1)
-          echo "$VERCEL_OUTPUT"
-          DEPLOY_URL=$(echo "$VERCEL_OUTPUT" | grep -oP 'https://[^\s]+' | grep -v 'vercel.com/KangHyeonSeok' | tail -1)
+            --local-config vercel.json 2>&1 | tee /tmp/vercel_output.txt
+          VERCEL_EXIT=${PIPESTATUS[0]}
+          DEPLOY_URL=$(grep -oP 'https://[^\s]+' /tmp/vercel_output.txt | grep -v 'vercel.com/KangHyeonSeok' | tail -1)
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployed to: $DEPLOY_URL"
+          exit $VERCEL_EXIT
 
       - name: Notify Slack on deploy
         if: success()
