@@ -1,7 +1,7 @@
 ---
 specId: spectator-mode
 title: 관전 모드 (진행 중인 경기 실시간 관람)
-status: queued
+status: done
 runnerProfile: developer
 runnerExecution: assistant
 createdAt: 2026-04-13
