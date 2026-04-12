@@ -18,3 +18,6 @@ notes: |
   2026-04-13 태연 스케줄 재검토 #2:
   - spec.md 파일목록에 CharacterListScreen.gd 누락 확인 → 추가 완료 (AC6)
   - GET /history limit 상한(50) 제약 명시 추가
+  2026-04-13 태연 스케줄 재검토 #3:
+  - GET /history에 status='done' 필터 및 ended_at DESC 정렬 명시
+  - 엣지케이스: 캐릭터 삭제 후 기록 → LEFT JOIN + "(삭제됨)" 처리 추가

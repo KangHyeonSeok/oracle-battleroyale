@@ -1,0 +1,11 @@
+specId: oracle-cooldown
+status: draft
+lastError: null
+retryCount: 0
+createdAt: 2026-04-13T00:00:00.000Z
+updatedAt: 2026-04-13T00:00:00.000Z
+notes: |
+  2026-04-13 태연 신규 draft:
+  - 신탁 스팸 방지 및 Gemini 비용 제어 목적
+  - 서버 메모리 Map 기반 30초 쿨다운
+  - match-history runner 완료 후 다음 구현 대상으로 검토 권장

@@ -44,7 +44,8 @@ dependsOn:
 ### `GET /history?limit=20&offset=0`
 - 인증 필수 (session middleware)
 - `limit` 최대 50, 초과 시 50으로 clamp. `offset` 음수 시 0으로 clamp.
-- 자신의 `account_id`가 포함된 `match_participants` 기준으로 최근 경기 목록 반환
+- `matches.status = 'done'` 인 완료된 경기만 반환 (진행 중·대기 중 경기 제외)
+- 자신의 `account_id`가 포함된 `match_participants` 기준으로 최근 경기 목록 반환 (ended_at DESC 정렬)
 - 응답 형식:
 
 ```json
@@ -151,6 +152,7 @@ dependsOn:
 | 존재하지 않는 matchId | HTTP 404 `{ "error": "not_found" }` | 에러 라벨 표시 후 MatchHistoryScreen으로 복귀 |
 | 본인이 참가하지 않은 matchId 접근 | HTTP 403 `{ "error": "forbidden" }` | 동일 처리 |
 | 세션 미인증 | HTTP 401 | Main.gd → LoginScreen 리다이렉트 (기존 auth 미들웨어 동작) |
+| 캐릭터 삭제 후 기록 조회 | 삭제된 캐릭터는 `characters` LEFT JOIN으로 처리, name=`"(삭제됨)"`, class=`""` 반환 | UI에서 이탤릭체·dimmed 색상으로 표시 |
 
 ---
 
