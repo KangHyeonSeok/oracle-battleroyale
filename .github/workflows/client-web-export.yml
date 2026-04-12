@@ -48,9 +48,11 @@ jobs:
         run: |
           sed -i 's|</head>|<script>window.WS_URL="wss://oracle.hyeonseok.uk/ws";</script>\n</head>|' build/web/index.html
           echo "WS_URL injected into index.html"
+          cp vercel.json build/web/vercel.json
 
       - name: Deploy to Vercel
         id: vercel_deploy
+        working-directory: client/build/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -59,7 +61,7 @@ jobs:
           npm install -g vercel@latest
           vercel deploy --prod --yes \
             --token "$VERCEL_TOKEN" \
-            --local-config client/vercel.json 2>&1 | tee /tmp/vercel_output.txt
+            --local-config vercel.json 2>&1 | tee /tmp/vercel_output.txt
           VERCEL_EXIT=${PIPESTATUS[0]}
           DEPLOY_URL=$(grep -oP 'https://[^\s]+' /tmp/vercel_output.txt | grep -v 'vercel.com/KangHyeonSeok' | tail -1)
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
