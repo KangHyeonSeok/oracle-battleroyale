@@ -9,3 +9,8 @@ notes: |
   - 배틀로얄 게임의 자연스러운 미구현 기능 (관전 모드)
   - match-history 완료 후 다음 구현 대상으로 검토 권장
   2026-04-13 태연: draft → queued 전환. spec 구현 준비 완료 (AC 8개, 파일 목록 확정).
+  2026-04-13 태연 스케줄 재검토:
+  - spec.md status 불일치(draft/queued) → spec.md queued로 동기화
+  - CharacterListScreen.gd 파일 목록 누락 → 추가
+  - Arena.gd spectator_mode 전달 방식 불명확 → Main.show_arena_spectate() 패턴으로 구체화
+  - 파일 목록에 SpectateListScreen.gd 호출 방식 명시

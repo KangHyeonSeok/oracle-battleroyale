@@ -1,7 +1,7 @@
 ---
 specId: spectator-mode
 title: 관전 모드 (진행 중인 경기 실시간 관람)
-status: draft
+status: queued
 runnerProfile: developer
 runnerExecution: assistant
 createdAt: 2026-04-13
@@ -82,8 +82,10 @@ dependsOn:
 |------|------|
 | `client/scenes/SpectateListScreen.tscn` | 관전 가능 경기 목록 씬 |
 | `client/scripts/SpectateListScreen.gd` | GET /spectate 호출, 경기 카드 목록, 선택 → Arena 진입 |
-| `client/scripts/Arena.gd` | `spectator_mode: bool` 플래그 추가, oracle 전송 UI 숨김, "관전 중" 뱃지 표시 |
-| `client/scripts/Main.gd` | `spectate_list` 화면 전환 추가, CharacterListScreen에 "관전하기" 버튼 |
+| `client/scripts/Arena.gd` | `@export var spectator_mode: bool = false` 추가. `_ready()` 시 true면 OraclePanel 숨김, "관전 중" 레이블 표시. WS `game_over` 수신 시 spectator_mode=true이면 `Main.show_screen("spectate_list")` 호출 |
+| `client/scripts/SpectateListScreen.gd` — 관전 경기 선택 시 `Main.gd`의 `show_arena_spectate(match_id)` 호출 |
+| `client/scripts/Main.gd` | `spectate_list` 화면 전환 추가, `show_arena_spectate(match_id: String)` 메서드 추가 — `current_spectate_match_id` 저장 후 Arena 씬 로드, `Arena.spectator_mode = true` 설정 |
+| `client/scripts/CharacterListScreen.gd` | "관전하기" 버튼 추가 → `Main.show_screen("spectate_list")` 호출 |
 
 ---
 

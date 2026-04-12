@@ -43,6 +43,7 @@ dependsOn:
 
 ### `GET /history?limit=20&offset=0`
 - 인증 필수 (session middleware)
+- `limit` 최대 50, 초과 시 50으로 clamp. `offset` 음수 시 0으로 clamp.
 - 자신의 `account_id`가 포함된 `match_participants` 기준으로 최근 경기 목록 반환
 - 응답 형식:
 
@@ -108,6 +109,7 @@ dependsOn:
 | `client/scripts/MatchHistoryScreen.gd` | 목록 로드, 페이지네이션, 상세 화면 전환 |
 | `client/scenes/MatchDetailScreen.tscn` | 경기 상세 씬 (참가자 표 + 신탁 피드) |
 | `client/scripts/MatchDetailScreen.gd` | 상세 데이터 렌더링 |
+| `client/scripts/CharacterListScreen.gd` | "경기 기록" 버튼 추가 → `Main.show_screen("match_history")` 호출 |
 | `client/scripts/Main.gd` | `match_history`, `match_detail` 화면 전환 추가 |
 
 ---

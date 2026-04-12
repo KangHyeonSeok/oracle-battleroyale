@@ -15,3 +15,6 @@ notes: |
   - Main.gd에 match_history/match_detail 화면 라우팅 미구현 확인
   - server/src/history/ 디렉토리 미생성 확인
   - 구현 갭 전체 스펙 AC와 일치 → runner 완료 대기 유지
+  2026-04-13 태연 스케줄 재검토 #2:
+  - spec.md 파일목록에 CharacterListScreen.gd 누락 확인 → 추가 완료 (AC6)
+  - GET /history limit 상한(50) 제약 명시 추가
