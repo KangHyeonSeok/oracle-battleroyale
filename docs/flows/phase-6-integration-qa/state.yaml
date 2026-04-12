@@ -1,5 +1,8 @@
 phase: 6
 name: 통합 & QA
-status: queued
+status: done
 started_at: null
 completed_at: null
+lastError: null
+retryCount: 0
+updatedAt: 2026-04-11T06:50:42.603Z

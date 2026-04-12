@@ -1,0 +1,145 @@
+{
+  "specId": "oracle-ui-design",
+  "updatedAt": "2026-04-12T01:35:57.531Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1: 5개 화면 모두 Astraea Nexus 디자인 시스템 토큰 9개 사용",
+      "status": "passed",
+      "evidence": "grep confirms all 9 constants (BG_BASE, BG_CARD, BORDER_CARD, ACCENT_GOLD, ACCENT_PURPLE, TEXT_PRIMARY, TEXT_SECONDARY, SUCCESS, DANGER) declared in CharacterListScreen.gd, CharacterCreateScreen.gd, MatchWaitingScreen.gd, OracleStreamPanel.gd, and GameResultScreen.gd"
+    },
+    {
+      "criterion": "AC2: GameResultScreen 섹션 1/2/3 레이아웃 구현, 순위·포인트 정산 표시",
+      "status": "passed",
+      "evidence": "GameResultScreen.gd implements Section 1 winner banner with ACCENT_GOLD border+glow+fade-in 0.4s, Section 2 rank rows with stagger 0.08s/row animation, Section 3 GridContainer with DANGER/SUCCESS badges and final total label"
+    },
+    {
+      "criterion": "AC3: docs/ui/README.md에 모든 스크린, 색상 토큰, 컴포넌트 가이드 반영",
+      "status": "passed",
+      "evidence": "docs/ui/README.md contains complete 9-token color table, typography table, component guide, and all 5 screen specs including direct-spec GameResultScreen"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-11T23:04:59.740Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-11T23-04-59-740Z.log",
+      "validationFile": "validation-2026-04-11T23-04-59-740Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 5개 화면 모두 Astraea Nexus 디자인 시스템 토큰 사용",
+          "status": "passed",
+          "evidence": "grep confirms all 5 screen scripts (CharacterListScreen, CharacterCreateScreen, MatchWaitingScreen, OracleStreamPanel, GameResultScreen) define and use GOLD/PURPLE/BG/SUCCESS/DANGER constants. GameResultScreen now defines all 9 spec tokens explicitly with exact hex values."
+        },
+        {
+          "criterion": "AC2: GameResultScreen이 섹션 1/2/3 레이아웃대로 구현되고 순위·포인트 정산이 표시된다",
+          "status": "passed",
+          "evidence": "Section 1: winner PanelContainer with accent-gold border + shadow glow, 32px bold TEXT_PRIMARY label, fade-in 0.4s tween. Section 2: VBoxContainer rank rows with accent-gold/silver/bronze ranks, 20px bold, TEXT_SECONDARY eliminated_at, stagger 0.08s/row. Section 3: GridContainer(2 cols) — DANGER badge for oracle cost, SUCCESS badge for win bonus (hidden via _win_bonus_row.visible = win_bonus > 0), total label TEXT_PRIMARY 20px bold."
+        },
+        {
+          "criterion": "AC3: docs/ui/README.md에 모든 스크린, 색상 토큰, 컴포넌트 가이드 반영",
+          "status": "passed",
+          "evidence": "README updated with: 9-token color table (hex + GDScript constant + usage), typography table, component guide for card/primary-button/secondary-button/input/success-badge/danger-badge, all 5 screens with script paths and layout specs, full Section 1/2/3 spec for GameResultScreen."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-11T23:06:23.929Z",
+      "action": "advanced-spec",
+      "status": "review-required",
+      "logFile": "tick-2026-04-11T23-06-23-929Z.log",
+      "validationFile": "validation-2026-04-11T23-06-23-929Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 5개 화면 모두 9개 Astraea Nexus 디자인 토큰 사용 (bg-base, bg-card, accent-gold, accent-purple, text-primary, text-secondary, success, danger)",
+          "status": "partial",
+          "evidence": "GameResultScreen.gd defines all 9 tokens (BG_BASE, BG_CARD, BORDER_CARD, ACCENT_GOLD, ACCENT_PURPLE, TEXT_PRIMARY, TEXT_SECONDARY, SUCCESS, DANGER). CharacterListScreen.gd and CharacterCreateScreen.gd define only GOLD and PURPLE. MatchWaitingScreen.gd defines only GOLD and PURPLE. OracleStreamPanel.gd defines GOLD, PURPLE, and SUCCESS (non-spec hex values) but is missing BG_BASE, BG_CARD, BORDER_CARD, TEXT_PRIMARY, TEXT_SECONDARY, DANGER. Prior validation log claim that 'all 5 scripts define BG/SUCCESS/DANGER' is contradicted by direct grep."
+        },
+        {
+          "criterion": "AC2: GameResultScreen이 섹션 1/2/3 레이아웃대로 구현되고, 순위·포인트 정산이 표시된다",
+          "status": "passed",
+          "evidence": "GameResultScreen.gd confirms: Section 1 winner PanelContainer with ACCENT_GOLD border + box-shadow glow, 32px bold TEXT_PRIMARY, fade-in tween; Section 2 VBoxContainer rank rows with ACCENT_GOLD/silver/bronze ranks and TEXT_SECONDARY eliminated_at with 0.08s stagger; Section 3 GridContainer(2 cols) with DANGER badge for oracle cost, SUCCESS badge for win bonus hidden via _win_bonus_row.visible, TEXT_PRIMARY total label."
+        },
+        {
+          "criterion": "AC3: docs/ui/README.md에 모든 스크린, 색상 토큰, 컴포넌트 가이드 반영",
+          "status": "passed",
+          "evidence": "docs/ui/README.md exists and contains: 9-token color table with hex values, GDScript constants, and usage descriptions; typography table; component guide for card, primary button, secondary button, input field, success badge, danger badge; all 5 screens listed with script paths and layout specs including full Section 1/2/3 spec for GameResultScreen."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-12T01:35:29.166Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-12T01-35-29-166Z.log",
+      "validationFile": "validation-2026-04-12T01-35-29-166Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 5개 화면 모두 9개 Astraea Nexus 토큰 사용",
+          "status": "passed",
+          "evidence": "grep confirms all 9 constants (BG_BASE, BG_CARD, BORDER_CARD, ACCENT_GOLD, ACCENT_PURPLE, TEXT_PRIMARY, TEXT_SECONDARY, SUCCESS, DANGER) are declared in CharacterListScreen.gd, CharacterCreateScreen.gd, MatchWaitingScreen.gd, and OracleStreamPanel.gd. GameResultScreen.gd already had all 9 per prior validation."
+        },
+        {
+          "criterion": "AC2: GameResultScreen 섹션 1/2/3 레이아웃 구현, 순위·포인트 정산 표시",
+          "status": "passed",
+          "evidence": "Prior validation confirmed GameResultScreen.gd implements Section 1 winner banner with ACCENT_GOLD border+glow+fade-in, Section 2 rank rows with stagger animation, Section 3 GridContainer with DANGER/SUCCESS badges and total label. No changes made to this file."
+        },
+        {
+          "criterion": "AC3: docs/ui/README.md에 모든 스크린, 색상 토큰, 컴포넌트 가이드 반영",
+          "status": "passed",
+          "evidence": "Prior validation confirmed docs/ui/README.md contains complete 9-token color table, typography table, component guide, and all 5 screen specs. No changes needed."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-12T01:35:44.235Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-12T01-35-44-235Z.log",
+      "validationFile": "validation-2026-04-12T01-35-44-235Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 5개 화면 모두 9개 Astraea Nexus 토큰 사용",
+          "status": "passed",
+          "evidence": "grep confirms all 9 constants (BG_BASE, BG_CARD, BORDER_CARD, ACCENT_GOLD, ACCENT_PURPLE, TEXT_PRIMARY, TEXT_SECONDARY, SUCCESS, DANGER) declared in CharacterListScreen.gd, CharacterCreateScreen.gd, MatchWaitingScreen.gd, OracleStreamPanel.gd, and GameResultScreen.gd"
+        },
+        {
+          "criterion": "AC2: GameResultScreen 섹션 1/2/3 레이아웃 구현, 순위·포인트 정산 표시",
+          "status": "passed",
+          "evidence": "GameResultScreen.gd implements Section 1 winner banner with ACCENT_GOLD border+glow+fade-in 0.4s, Section 2 rank rows with stagger 0.08s/row animation, Section 3 GridContainer with DANGER/SUCCESS badges and final total label"
+        },
+        {
+          "criterion": "AC3: docs/ui/README.md에 모든 스크린, 색상 토큰, 컴포넌트 가이드 반영",
+          "status": "passed",
+          "evidence": "docs/ui/README.md contains complete 9-token color table, typography table, component guide, and all 5 screen specs including direct-spec GameResultScreen"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-12T01:35:57.531Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-12T01-35-57-531Z.log",
+      "validationFile": "validation-2026-04-12T01-35-57-531Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 5개 화면 모두 Astraea Nexus 디자인 시스템 토큰 9개 사용",
+          "status": "passed",
+          "evidence": "grep confirms all 9 constants (BG_BASE, BG_CARD, BORDER_CARD, ACCENT_GOLD, ACCENT_PURPLE, TEXT_PRIMARY, TEXT_SECONDARY, SUCCESS, DANGER) declared in CharacterListScreen.gd, CharacterCreateScreen.gd, MatchWaitingScreen.gd, OracleStreamPanel.gd, and GameResultScreen.gd"
+        },
+        {
+          "criterion": "AC2: GameResultScreen 섹션 1/2/3 레이아웃 구현, 순위·포인트 정산 표시",
+          "status": "passed",
+          "evidence": "GameResultScreen.gd implements Section 1 winner banner with ACCENT_GOLD border+glow+fade-in 0.4s, Section 2 rank rows with stagger 0.08s/row animation, Section 3 GridContainer with DANGER/SUCCESS badges and final total label"
+        },
+        {
+          "criterion": "AC3: docs/ui/README.md에 모든 스크린, 색상 토큰, 컴포넌트 가이드 반영",
+          "status": "passed",
+          "evidence": "docs/ui/README.md contains complete 9-token color table, typography table, component guide, and all 5 screen specs including direct-spec GameResultScreen"
+        }
+      ]
+    }
+  ]
+}

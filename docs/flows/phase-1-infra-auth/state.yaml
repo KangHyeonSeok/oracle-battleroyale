@@ -1,5 +1,8 @@
 phase: 1
 name: 인프라 & 인증
-status: queued
+status: done
 started_at: null
 completed_at: null
+lastError: null
+retryCount: 0
+updatedAt: 2026-04-05T22:07:33.238Z

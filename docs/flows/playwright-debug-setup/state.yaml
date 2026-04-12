@@ -1,0 +1,8 @@
+specId: playwright-debug-setup
+status: queued
+createdAt: 2026-04-12
+updatedAt: 2026-04-12
+assignee: null
+notes: |
+  Godot JavaScriptBridge + Playwright 스크린샷 워크플로우 설정.
+  구현 범위: Main.gd JS bridge + tests/ + .github/workflows/playwright-screenshot.yml

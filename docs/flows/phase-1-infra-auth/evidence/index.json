@@ -1,0 +1,97 @@
+{
+  "specId": "phase-1-infra-auth",
+  "updatedAt": "2026-04-05T22:07:33.239Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "docker-compose up으로 서버, Redis, PostgreSQL 전체 실행 가능",
+      "status": "passed",
+      "evidence": "docker-compose.yml defines server, postgres:16-alpine, and redis:7-alpine services with healthchecks, depends_on conditions, persistent volumes, and a separate migrate profile service."
+    },
+    {
+      "criterion": "/auth/google → OAuth 콜백 → 세션 쿠키 발급 정상 동작",
+      "status": "passed",
+      "evidence": "server/src/auth/routes.js exposes /auth/google and /auth/google/callback; passport.js implements GoogleStrategy with DB upsert; sessions stored in Redis via express-session + connect-redis."
+    },
+    {
+      "criterion": "DB 마이그레이션 파일 실행 후 캐릭터/매치 테이블 생성 확인",
+      "status": "passed",
+      "evidence": "server/migrations/001_initial_schema.sql creates 5 tables (users, characters, matches, match_participants, oracle_invocations) and a match_history view; migrate.js runs idempotently with schema_migrations tracking."
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-05T22:06:57.001Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-05T22-06-57-001Z.log",
+      "validationFile": "validation-2026-04-05T22-06-57-001Z.md",
+      "validationChecks": [
+        {
+          "criterion": "docker-compose up으로 서버, Redis, PostgreSQL 전체 실행 가능",
+          "status": "passed",
+          "evidence": "docker-compose.yml defines server, postgres (postgres:16-alpine with healthcheck), and redis (redis:7-alpine with healthcheck) services with proper depends_on conditions and persistent volumes. A separate 'migrate' profile service handles schema application."
+        },
+        {
+          "criterion": "/auth/google → OAuth 콜백 → 세션 쿠키 발급 정상 동작",
+          "status": "passed",
+          "evidence": "server/src/auth/routes.js exposes GET /auth/google (initiates OAuth), GET /auth/google/callback (handles callback, sets session via express-session + connect-redis), GET /auth/me (returns session user), and POST /auth/logout. passport.js implements GoogleStrategy with DB upsert and serialize/deserializeUser."
+        },
+        {
+          "criterion": "DB 마이그레이션 파일 실행 후 캐릭터/매치 테이블 생성 확인",
+          "status": "passed",
+          "evidence": "server/migrations/001_initial_schema.sql creates 5 tables (users, characters, matches, match_participants, oracle_invocations) and 1 view (match_history). Node validation confirmed all 5 CREATE TABLE statements and the view are present. server/src/db/migrate.js runs migrations idempotently tracking applied files in schema_migrations table."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:07:11.639Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-05T22-07-11-639Z.log",
+      "validationFile": "validation-2026-04-05T22-07-11-639Z.md",
+      "validationChecks": [
+        {
+          "criterion": "docker-compose up으로 서버, Redis, PostgreSQL 전체 실행 가능",
+          "status": "passed",
+          "evidence": "docker-compose.yml defines server, postgres:16-alpine, and redis:7-alpine services with healthchecks, depends_on conditions, persistent volumes, and a separate migrate profile service."
+        },
+        {
+          "criterion": "/auth/google → OAuth 콜백 → 세션 쿠키 발급 정상 동작",
+          "status": "passed",
+          "evidence": "server/src/auth/routes.js exposes /auth/google and /auth/google/callback; passport.js implements GoogleStrategy with DB upsert; sessions stored in Redis via express-session + connect-redis."
+        },
+        {
+          "criterion": "DB 마이그레이션 파일 실행 후 캐릭터/매치 테이블 생성 확인",
+          "status": "passed",
+          "evidence": "server/migrations/001_initial_schema.sql creates 5 tables (users, characters, matches, match_participants, oracle_invocations) and a match_history view; migrate.js runs idempotently with schema_migrations tracking."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:07:33.239Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-05T22-07-33-239Z.log",
+      "validationFile": "validation-2026-04-05T22-07-33-239Z.md",
+      "validationChecks": [
+        {
+          "criterion": "docker-compose up으로 서버, Redis, PostgreSQL 전체 실행 가능",
+          "status": "passed",
+          "evidence": "docker-compose.yml defines server, postgres:16-alpine, and redis:7-alpine services with healthchecks, depends_on conditions, persistent volumes, and a separate migrate profile service."
+        },
+        {
+          "criterion": "/auth/google → OAuth 콜백 → 세션 쿠키 발급 정상 동작",
+          "status": "passed",
+          "evidence": "server/src/auth/routes.js exposes /auth/google and /auth/google/callback; passport.js implements GoogleStrategy with DB upsert; sessions stored in Redis via express-session + connect-redis."
+        },
+        {
+          "criterion": "DB 마이그레이션 파일 실행 후 캐릭터/매치 테이블 생성 확인",
+          "status": "passed",
+          "evidence": "server/migrations/001_initial_schema.sql creates 5 tables (users, characters, matches, match_participants, oracle_invocations) and a match_history view; migrate.js runs idempotently with schema_migrations tracking."
+        }
+      ]
+    }
+  ]
+}

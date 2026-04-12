@@ -1,0 +1,137 @@
+{
+  "specId": "phase-2-character-ai",
+  "updatedAt": "2026-04-05T22:13:29.166Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "POST /characters — 캐릭터 생성 + Gemini 규칙 테이블 JSON 반환",
+      "status": "passed",
+      "evidence": "server/src/characters/routes.js implements POST / calling extractRulesTable from gemini.js, inserts with rules_table JSONB, returns 201. Route mounted in app.js line 52."
+    },
+    {
+      "criterion": "NPC 충원: 참가자 4명 미만 시 자동으로 NPC 프리셋 삽입",
+      "status": "passed",
+      "evidence": "server/src/ai/npc-presets.js exports autoFillNpcs(matchId, minCount=4) upserts NPC rows with user_id=NULL and is_npc=TRUE. Migration 002 makes user_id nullable to allow NPC rows."
+    },
+    {
+      "criterion": "AI 행동 엔진: 60초 턴마다 각 캐릭터 규칙 테이블 기반 행동 결정 (이동/공격/회피)",
+      "status": "passed",
+      "evidence": "server/src/game/ai-engine.js exports evaluateAction and decideTurnActions. Priority-sorted rule evaluation covers move/attack/evade. Unit tests confirm all 3 NPC archetypes including berserk damage_multiplier_override."
+    },
+    {
+      "criterion": "NPC 프리셋 3종 확정 (철혈 검사 / 그림자 궁수 / 피에 굶주린 전사)",
+      "status": "passed",
+      "evidence": "NPC_PRESETS array in npc-presets.js defines all 3 approved presets with class, stats, ai_persona, and rules_table matching the spec."
+    },
+    {
+      "criterion": "Gemini Flash 규칙 테이블 추출 파이프라인",
+      "status": "passed",
+      "evidence": "server/src/ai/gemini.js calls gemini-1.5-flash with structured extraction prompt, strips markdown fences, falls back gracefully when GEMINI_API_KEY is absent. GEMINI_API_KEY + GEMINI_MODEL added to .env.example."
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-05T22:12:07.916Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-05T22-12-07-916Z.log",
+      "validationFile": "validation-2026-04-05T22-12-07-916Z.md",
+      "validationChecks": [
+        {
+          "criterion": "POST /characters — 캐릭터 생성 + Gemini 규칙 테이블 JSON 반환",
+          "status": "passed",
+          "evidence": "server/src/characters/routes.js implements POST /characters (requireAuth → extractRulesTable → INSERT with rules_table JSONB → 201 response). Gemini fallback returns valid rules when GEMINI_API_KEY absent. Route mounted in app.js line 52."
+        },
+        {
+          "criterion": "NPC 충원: 참가자 4명 미만 시 자동으로 NPC 프리셋 삽입",
+          "status": "passed",
+          "evidence": "server/src/ai/npc-presets.js exports autoFillNpcs(matchId, minCount=4): queries current participant count, calls ensureNpcCharactersExist() to upsert 3 preset NPCs (user_id=NULL), inserts as is_npc=TRUE until minCount reached. Migration 002 makes user_id nullable to allow NPC rows."
+        },
+        {
+          "criterion": "AI 행동 엔진: 60초 턴마다 각 캐릭터 규칙 테이블 기반 행동 결정 (이동/공격/회피)",
+          "status": "passed",
+          "evidence": "server/src/game/ai-engine.js exports evaluateAction(rulesTable, gameState) and decideTurnActions(participants). Priority-sorted rule evaluation covers all three action categories. Unit tests passed: warrior attack_melee when enemy_distance<=2; archer retreat when hp_percent<=50; berserk damage_multiplier_override=1.5 when hp<=50."
+        },
+        {
+          "criterion": "NPC 프리셋 3종 확정 (철혈 검사 / 그림자 궁수 / 피에 굶주린 전사)",
+          "status": "passed",
+          "evidence": "NPC_PRESETS array in npc-presets.js defines all 3 approved types with class, stats, ai_persona, and rules_table matching the spec (warrior/charge, archer/retreat-at-50hp, berserk/×1.5-at-low-hp)."
+        },
+        {
+          "criterion": "Gemini Flash 규칙 테이블 추출 파이프라인",
+          "status": "passed",
+          "evidence": "server/src/ai/gemini.js calls gemini-1.5-flash with a structured extraction prompt; strips markdown fences from response; falls back gracefully if GEMINI_API_KEY unset. GEMINI_API_KEY + GEMINI_MODEL added to .env.example. @google/generative-ai added to package.json dependencies."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:13:13.299Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-05T22-13-13-299Z.log",
+      "validationFile": "validation-2026-04-05T22-13-13-299Z.md",
+      "validationChecks": [
+        {
+          "criterion": "POST /characters — 캐릭터 생성 + Gemini 규칙 테이블 JSON 반환",
+          "status": "passed",
+          "evidence": "server/src/characters/routes.js implements POST / calling extractRulesTable from gemini.js, inserts with rules_table JSONB, returns 201. Route mounted in app.js line 52."
+        },
+        {
+          "criterion": "NPC 충원: 참가자 4명 미만 시 자동으로 NPC 프리셋 삽입",
+          "status": "passed",
+          "evidence": "server/src/ai/npc-presets.js exports autoFillNpcs(matchId, minCount=4) upserts NPC rows with user_id=NULL and is_npc=TRUE. Migration 002 makes user_id nullable to allow NPC rows."
+        },
+        {
+          "criterion": "AI 행동 엔진: 60초 턴마다 각 캐릭터 규칙 테이블 기반 행동 결정 (이동/공격/회피)",
+          "status": "passed",
+          "evidence": "server/src/game/ai-engine.js exports evaluateAction and decideTurnActions. Priority-sorted rule evaluation covers move/attack/evade. Unit tests confirm all 3 NPC archetypes including berserk damage_multiplier_override."
+        },
+        {
+          "criterion": "NPC 프리셋 3종 확정 (철혈 검사 / 그림자 궁수 / 피에 굶주린 전사)",
+          "status": "passed",
+          "evidence": "NPC_PRESETS array in npc-presets.js defines all 3 approved presets with class, stats, ai_persona, and rules_table matching the spec."
+        },
+        {
+          "criterion": "Gemini Flash 규칙 테이블 추출 파이프라인",
+          "status": "passed",
+          "evidence": "server/src/ai/gemini.js calls gemini-1.5-flash with structured extraction prompt, strips markdown fences, falls back gracefully when GEMINI_API_KEY is absent. GEMINI_API_KEY + GEMINI_MODEL added to .env.example."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:13:29.166Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-05T22-13-29-166Z.log",
+      "validationFile": "validation-2026-04-05T22-13-29-166Z.md",
+      "validationChecks": [
+        {
+          "criterion": "POST /characters — 캐릭터 생성 + Gemini 규칙 테이블 JSON 반환",
+          "status": "passed",
+          "evidence": "server/src/characters/routes.js implements POST / calling extractRulesTable from gemini.js, inserts with rules_table JSONB, returns 201. Route mounted in app.js line 52."
+        },
+        {
+          "criterion": "NPC 충원: 참가자 4명 미만 시 자동으로 NPC 프리셋 삽입",
+          "status": "passed",
+          "evidence": "server/src/ai/npc-presets.js exports autoFillNpcs(matchId, minCount=4) upserts NPC rows with user_id=NULL and is_npc=TRUE. Migration 002 makes user_id nullable to allow NPC rows."
+        },
+        {
+          "criterion": "AI 행동 엔진: 60초 턴마다 각 캐릭터 규칙 테이블 기반 행동 결정 (이동/공격/회피)",
+          "status": "passed",
+          "evidence": "server/src/game/ai-engine.js exports evaluateAction and decideTurnActions. Priority-sorted rule evaluation covers move/attack/evade. Unit tests confirm all 3 NPC archetypes including berserk damage_multiplier_override."
+        },
+        {
+          "criterion": "NPC 프리셋 3종 확정 (철혈 검사 / 그림자 궁수 / 피에 굶주린 전사)",
+          "status": "passed",
+          "evidence": "NPC_PRESETS array in npc-presets.js defines all 3 approved presets with class, stats, ai_persona, and rules_table matching the spec."
+        },
+        {
+          "criterion": "Gemini Flash 규칙 테이블 추출 파이프라인",
+          "status": "passed",
+          "evidence": "server/src/ai/gemini.js calls gemini-1.5-flash with structured extraction prompt, strips markdown fences, falls back gracefully when GEMINI_API_KEY is absent. GEMINI_API_KEY + GEMINI_MODEL added to .env.example."
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,13 @@
 phase: 3
 name: 게임 서버 코어
-status: queued
+status: done
 started_at: null
 completed_at: null
-blockers:
-  - 콜로세움 맵 크기 미결
-  - 기본 전투 수치 미결
+blockers: []
+lastError: null
+retryCount: 0
+updatedAt: 2026-04-13T09:00:00.000Z
+notes: |
+  blockers 해소 확인 (2026-04-13 태연 스펙 리뷰).
+  - 맵 크기: 800×800px → spec.md 및 combat.js 일치 확인
+  - 전투 수치: 근접 80px/15, 원거리 300px/10, 속도 120px/턴 → combat.js 구현 일치 확인

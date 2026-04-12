@@ -1,0 +1,157 @@
+{
+  "specId": "oracle-point-system",
+  "updatedAt": "2026-04-10T06:29:10.864Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1: 신규 계정 생성 후 accounts.oracle_points = 100",
+      "status": "passed",
+      "evidence": "Default 100 set in schema; getPoints returns 100 for new user confirmed by test"
+    },
+    {
+      "criterion": "AC2: 잔액 10pt 미만 시 insufficient_points 에러 반환",
+      "status": "passed",
+      "evidence": "deductPoint uses WHERE constellation_points >= 10; routes.js early guard returns insufficient_points; test user with 5pt correctly got the error"
+    },
+    {
+      "criterion": "AC3: 신탁 전송 성공 시 -10pt 및 point_transactions 레코드 생성",
+      "status": "passed",
+      "evidence": "deductPoint atomically deducts 10pt and inserts delta=-10, reason='oracle_send' into point_transactions; test confirmed"
+    },
+    {
+      "criterion": "AC4: 경기 우승 시 +50pt, win_bonus 레코드 생성",
+      "status": "passed",
+      "evidence": "awardMatchEndPoints awards WIN_REWARD=50 with reason='win_bonus' for placement=1; test confirmed +50pt and transaction record"
+    },
+    {
+      "criterion": "AC5: 로그인 시 당일 첫 1회만 +10pt (중복 방지)",
+      "status": "passed",
+      "evidence": "grantDailyBonus queries same-day daily_login record before awarding; second call returns null without modifying balance; both paths tested"
+    },
+    {
+      "criterion": "AC6: WS points_update 이벤트 즉시 전달",
+      "status": "passed",
+      "evidence": "broadcastToUser added to room-manager; called from deductPoint/awardPoints/grantDailyBonus; initial points_update sent on join_match; test confirmed event fired with numeric points value"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-10T06:28:24.643Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-10T06-28-24-643Z.log",
+      "validationFile": "validation-2026-04-10T06-28-24-643Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 신규 계정 생성 후 accounts.oracle_points = 100 확인",
+          "status": "passed",
+          "evidence": "users.constellation_points already defaults to 100 per 001_initial_schema.sql; test confirmed getPoints returns 100 for new user"
+        },
+        {
+          "criterion": "AC2: 포인트 10pt 미만 상태에서 신탁 전송 시 insufficient_points 에러 반환",
+          "status": "passed",
+          "evidence": "deductPoint uses WHERE constellation_points >= ORACLE_COST (10); returns { error: 'insufficient_points' } when row count is 0; oracle/routes.js early guard also checks < 10 and returns insufficient_points; test user with 5pt correctly got the error"
+        },
+        {
+          "criterion": "AC3: 신탁 전송 성공 시 잔액 -10pt, point_transactions 레코드 생성",
+          "status": "passed",
+          "evidence": "deductPoint deducts 10pt atomically and inserts into point_transactions with delta=-10, reason='oracle_send', match_id set; test confirmed balance drop and transaction record"
+        },
+        {
+          "criterion": "AC4: 경기 우승 시 +50pt, point_transactions에 win_bonus 레코드 생성",
+          "status": "passed",
+          "evidence": "awardMatchEndPoints awards WIN_REWARD=50 with reason='win_bonus' for placement=1; awardPoints logs to point_transactions; test confirmed +50pt and transaction"
+        },
+        {
+          "criterion": "AC5: 로그인 시 당일 첫 1회만 +10pt (재로그인 시 중복 지급 없음)",
+          "status": "passed",
+          "evidence": "grantDailyBonus queries point_transactions for same-day daily_login record before awarding; second call returns null without modifying balance; both paths tested and passed"
+        },
+        {
+          "criterion": "AC6: WS points_update 이벤트가 포인트 변동 즉시 클라이언트에 전달됨",
+          "status": "passed",
+          "evidence": "broadcastToUser added to room-manager; called from deductPoint, awardPoints, grantDailyBonus; ws/server.js sends initial points_update on join_match with userId; test confirmed event fired with numeric points value"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-10T06:28:48.605Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-10T06-28-48-605Z.log",
+      "validationFile": "validation-2026-04-10T06-28-48-605Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 신규 계정 생성 후 accounts.oracle_points = 100",
+          "status": "passed",
+          "evidence": "Default 100 set in schema; getPoints returns 100 for new user confirmed by test"
+        },
+        {
+          "criterion": "AC2: 잔액 10pt 미만 시 insufficient_points 에러 반환",
+          "status": "passed",
+          "evidence": "deductPoint uses WHERE constellation_points >= 10; routes.js early guard also returns insufficient_points; test user with 5pt correctly got the error"
+        },
+        {
+          "criterion": "AC3: 신탁 전송 성공 시 -10pt 및 point_transactions 레코드 생성",
+          "status": "passed",
+          "evidence": "deductPoint atomically deducts 10pt and inserts delta=-10, reason='oracle_send' into point_transactions; test confirmed"
+        },
+        {
+          "criterion": "AC4: 경기 우승 시 +50pt, win_bonus 레코드 생성",
+          "status": "passed",
+          "evidence": "awardMatchEndPoints awards WIN_REWARD=50 with reason='win_bonus' for placement=1; test confirmed +50pt and transaction record"
+        },
+        {
+          "criterion": "AC5: 로그인 시 당일 첫 1회만 +10pt (중복 방지)",
+          "status": "passed",
+          "evidence": "grantDailyBonus queries same-day daily_login record before awarding; second call returns null without modifying balance; both paths tested"
+        },
+        {
+          "criterion": "AC6: WS points_update 이벤트 즉시 전달",
+          "status": "passed",
+          "evidence": "broadcastToUser added to room-manager; called from deductPoint/awardPoints/grantDailyBonus; initial points_update sent on join_match; test confirmed event fired with numeric points value"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-10T06:29:10.864Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-10T06-29-10-864Z.log",
+      "validationFile": "validation-2026-04-10T06-29-10-864Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 신규 계정 생성 후 accounts.oracle_points = 100",
+          "status": "passed",
+          "evidence": "Default 100 set in schema; getPoints returns 100 for new user confirmed by test"
+        },
+        {
+          "criterion": "AC2: 잔액 10pt 미만 시 insufficient_points 에러 반환",
+          "status": "passed",
+          "evidence": "deductPoint uses WHERE constellation_points >= 10; routes.js early guard returns insufficient_points; test user with 5pt correctly got the error"
+        },
+        {
+          "criterion": "AC3: 신탁 전송 성공 시 -10pt 및 point_transactions 레코드 생성",
+          "status": "passed",
+          "evidence": "deductPoint atomically deducts 10pt and inserts delta=-10, reason='oracle_send' into point_transactions; test confirmed"
+        },
+        {
+          "criterion": "AC4: 경기 우승 시 +50pt, win_bonus 레코드 생성",
+          "status": "passed",
+          "evidence": "awardMatchEndPoints awards WIN_REWARD=50 with reason='win_bonus' for placement=1; test confirmed +50pt and transaction record"
+        },
+        {
+          "criterion": "AC5: 로그인 시 당일 첫 1회만 +10pt (중복 방지)",
+          "status": "passed",
+          "evidence": "grantDailyBonus queries same-day daily_login record before awarding; second call returns null without modifying balance; both paths tested"
+        },
+        {
+          "criterion": "AC6: WS points_update 이벤트 즉시 전달",
+          "status": "passed",
+          "evidence": "broadcastToUser added to room-manager; called from deductPoint/awardPoints/grantDailyBonus; initial points_update sent on join_match; test confirmed event fired with numeric points value"
+        }
+      ]
+    }
+  ]
+}

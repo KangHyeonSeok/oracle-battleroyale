@@ -1,8 +1,11 @@
 phase: 2
 name: 캐릭터 & AI
-status: queued
+status: done
 started_at: null
 completed_at: null
 blockers: []
 decisions:
-  npc_presets: "확정 (2026-04-05 hyeonseok 승인) — 전사형/도주형/광전사형 3종"
+  npc_presets: 확정 (2026-04-05 hyeonseok 승인) — 전사형/도주형/광전사형 3종
+lastError: null
+retryCount: 0
+updatedAt: 2026-04-05T22:13:29.166Z

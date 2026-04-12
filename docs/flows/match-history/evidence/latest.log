@@ -1,0 +1,22 @@
+# match-history
+
+TickAt: 2026-04-13T09:00:00.000Z
+Action: spec-reviewed
+PreviousState: in-flight (잘못 설정됨)
+UpdatedState: queued
+UpdatedBy: 태연 (schedule: oracle-battleroyale 스펙 리뷰)
+
+## 변경 요약
+- state.yaml: in-flight → queued (서버/클라이언트 구현 없음 확인)
+- spec.md: status draft → queued
+- AC7 추가: 빈 경기 기록 상태 처리
+- 엣지케이스 섹션 추가: 404/403/401 처리 명세
+
+## 구현 현황
+- server/src/history/: 미존재 (미구현)
+- client/scripts/MatchHistoryScreen.gd: 미존재 (미구현)
+- client/scripts/MatchDetailScreen.gd: 미존재 (미구현)
+- Main.gd: history 화면 전환 없음 (미구현)
+
+## 다음 액션
+runner 실행 시 queued spec 기준으로 전체 구현 착수 가능
