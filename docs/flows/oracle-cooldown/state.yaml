@@ -1,9 +1,9 @@
 specId: oracle-cooldown
-status: queued
+status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T00:00:00.000Z
-updatedAt: 2026-04-13T00:00:00.000Z
+updatedAt: 2026-04-13T05:00:00.000Z
 notes: |
   2026-04-13 태연 신규 draft:
   - 신탁 스팸 방지 및 Gemini 비용 제어 목적
