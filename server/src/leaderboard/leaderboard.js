@@ -14,7 +14,7 @@ async function getLeaderboard(limit = 20) {
     `SELECT
        ROW_NUMBER() OVER (ORDER BY u.constellation_points DESC) AS rank,
        u.id                          AS account_id,
-       u.display_name,
+       COALESCE(NULLIF(u.display_name, ''), '(이름 없음)') AS display_name,
        u.constellation_points        AS oracle_points,
        COALESCE(ps.total_wins, 0)    AS total_wins,
        COALESCE(ps.total_matches, 0) AS total_matches,

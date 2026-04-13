@@ -1,7 +1,7 @@
 ---
 specId: server-test-ci
 title: 서버 CI 테스트 워크플로
-status: draft
+status: done
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant

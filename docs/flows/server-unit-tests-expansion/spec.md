@@ -82,18 +82,31 @@ require.cache[require.resolve('../src/db/pool')] = {
 
 const { getLeaderboard } = require('../src/leaderboard/leaderboard');
 
+// ⚠️ Node.js에서 top-level await 미지원 — 전체 테스트를 async IIFE로 감쌀 것
+(async () => {
+
 // 각 테스트마다 mockRows를 교체하여 시나리오 설정
 // 예: 기본 정렬 테스트
 mockRows = [
-  { rank: '1', account_id: 1, display_name: '알파', oracle_points: '100', total_wins: '5', total_matches: '10', win_rate: '50', oracle_sent: '20' },
+  { rank: '1', account_id: 1, display_name: '알파', oracle_points: 100, total_wins: 5, total_matches: 10, win_rate: 50, oracle_sent: 20 },
   // ... 나머지 rows
 ];
 const result = await getLeaderboard(20);
 assert(result[0].oraclePoints === 100, '기본 정렬: 첫 항목 oraclePoints=100');
 
+// 테스트 케이스 8: displayName 빈 문자열 → NULLIF 패턴
+// leaderboard.js SQL에 COALESCE(NULLIF(u.display_name, ''), '(이름 없음)') 적용됨 (2026-04-13 수정)
+// 따라서 mockRows에서 display_name: '' 로 주입해도 pool.query 결과에서 이미 fallback 적용됨
+// mock 테스트에서는 poolMock이 rows를 직접 반환하므로, display_name: '(이름 없음)'으로 주입
+mockRows = [{ rank: '1', account_id: 2, display_name: '(이름 없음)', oracle_points: 50, total_wins: 0, total_matches: 0, win_rate: 0, oracle_sent: 0 }];
+const r8 = await getLeaderboard(1);
+assert(r8[0].displayName === '(이름 없음)', 'displayName 빈 문자열 fallback: "(이름 없음)" 반환');
+
 // 실행 종료 시:
 if (failed > 0) { console.error(`\n${failed} test(s) failed`); process.exit(1); }
 else { console.log(`\nAll ${passed} tests passed`); }
+
+})();
 ```
 
 ---

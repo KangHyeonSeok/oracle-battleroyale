@@ -32,3 +32,8 @@ notes: |
   2026-04-13 태연 스케줄: in-flight → queued 재전환
   - evidence 디렉토리 비어 있음 확인 → runner 실제 미시작 판단
   - queued 전환 후 runner 시작
+  2026-04-13 태연 스케줄 spec.md 버그 수정:
+  - top-level await → async IIFE 패턴으로 수정 (Node.js 미지원 이슈)
+  - mockRows 숫자 필드 타입 수정 (문자열 → Number) → assert 비교 정확도 보장
+  - leaderboard.js NULLIF 수정 반영 (display_name='' → '(이름 없음)' fallback): 테스트 케이스 8 가이드 업데이트
+  - runner 착수 준비 완료
