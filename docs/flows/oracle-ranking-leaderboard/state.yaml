@@ -3,7 +3,7 @@ status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T04:35:44.283Z
-updatedAt: 2026-04-13T12:00:00.000Z
+updatedAt: 2026-04-13T14:30:00.000Z
 notes: |
   2026-04-12 초안 작성 (draft): 기본 구조, AC, 파일 목록 포함
   2026-04-13 태연 스케줄 재검토:
@@ -35,3 +35,7 @@ notes: |
   - displayName 엣지케이스 수정: users.display_name NOT NULL 확인 → NULL fallback 대신 빈 문자열 fallback으로 수정 (NULLIF 패턴)
   - 제약 displayName 출처를 users.display_name으로 명확화
   - 잔여 미구현: AC7, AC8, AC9 (runner 처리 대기)
+  2026-04-13 태연 스케줄 (4차):
+  - AC9 구현 완료: leaderboard.js ORDER BY에 tiebreak 추가 (total_wins DESC, created_at ASC)
+  - AC8 스펙 보강: /auth/me 응답 id 필드 기준 my_account_id 주입 코드 가이드 추가
+  - 잔여 미구현: AC7(Main.gd 라우팅), AC8(my_account_id 주입) — runner 처리 대기

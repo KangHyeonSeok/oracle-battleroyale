@@ -173,8 +173,37 @@ func _on_leaderboard_back() -> void:
 | AC5 | 로그인 플레이어 행이 accent-purple border로 강조 표시됨 | ⚠️ 부분 — `my_account_id` 미설정 시 강조 없음 (AC8 참조) |
 | AC6 | CharacterListScreen의 "랭킹 🏆" 버튼이 LeaderboardScreen으로 이동하고, "돌아가기" 버튼이 목록으로 복귀함 | ⚠️ 버튼은 있으나 Main.gd 라우팅 미연결 (AC7) |
 | AC7 | **[미구현]** `Main.gd`에서 LeaderboardScreen 인스턴스 초기화 + `leaderboard_requested` 시그널 연결 + `_show_screen("leaderboard")` 라우팅 동작 | ❌ 미구현 |
-| AC8 | **[미구현]** `Main.gd → LeaderboardScreen.my_account_id` 설정: `/me` API 호출 또는 WS session 응답에서 `accountId` 추출하여 주입, 미로그인 시 -1 유지 | ❌ 미구현 |
-| AC9 | `leaderboard.js` ORDER BY에 동점 tiebreak 적용: `constellation_points DESC → total_wins DESC → created_at ASC` | ❌ 미구현 |
+| AC8 | **[미구현]** `Main.gd → LeaderboardScreen.my_account_id` 설정: `GET /auth/me` 호출 → 응답 `id` 필드를 `my_account_id`로 주입, 미로그인(401) 시 -1 유지 | ❌ 미구현 |
+| AC9 | `leaderboard.js` ORDER BY에 동점 tiebreak 적용: `constellation_points DESC → total_wins DESC → created_at ASC` | ✅ 구현됨 (2026-04-13) |
+
+### AC8 구현 가이드: my_account_id 주입
+
+`GET /auth/me` 응답 예시:
+```json
+{ "id": 42, "displayName": "별자리 사냥꾼", "constellationPoints": 450 }
+```
+- 인증 시: `id` 필드를 `LeaderboardScreen.my_account_id`에 주입
+- 미인증(401): `my_account_id = -1` 유지
+
+`Main.gd`에 아래 코드 추가 (`_build_ui()` 완료 후 호출):
+
+```gdscript
+func _fetch_my_account_id() -> void:
+    var http = HTTPRequest.new()
+    add_child(http)
+    http.request_completed.connect(_on_me_response)
+    http.request("http://SERVER_URL/auth/me")
+
+func _on_me_response(result, code, _headers, body) -> void:
+    if code == 200:
+        var data = JSON.parse_string(body.get_string_from_utf8())
+        _leaderboard_screen.my_account_id = data.get("id", -1)
+    else:
+        _leaderboard_screen.my_account_id = -1
+```
+
+- `_leaderboard_screen` 초기화 직후 `_fetch_my_account_id()` 호출
+- `LeaderboardScreen.gd`에서 `var my_account_id: int = -1` 변수 선언 필요
 
 ---
 
