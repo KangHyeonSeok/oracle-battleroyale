@@ -2,6 +2,58 @@
 
 ---
 
+## 2026-04-13 점검 9회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js v22.22.2 / Express (26 모듈) / 클라이언트: Godot 4.3 WebAssembly (14 스크립트, Arena.gd·CharacterCreateScreen.gd·CharacterListScreen.gd 수정 중)
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p99 < 1,000ms | 실측 p99 ≈ 2.3ms |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ $0.005/게임 한도 내 | 정적 계산 ($0.001416 실측) |
+| `npm test` 스크립트 | `package.json` | ❌ 미정의 | **P0-1 — 9회차 연속 미해결** |
+| CI 서버 테스트 워크플로 | `.github/workflows/` | ❌ 미포함 | **P0-2 — 9회차 연속 미해결** |
+| oracle-cooldown 단위 테스트 | — | ❌ 부재 | **P1-4 — in-flight 전환으로 긴급 격상** |
+| oracle-ranking-leaderboard 테스트 | — | ❌ 부재 | **P1-5 신규 — in-flight 전환 확인** |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (7개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | — | ❌ 부재 | P2-1 — 미수정 클라이언트 파일 증가로 위험도 상승 |
+
+### 발견한 문제점 (8회차 대비 신규 변동)
+
+1. **`npm test` 미정의** — 6개 테스트 파일을 개별 `node`로만 실행 가능. CI 집계 불가 (P0-1)
+2. **CI 서버 테스트 워크플로 미생성** — `client-web-export.yml`만 존재. PR merge gate 없음 (P0-2)
+3. **스텁 기반 통합 테스트** — PostgreSQL, Redis, Gemini 모두 모킹. 실 서비스 회귀 감지 불가 (P1)
+4. **WebSocket 프로토콜 실 검증 없음** — `ws/server.js` 핸들러 실 연결 미검증 (P1-1)
+5. **Godot 클라이언트 테스트 완전 부재** — Arena.gd·CharacterCreateScreen.gd·CharacterListScreen.gd 수정 사항이 unstaged 상태로 존재하며 무검증 (P2-1, 위험도 상승)
+6. **커스텀 assert harness** — CI 표준 출력 파싱 불가 (P1-3)
+7. **🆕 oracle-cooldown `in-flight` 전환 확인** — `feat(oracle-cooldown)` 브랜치가 queued → in-flight 상태. DevourerKing 구현 중. P1-4 테스트 없이 머지될 경우 회귀 위험 현실화.
+8. **🆕 oracle-ranking-leaderboard `in-flight` 전환 확인** — 별도 플로우(`oracle-ranking-leaderboard`)가 in-flight 진입. 리더보드 정렬·집계 로직 단위 테스트 부재 (P1-5 신규).
+
+### 개선 제안 상태 (9회차 기준)
+
+| 우선순위 | 작업 | 상태 | 구현 규모 |
+|----------|------|------|-----------|
+| P0-1 | `package.json`에 `"test": "node --test test/**/*.test.js"` 추가 | ⏳ hyeonseok 착수 승인 대기 (9회 연속) | ~1줄 |
+| P0-2 | `.github/workflows/server-test.yml` 생성 (push/PR 트리거) | ⏳ hyeonseok 착수 승인 대기 (9회 연속) | ~20줄 |
+| P1-1 | 실 WebSocket 통합 테스트 (`ws` 클라이언트 + `redis-memory-server`) | 🔲 미착수 | ~100줄 |
+| P1-2 | `pg-mem` 마이그레이션 스모크 테스트 (7개 SQL 순서 적용) | 🔲 미착수 | ~60줄 |
+| P1-3 | 커스텀 assert → `node:test` 표준화 | 🔲 미착수 | ~50줄 |
+| P1-4 | `oracle-cooldown` 쿨다운 로직 단위 테스트 | 🔴 **긴급** — in-flight 전환 확인, 머지 전 필요 | ~40줄 |
+| P1-5 | `oracle-ranking-leaderboard` 정렬·집계 단위 테스트 | 🆕 신규 — in-flight 전환 확인 | ~40줄 |
+| P2-1 | Playwright E2E: 로그인→캐릭터 생성→신탁 전송 자동화 | 🔲 미착수 (클라이언트 변경 증가로 위험도 상승) | 별도 스펙 필요 |
+| P2-2 | Gemini 응답 계약 테스트 (zod 스키마) | 🔲 미착수 | ~30줄 |
+| P2-3 | 부하 테스트 CI 기준선 등록 (p95 < 1,000ms) | 🔲 미착수 | CI 워크플로 확장 |
+
+**9회차 진단**: P0-1·P0-2가 9회 연속 미해결인 상태에서 `oracle-cooldown`과 `oracle-ranking-leaderboard` 두 기능이 동시에 in-flight 진입. P1-4·P1-5 테스트 없이 두 기능이 머지될 경우 회귀 감지 불가. 또한 Godot 클라이언트 3개 파일이 unstaged 수정 상태로 검증 없이 커밋될 위험이 있음. **hyeonseok에게 P0-1·P0-2 착수 결정 및 P1-4 긴급 작성 여부 명시적 확인 필요.**
+
+---
+
 ## 2026-04-13 점검 8회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
 
 ### 현재 테스트 커버리지 상태
