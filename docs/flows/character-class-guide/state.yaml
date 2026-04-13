@@ -33,3 +33,6 @@ notes: |
     · AC 재정의: 클래스 버튼 관련 → AI 분석 결과 수신 후 가이드 표시
     · 변경 범위 최소화: _populate_preview() 한 줄 추가 + 라벨 2개 빌드
   - runner 착수 전 스펙 수정 완료 (구현 차단 해소)
+  2026-04-13 태연 스케줄 구현 갭 재확인:
+  - CharacterCreateScreen.gd: CLASS_DATA 상수, _guide_spd_lbl/_guide_desc_lbl 변수, _update_class_guide() 함수 전무 확인
+  - 스펙 완비 상태(AC 5개, 엣지케이스 3개, 코드 가이드 상세) → runner 구현 대기 중

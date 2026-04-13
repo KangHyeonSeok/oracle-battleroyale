@@ -47,3 +47,8 @@ notes: |
   - server/src/history/ 디렉토리 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재 재확인
   - Main.gd spectate 라우팅 패턴(_spectate_list_screen: :179-184) 확인 → Main.gd 코드 가이드 패턴 일치 확인
   - 스펙 전체(AC 9개, 엣지케이스 8개, Main.gd 코드 가이드) 완비 → runner 착수 준비 완료
+  2026-04-13 태연 스케줄 구현 갭 재확인:
+  - server/src/history/ 디렉토리 미생성 확인 (routes.js, queries.js 없음)
+  - MatchHistoryScreen.gd, MatchDetailScreen.gd 미생성 확인
+  - Main.gd leaderboard/match_history/match_detail 라우팅 전무 확인
+  - 스펙 완비 상태, runner 구현 대기 중

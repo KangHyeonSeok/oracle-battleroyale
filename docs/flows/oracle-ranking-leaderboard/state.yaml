@@ -62,3 +62,8 @@ notes: |
   - _fetch_my_account_id() 호출 위치 명확화: _build_ui() 내 LeaderboardScreen 블록 끝
   - /auth/me 응답 형식 출처 명시: server/src/auth/routes.js:26
   - 잔여: AC7, AC8 (runner 처리 대기)
+  2026-04-13 태연 스케줄 구현 갭 재확인:
+  - Main.gd: _leaderboard_screen 변수 없음, leaderboard_requested 시그널 연결 없음 재확인 → AC7/AC8 미구현
+  - 서버(leaderboard.js, routes.js), LeaderboardScreen.gd, CharacterListScreen 버튼 모두 구현 완료 ✓
+  - AC9 tiebreak 구현 완료 ✓
+  - 잔여: AC7, AC8만 남음 → Main.gd 단일 파일 수정으로 해소 가능

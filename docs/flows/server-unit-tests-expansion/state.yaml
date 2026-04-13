@@ -37,3 +37,7 @@ notes: |
   - mockRows 숫자 필드 타입 수정 (문자열 → Number) → assert 비교 정확도 보장
   - leaderboard.js NULLIF 수정 반영 (display_name='' → '(이름 없음)' fallback): 테스트 케이스 8 가이드 업데이트
   - runner 착수 준비 완료
+  2026-04-13 태연 스케줄 구현 갭 재확인:
+  - server/test/leaderboard.test.js 미생성 확인
+  - server/test/oracle-cooldown.test.js 미생성 확인
+  - spec.md 완비 상태(leaderboard 8케이스, cooldown 6케이스, package.json 수정 가이드) → runner 구현 대기 중
