@@ -2,6 +2,49 @@
 
 ---
 
+## 2026-04-13 점검 22회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js / Express (11 모듈) · 클라이언트: Godot 4.3 WebAssembly (unstaged 0파일 — 21회차 대비 개선)
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 통과 | 커스텀 assert harness, 회귀 없음 유지 |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ 통과 | SLA 1,000ms 이하 유지 |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ 통과 | 예산 $0.005 이하 유지 |
+| oracle-cooldown 단위 | `test/oracle-cooldown.test.js` | ❌ 부재 | **P1-4** — server-unit-tests-expansion queued, runner 착수 대기 지속 |
+| leaderboard 단위 | `test/leaderboard.test.js` | ❌ 부재 | **P1-5** — server-unit-tests-expansion queued 동일 |
+| CI 서버 테스트 워크플로 | `.github/workflows/server-test.yml` | ✅ **파일 존재 확인** | **P0-2 해소** — server-test-ci flow done, push/PR 트리거·Node 20·Redis 7·PG 15 구성 완료 |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (7개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | `tests/smoke.spec.js` | ⚠️ canvas 렌더만 검증 | WS·OAuth·매치 플로우 미검증 지속 |
+
+### 발견한 문제점 (21회차 대비)
+
+1. **P0-2 CI 워크플로 해소 확인** — `server-test-ci` flow가 done으로 전환된 것이 이번 회차에 실제 파일 존재로 확인됨. `.github/workflows/server-test.yml` 생성 완료. `client-web-export.yml`·`playwright-screenshot.yml`과 함께 총 3개 워크플로 운용 중. AC2(npm test 전체 통과) 충족을 위해 server-unit-tests-expansion 완료가 필요한 상태.
+2. **Godot 클라이언트 unstaged 파일 0개로 개선** — 21회차까지 11파일 지속됐던 미스테이징 이슈가 이번 회차 확인 시 git status clean 상태. 변경 커밋 or 스테이징 완료 추정. Playwright E2E 검증 공백은 여전히 존재하나 구조적 리스크는 감소.
+3. **server-unit-tests-expansion queued 지속** — oracle-cooldown.test.js(6케이스)·leaderboard.test.js(8케이스) 미생성 상태 22회차 연속. spec.md 완비·queued 상태이나 runner 실제 착수 없음. 구현 완료된 oracle-cooldown·leaderboard 모듈에 단위 테스트 없이 CI까지 구성된 역설적 상태.
+4. **CI 있으나 테스트 불완전** — server-test.yml이 존재하나 oracle-cooldown.test.js·leaderboard.test.js가 없어 AC2 조건 미충족. CI 자체는 6개 기존 테스트에 대해서만 동작 가능.
+5. **스텁 기반 통합 테스트 구조적 한계 지속** — e2e-flow.test.js가 PostgreSQL·Redis·Gemini 전량 Module stub으로 대체. redis-memory-server(devDependency 설치됨) 22회 연속 미활용.
+
+### 개선 제안 (우선순위 포함)
+
+| 우선순위 | 작업 | 상태 | 규모 |
+|----------|------|------|------|
+| **P0-2** | `.github/workflows/server-test.yml` CI 워크플로 | ✅ **done** — 22회차 해소 확인 | — |
+| **P1-4+P1-5** | `test/oracle-cooldown.test.js` + `test/leaderboard.test.js` — server-unit-tests-expansion spec 기준 구현 | 🟡 **queued — runner 착수 대기 (22회 연속)** | ~100줄 합계 |
+| **P1-1** | 실 WebSocket 통합 테스트 — `ws` 클라이언트 + `redis-memory-server` 활용 | 🔲 미착수 (라이브러리 기설치, 장벽 낮음) | ~100줄 |
+| **P1-2** | `pg-mem` 마이그레이션 스모크 테스트 — 7개 SQL 순서 적용 검증 | 🔲 미착수 | ~60줄 |
+| **P2-1** | Playwright E2E 확장 — WS 연결·OAuth·매치 플로우 검증 (JavaScriptBridge 준비됨) | 🔲 spec 있음, smoke 수준 구현만 존재 | TBD |
+
+**22회차 진단**: 최대 블로커였던 P0-2 CI 워크플로가 실물 파일 존재로 해소 확인. Godot unstaged 11파일도 0으로 정리됨 — 두 가지 지속 이슈가 동시 해소된 회차. 잔여 핵심 갭은 server-unit-tests-expansion(oracle-cooldown + leaderboard 테스트 미생성)으로, CI 구성은 됐으나 이 두 파일이 없어 CI 커버리지가 실질적으로 불완전한 상태. runner 실제 착수 여부를 최우선으로 확인할 필요.
+
+---
+
 ## 2026-04-13 점검 21회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
 
 ### 현재 테스트 커버리지 상태
