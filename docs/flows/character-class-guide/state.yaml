@@ -1,0 +1,12 @@
+specId: character-class-guide
+status: draft
+lastError: null
+retryCount: 0
+createdAt: 2026-04-13T13:00:00.000Z
+updatedAt: 2026-04-13T13:00:00.000Z
+notes: |
+  2026-04-13 태연 신규 draft:
+  - CharacterCreateScreen 클래스 선택 시 스탯/특성 설명 미표시 → UX 갭 확인
+  - 서버 변경 없음, CharacterCreateScreen.gd 단일 파일 수정
+  - class-balance 확정 스탯 기반 클라이언트 하드코딩
+  - match-history runner 완료 후 다음 구현 대상으로 검토 권장

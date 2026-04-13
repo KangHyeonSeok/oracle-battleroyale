@@ -3,7 +3,7 @@ status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T00:00:00.000Z
-updatedAt: 2026-04-13T12:00:00.000Z
+updatedAt: 2026-04-13T13:00:00.000Z
 notes: |
   2026-04-13 09:00 태연 스펙 리뷰:
   - server/src/history/ 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재 확인
@@ -31,3 +31,11 @@ notes: |
   - CharacterListScreen.gd에 history_requested 시그널·"경기 기록" 버튼 미존재 재확인 (AC6 미구현)
   - leaderboard_requested 시그널은 있음 → AC6 우선순위 유지
   - 스펙 AC/엣지케이스 이상 없음 → runner 완료 대기 유지
+  2026-04-13 태연 스케줄 스펙 보강 (5차):
+  - CharacterListScreen 버튼이 직접 Main.gd 함수 호출하는 패턴 → signal 방출 패턴으로 수정 (leaderboard/spectate와 일치)
+  - spec.md 파일목록 설명 업데이트: "signal history_requested 추가 + emit" 명시
+  - Main.gd 연결 코드 가이드 섹션 신규 추가 (spectate/leaderboard 패턴 기반)
+    · MatchHistoryScreen/MatchDetailScreen 인스턴스 초기화 코드
+    · back_requested/detail_requested/history_requested 시그널 연결 코드
+    · _show_screen() 가시성 토글 라인
+    · 핸들러 함수 4개 (_on_history_requested, _on_match_history_back, _on_match_detail_requested, _on_match_detail_back)

@@ -117,8 +117,63 @@ dependsOn:
 | `client/scripts/MatchHistoryScreen.gd` | 목록 로드, 페이지네이션, 상세 화면 전환 |
 | `client/scenes/MatchDetailScreen.tscn` | 경기 상세 씬 (참가자 표 + 신탁 피드) |
 | `client/scripts/MatchDetailScreen.gd` | 상세 데이터 렌더링 |
-| `client/scripts/CharacterListScreen.gd` | "경기 기록" 버튼 추가 → `Main.show_screen("match_history")` 호출 |
-| `client/scripts/Main.gd` | `match_history`, `match_detail` 화면 전환 추가 |
+| `client/scripts/CharacterListScreen.gd` | `signal history_requested` 추가 + "경기 기록" 버튼 → `history_requested.emit()` |
+| `client/scripts/Main.gd` | `MatchHistoryScreen` 인스턴스 초기화, `history_requested` 시그널 연결, `_show_screen("match_history"/"match_detail")` 라우팅 추가 |
+
+---
+
+## Main.gd 연결 코드 가이드
+
+아래 패턴은 spectator/leaderboard 연결 방식과 동일. `_build_ui()` 내 SpectateListScreen 블록 뒤에 추가.
+
+```gdscript
+# 상단 상수 선언
+const MATCH_HISTORY_SCRIPT := preload("res://scripts/MatchHistoryScreen.gd")
+const MATCH_DETAIL_SCRIPT  := preload("res://scripts/MatchDetailScreen.gd")
+
+# 변수 선언
+var _match_history_screen: Control
+var _match_detail_screen:  Control
+
+# _build_ui() — SpectateListScreen 블록 다음에 추가
+# ── MatchHistoryScreen ──
+_match_history_screen = Control.new()
+_match_history_screen.set_script(MATCH_HISTORY_SCRIPT)
+_match_history_screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+_match_history_screen.visible = false
+ui.add_child(_match_history_screen)
+_match_history_screen.back_requested.connect(_on_match_history_back)
+_match_history_screen.detail_requested.connect(_on_match_detail_requested)
+
+# ── MatchDetailScreen ──
+_match_detail_screen = Control.new()
+_match_detail_screen.set_script(MATCH_DETAIL_SCRIPT)
+_match_detail_screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+_match_detail_screen.visible = false
+ui.add_child(_match_detail_screen)
+_match_detail_screen.back_requested.connect(_on_match_detail_back)
+
+# CharacterListScreen 시그널 연결 블록에 추가
+_char_list_screen.history_requested.connect(_on_history_requested)
+
+# _show_screen() 함수에 추가
+_match_history_screen.visible = name == "match_history"
+_match_detail_screen.visible  = name == "match_detail"
+
+# 핸들러 함수 추가
+func _on_history_requested() -> void:
+    _show_screen("match_history")
+
+func _on_match_history_back() -> void:
+    _show_screen("char_list")
+
+func _on_match_detail_requested(match_id: String) -> void:
+    _match_detail_screen.call("load_match", match_id)
+    _show_screen("match_detail")
+
+func _on_match_detail_back() -> void:
+    _show_screen("match_history")
+```
 
 ---
 
