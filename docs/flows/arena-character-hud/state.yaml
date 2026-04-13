@@ -17,3 +17,7 @@ notes: |
   - ScrollContainer 래핑 구현 코드 추가 (_char_hud_scroll 변수, SCROLL_MODE_AUTO)
   - 엣지케이스 8명 초과 처리 코드 가이드 구체화
   - 미구현: Main.gd 전체 (runner 착수 대기 중, match-history 완료 후 권장)
+  2026-04-13 태연 스케줄 스펙 보강 (2차):
+  - spec.md status queued→in-flight 동기화 (state.yaml과 일치)
+  - _make_char_hud_card()에 vbox.name = "VBoxContainer" 누락 수정 → get_node() 경로 보장
+  - 미구현: Main.gd 전체 (runner 착수 대기 중)

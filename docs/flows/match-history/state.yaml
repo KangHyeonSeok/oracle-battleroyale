@@ -39,3 +39,5 @@ notes: |
     · back_requested/detail_requested/history_requested 시그널 연결 코드
     · _show_screen() 가시성 토글 라인
     · 핸들러 함수 4개 (_on_history_requested, _on_match_history_back, _on_match_detail_requested, _on_match_detail_back)
+  2026-04-13 태연 스케줄 스펙 보강 (6차):
+  - 엣지케이스 추가: winner_character_id = NULL (비정상 종료 경기) → winner 필드 null 반환, 클라이언트 "—" 표시

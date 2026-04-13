@@ -1,7 +1,7 @@
 ---
 specId: arena-character-hud
 title: 아레나 캐릭터 상태 HUD
-status: queued
+status: in-flight
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant
@@ -106,6 +106,7 @@ func _make_char_hud_card(data: Dictionary) -> Control:
     card.custom_minimum_size = Vector2(80, 60)
 
     var vbox := VBoxContainer.new()
+    vbox.name = "VBoxContainer"
     vbox.add_theme_constant_override("separation", 2)
     card.add_child(vbox)
 

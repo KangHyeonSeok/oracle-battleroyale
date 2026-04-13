@@ -221,6 +221,7 @@ func _on_match_detail_back() -> void:
 | 캐릭터 삭제 후 기록 조회 | 삭제된 캐릭터는 `characters` LEFT JOIN으로 처리, name=`"(삭제됨)"`, class=`""` 반환 | UI에서 이탤릭체·dimmed 색상으로 표시 |
 | oracle_messages 없는 경기 | `"oracles": [], "oracleCount": 0` 반환 | "이 경기에서 신탁이 사용되지 않았습니다" 메시지 표시 |
 | oracle_messages 100개 초과 | 시간순 최신 100개만 반환, `oracleCount`에 실제 총 수 포함 | 피드 상단에 "총 N건 중 최근 100건 표시" 안내 문구 |
+| winner_character_id = NULL (비정상 종료) | `winner` 필드를 `null`로 반환 | 목록 카드에 "우승자 없음" 또는 "—" 표시 |
 
 ---
 
