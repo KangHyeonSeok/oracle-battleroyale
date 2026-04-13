@@ -207,15 +207,33 @@ func _on_me_response(result, code, _headers, body) -> void:
 
 ---
 
-## 테스트 방법
+## 단위 테스트 명세 (P1-5 — 미작성)
+
+> `leaderboard.js` tiebreak 구현 완료(AC9). `test/leaderboard.test.js` 신규 작성 필요.
+
+### 파일: `server/test/leaderboard.test.js`
+
+테스트 환경: Node.js `node:test` + `pg-mem` (PostgreSQL in-memory) 또는 DB stub
+
+| # | 테스트 케이스 | 검증 내용 |
+|---|--------------|-----------|
+| 1 | 기본 정렬 | constellation_points 내림차순으로 최대 20개 반환 |
+| 2 | tiebreak — total_wins | 동점 시 total_wins DESC 우선 적용 |
+| 3 | tiebreak — created_at | total_wins도 동점 시 created_at ASC(먼저 가입한 순) 적용 |
+| 4 | limit 적용 | DB에 30개 항목 존재 시 기본 limit=20으로 상위 20개만 반환 |
+| 5 | limit 파라미터 | limit=5 요청 시 5개 반환, limit=100 요청 시 상한 100 적용 |
+| 6 | player_stats 행 없는 계정 | LEFT JOIN → total_matches=0, total_wins=0, oracle_sent=0, winRate=0 |
+| 7 | 빈 리더보드 | 경기 기록 없음 → `{ "entries": [] }` 반환, 오류 없음 |
+| 8 | displayName 빈 문자열 | `NULLIF(display_name, '')` 적용 시 `"(이름 없음)"` fallback 반환 |
 
 ```bash
 # 서버 단위 테스트
 cd server && node test/leaderboard.test.js
-# 검증 항목: 빈 DB 응답, 20개 초과 데이터 시 limit 적용, 정렬 순서
+# 검증 항목: tiebreak 정렬(total_wins DESC → created_at ASC), LEFT JOIN NULL, limit 상한
 ```
 
 - Godot: LeaderboardScreen 씬을 직접 실행하고 목 데이터 주입으로 렌더링 확인
+- tiebreak 케이스: constellation_points가 동일한 2–3개 항목 포함 목 데이터로 정렬 순서 확인
 
 ---
 

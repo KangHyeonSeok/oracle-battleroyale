@@ -2,6 +2,57 @@
 
 ---
 
+## 2026-04-13 점검 16회차 (태연 스케줄 점검 — oracle-battleroyale 스펙 보강)
+
+### 이번 회차 작업 내용
+
+1. **`server-test-ci` draft spec 신규 생성** (`docs/flows/server-test-ci/`)
+   - P0-2 블로커(15회 연속) → `.github/workflows/server-test.yml` 구현 명세 작성
+   - push/PR 트리거, Node.js 20, Redis 7, PostgreSQL 15, AC 5개
+   - `GEMINI_API_KEY` secret 불필요 확인 (정적 계산 테스트)
+   - DevourerKing 핸드오프 대상, hyeonseok 착수 승인 항목
+
+2. **`oracle-cooldown` spec 보강** — 단위 테스트 명세 추가 (P1-4)
+   - `server/test/oracle-cooldown.test.js` 작성 가이드: 7개 테스트 케이스 명시
+   - Redis TTL 60s mock, HTTP 429, TTL 잔여 초 응답, matchId 격리, 만료 후 재전송, 포인트 실패 시 키 갱신 없음, Redis 미연결 503
+   - redis 의존성 주입 패턴 확인 착수 조건 명시
+
+3. **`oracle-ranking-leaderboard` spec 보강** — tiebreak 테스트 명세 추가 (P1-5)
+   - `server/test/leaderboard.test.js` 작성 가이드: 8개 테스트 케이스 명시
+   - tiebreak(total_wins DESC → created_at ASC), LEFT JOIN NULL, limit 상한, displayName fallback
+
+### 현재 테스트 커버리지 상태
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p99 < 1,000ms | 실측 p99 ≈ 7.3ms |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ $0.005/게임 한도 내 | 정적 계산 ($0.001416 실측) |
+| CI 서버 테스트 워크플로 | `.github/workflows/` | ❌ 미포함 | **P0-2 — 16회차 연속** (spec draft 생성됨) |
+| oracle-cooldown 단위 테스트 | `test/oracle-cooldown.test.js` | ❌ 부재 | **P1-4** — 테스트 명세 spec에 추가됨 |
+| oracle-ranking-leaderboard 단위 테스트 | `test/leaderboard.test.js` | ❌ 부재 | **P1-5** — 테스트 명세 spec에 추가됨 |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (9개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | — | ❌ 부재 | P2-1 — unstaged 11개 |
+
+### 개선 제안 (우선순위)
+
+| 우선순위 | 작업 | 상태 | 규모 |
+|----------|------|------|------|
+| **P0-2** | `.github/workflows/server-test.yml` — `server-test-ci` spec 기준 구현 | ⏳ **spec 생성됨, hyeonseok 착수 승인 대기** | ~30줄 |
+| **P1-4** | `test/oracle-cooldown.test.js` — Redis TTL mock, 429, matchId 격리 | 🔴 spec 테스트 명세 추가됨, DevourerKing 작성 권고 | ~50줄 |
+| **P1-5** | `test/leaderboard.test.js` — tiebreak, NULL, limit | 🔴 spec 테스트 명세 추가됨, DevourerKing 작성 권고 | ~50줄 |
+| **P1-1** | 실 WebSocket 통합 테스트 | 🔲 미착수 | ~100줄 |
+| **P1-2** | `pg-mem` 마이그레이션 스모크 테스트 | 🔲 미착수 | ~60줄 |
+| **P2-1** | Playwright E2E — `playwright-debug-setup` spec 기준 구현 | 🔲 spec 있음, 미구현 | TBD |
+
+**16회차 진단**: `server-test-ci` draft spec 생성으로 P0-2 구현 명세 완성. P1-4·P1-5 테스트 케이스를 각 spec에 명시 완료 → DevourerKing 즉시 착수 가능 상태. CI 워크플로 착수는 hyeonseok 승인 필요 — 16회차 연속 대기.
+
+---
+
 ## 2026-04-13 점검 15회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
 
 ### 현재 테스트 커버리지 상태

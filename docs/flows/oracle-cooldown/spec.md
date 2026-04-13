@@ -104,6 +104,49 @@ POST /oracle 수신 시:
 
 ---
 
+## 단위 테스트 명세 (P1-4 — 미작성)
+
+> 구현은 완료됐으나 단위 테스트 0개. `test/oracle-cooldown.test.js` 신규 작성 필요.
+
+### 파일: `server/test/oracle-cooldown.test.js`
+
+테스트 환경: Node.js `node:test` + `ioredis-mock` (Redis mock)
+
+| # | 테스트 케이스 | 검증 내용 |
+|---|--------------|-----------|
+| 1 | 첫 oracle POST → 쿨다운 키 설정 | `cooldownKey(userId, matchId)` 키가 Redis에 TTL=60으로 설정됨 확인 |
+| 2 | 쿨다운 중 재전송 → HTTP 429 | `GET cooldownKey` 존재 시 응답 `{ "error": "Cooldown active. Try again in Ns" }` + 상태코드 429 |
+| 3 | TTL 잔여 초 응답 포함 | 429 응답 body의 N이 Redis TTL 잔여 값과 일치 (mock TTL 30 → "Try again in 30s") |
+| 4 | matchId 격리 | `userId=1, matchId=A` 쿨다운 중에 `userId=1, matchId=B` oracle은 정상 통과 (별도 키 `oracle:cooldown:1:B`) |
+| 5 | 쿨다운 만료 후 재전송 가능 | Redis TTL 만료(mock: key 삭제) 후 동일 userId+matchId POST → 200 응답, Gemini 파이프라인 호출 |
+| 6 | 포인트 부족 시 쿨다운 키 갱신 없음 | 포인트 체크 실패(403) 시 `SET cooldownKey` 호출 없음 확인 |
+| 7 | Redis 미연결 시 HTTP 503 | `redis.get()` throw 시 응답 503 + 쿨다운 키 미설정 |
+
+```js
+// 테스트 구조 예시
+import { test, mock } from 'node:test';
+import assert from 'node:assert/strict';
+
+// redis mock: ioredis-mock 또는 jest-redis-mock 패턴
+// routes.js에서 redis 의존성 주입 가능하도록 구조 확인 필요
+test('POST /oracle: 60초 이내 재전송 → 429', async () => {
+  // mock redis: cooldownKey 존재
+  // POST /oracle → 응답 status 429
+  // body.error에 "Cooldown active" 포함 확인
+});
+
+test('matchId 격리: 다른 matchId는 쿨다운 독립', async () => {
+  // matchId=A 쿨다운 중
+  // matchId=B POST → 200 (쿨다운 미적용)
+});
+```
+
+> **착수 조건**: `server/src/oracle/routes.js`의 redis 의존성 주입 구조 확인 필요.
+> 현재 모듈 최상단에서 redis 클라이언트를 직접 import하는 경우 테스트 시 mock 주입을 위해
+> 의존성 주입 패턴 또는 모듈 교체(`proxyquire`, `--import` flag) 필요.
+
+---
+
 ## 제약
 - 쿨다운 값(60초)은 서버/클라이언트 양측 상수로 관리
 - NPC 캐릭터에게는 쿨다운 미적용 (AI 내부 oracle은 별도 경로)
