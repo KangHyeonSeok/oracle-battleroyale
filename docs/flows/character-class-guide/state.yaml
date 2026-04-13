@@ -1,5 +1,5 @@
 specId: character-class-guide
-status: queued
+status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T13:00:00.000Z
@@ -14,3 +14,5 @@ notes: |
   - 의존성 phase-2-character-ai, class-balance 모두 done ✓
   - 단일 파일 구현(CharacterCreateScreen.gd), 서버 변경 없음
   - AC 5개, 엣지케이스 2개 완성 → runner 시작
+  2026-04-13 태연 스케줄: queued → in-flight
+  - runner started (PARTNER_RUNNER_NOTIFY_CHANNEL=C0ANSP7FU91)
