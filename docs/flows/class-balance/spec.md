@@ -1,11 +1,11 @@
 ---
 specId: class-balance
 title: 클래스 밸런스 스탯 & 전투 공식 구현
-status: queued
+status: done
 runnerProfile: developer
 runnerExecution: assistant
 createdAt: 2026-04-09
-updatedAt: 2026-04-09
+updatedAt: 2026-04-13
 ---
 
 # class-balance: 클래스 밸런스 스탯 & 전투 공식 구현
