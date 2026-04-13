@@ -3,7 +3,7 @@ status: queued
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T04:35:44.283Z
-updatedAt: 2026-04-13T00:00:00.000Z
+updatedAt: 2026-04-13T11:00:00.000Z
 notes: |
   2026-04-12 초안 작성 (draft): 기본 구조, AC, 파일 목록 포함
   2026-04-13 태연 스케줄 재검토:
@@ -21,3 +21,12 @@ notes: |
   - CharacterListScreen.gd: "랭킹 🏆" 버튼 + leaderboard_requested 시그널 ✓
   - Main.gd: leaderboard_requested 시그널 미연결, LeaderboardScreen 미초기화 ✗
   - → AC7 추가 (Main.gd 연결 필수), status ready 유지 (구현 대기 중)
+  2026-04-13 태연 스케줄 심층 검토 (2차):
+  - leaderboard.js 실제 구현 확인: FROM users (not accounts), ORDER BY constellation_points DESC
+  - tiebreak(total_wins DESC → created_at ASC) 미구현 → AC9 추가
+  - 응답에 accountId 포함됨 (is_mine 체크용) → spec 응답 예시 업데이트
+  - matchResult.js 미존재 → turn-scheduler.js(:258) 구현 확인
+  - oracle.js 미존재 → oracle/routes.js(:143) 구현 확인
+  - my_account_id 미설정 메커니즘 → AC8 추가 (GET /me 또는 WS session)
+  - spec.md: 구현 상태 반영, AC 9개로 확장, Main.gd 코드 가이드 추가
+  - 미구현: AC7(Main.gd 라우팅), AC8(my_account_id 주입), AC9(tiebreak)
