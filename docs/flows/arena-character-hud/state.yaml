@@ -1,9 +1,9 @@
 specId: arena-character-hud
-status: queued
+status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T14:00:00.000Z
-updatedAt: 2026-04-13T14:30:00.000Z
+updatedAt: 2026-04-13T15:00:00.000Z
 notes: |
   2026-04-13 태연 신규 draft:
   - 아레나 HUD에 캐릭터별 HP bar가 없어 신탁 전략 판단 어려움 → UX 갭
