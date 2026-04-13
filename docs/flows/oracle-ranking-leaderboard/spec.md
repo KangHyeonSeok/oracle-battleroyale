@@ -189,12 +189,15 @@ func _on_leaderboard_back() -> void:
 
 ```gdscript
 func _fetch_my_account_id() -> void:
+    var server_url: String = OS.get_environment("SERVER_URL")
+    if server_url.is_empty():
+        server_url = "http://localhost:3000"
     var http = HTTPRequest.new()
     add_child(http)
     http.request_completed.connect(_on_me_response)
-    http.request("http://SERVER_URL/auth/me")
+    http.request(server_url + "/auth/me")
 
-func _on_me_response(result, code, _headers, body) -> void:
+func _on_me_response(_result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
     if code == 200:
         var data = JSON.parse_string(body.get_string_from_utf8())
         _leaderboard_screen.my_account_id = data.get("id", -1)
@@ -202,7 +205,8 @@ func _on_me_response(result, code, _headers, body) -> void:
         _leaderboard_screen.my_account_id = -1
 ```
 
-- `_leaderboard_screen` 초기화 직후 `_fetch_my_account_id()` 호출
+- `_leaderboard_screen` 초기화 직후 (즉, `_build_ui()` 안, LeaderboardScreen 블록 끝에서) `_fetch_my_account_id()` 호출
+- `/auth/me` 응답 `id` 필드: `GET /auth/me` → `{ "id": 42, "displayName": "...", ... }` 형식 (server/src/auth/routes.js:26 확인됨)
 - `LeaderboardScreen.gd:17` `var my_account_id: int = -1` 및 강조 로직(`:151`) **이미 구현 완료** — Main.gd에서 주입 코드만 추가하면 됨
 
 ---

@@ -1,9 +1,9 @@
 specId: server-unit-tests-expansion
-status: draft
+status: queued
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T15:30:00.000Z
-updatedAt: 2026-04-13T16:00:00.000Z
+updatedAt: 2026-04-13T15:35:00.000Z
 notes: |
   2026-04-13 태연 신규 draft:
   - server-test-ci 스펙 P1-4/P1-5 참조 항목(leaderboard, oracle-cooldown 테스트)이 별도 flow 없이 참조만 된 상태 발견
@@ -16,3 +16,8 @@ notes: |
   - require.cache 기반 pool mock 패턴 추가 (points.test.js 동일 방식)
   - oracle-cooldown 테스트: cooldownKey는 inline 재현, setRedisClient 주입으로 Redis 격리
   - HTTP 라우트 직접 테스트 한계 명시 (supertest 미설치)
+  2026-04-13 태연 스케줄: draft → queued 전환
+  - oracle-cooldown: done ✓ (구현 검증 완료)
+  - oracle-ranking-leaderboard: getLeaderboard() 서버 구현 완료(AC9 tiebreak 포함) ✓
+    (AC7/AC8 클라이언트 미구현이나 서버 테스트와 무관)
+  - spec.md 동기화 완료

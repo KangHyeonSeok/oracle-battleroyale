@@ -3,7 +3,7 @@ status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T04:35:44.283Z
-updatedAt: 2026-04-13T14:30:00.000Z
+updatedAt: 2026-04-13T15:30:00.000Z
 notes: |
   2026-04-12 초안 작성 (draft): 기본 구조, AC, 파일 목록 포함
   2026-04-13 태연 스케줄 재검토:
@@ -48,3 +48,10 @@ notes: |
   - LeaderboardScreen.gd:151 accountId == my_account_id 강조 로직 구현 ✓
   - spec.md AC8 "LeaderboardScreen.gd에서 var my_account_id 변수 선언 필요" → 이미 완료. 구현 가이드 수정 반영
   - 잔여: AC7(Main.gd 초기화+라우팅), AC8(Main.gd _fetch_my_account_id() 호출만 미구현)
+  2026-04-13 태연 스케줄 (7차) 스펙 보강:
+  - AC8 코드 가이드: http://SERVER_URL 플레이스홀더 → OS.get_environment("SERVER_URL") 패턴으로 수정
+    (LeaderboardScreen.gd :115-118 동일 패턴 기준)
+  - _on_me_response 시그니처를 Main.gd 타입 표기 스타일로 수정 (PackedStringArray, PackedByteArray)
+  - _fetch_my_account_id() 호출 위치 명확화: _build_ui() 내 LeaderboardScreen 블록 끝
+  - /auth/me 응답 형식 출처 명시: server/src/auth/routes.js:26
+  - 잔여: AC7, AC8 (runner 처리 대기)
