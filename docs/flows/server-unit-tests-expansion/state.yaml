@@ -1,0 +1,13 @@
+specId: server-unit-tests-expansion
+status: draft
+lastError: null
+retryCount: 0
+createdAt: 2026-04-13T15:30:00.000Z
+updatedAt: 2026-04-13T15:30:00.000Z
+notes: |
+  2026-04-13 태연 신규 draft:
+  - server-test-ci 스펙 P1-4/P1-5 참조 항목(leaderboard, oracle-cooldown 테스트)이 별도 flow 없이 참조만 된 상태 발견
+  - oracle-ranking-leaderboard 스펙 내 leaderboard 테스트 명세(8 케이스) 재활용
+  - oracle-cooldown.test.js 6개 케이스 신규 정의 (Redis mock 기반)
+  - server/package.json test 스크립트 확장 포함
+  - server-test-ci 착수 전 선행 완료 권장 (AC2 조건 충족 위해)

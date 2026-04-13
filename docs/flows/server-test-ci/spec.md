@@ -112,7 +112,7 @@ jobs:
 | AC | 내용 |
 |----|------|
 | AC1 | `server/**` 경로 변경 push 시 워크플로 자동 트리거 확인 |
-| AC2 | `npm test` 실행 결과 전체 통과 — combat(17), points(18), matchmaker, e2e-flow(7단계), load, gemini-cost |
+| AC2 | `npm test` 실행 결과 전체 통과 — combat(17), points(18), matchmaker, e2e-flow(7단계), load, gemini-cost, **leaderboard(8)**, **oracle-cooldown(6)** (`server-unit-tests-expansion` 완료 후) |
 | AC3 | 테스트 실패 시 GitHub PR 상태 체크 blocking (머지 차단) |
 | AC4 | Node.js 20, Redis 7, PostgreSQL 15 서비스 컨테이너 정상 기동 및 헬스체크 통과 |
 | AC5 | `server/**` 외 경로만 변경 시 워크플로 미실행 (`paths` 필터 동작 확인) |
