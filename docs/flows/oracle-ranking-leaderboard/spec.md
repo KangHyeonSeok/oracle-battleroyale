@@ -1,7 +1,7 @@
 ---
 specId: oracle-ranking-leaderboard
 title: 성좌 랭킹 리더보드
-status: ready
+status: queued
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant
