@@ -2,6 +2,55 @@
 
 ---
 
+## 2026-04-13 점검 11회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js / Express · 클라이언트: Godot 4.3 WebAssembly (수정 7파일 + 신규 4파일 unstaged 지속)
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p99 < 1,000ms | 실측 p99 ≈ 2.3ms |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ $0.005/게임 한도 내 | 정적 계산 ($0.001416 실측) |
+| `npm test` 스크립트 | `package.json` | ✅ **해결** | node 직접 실행 6파일, P0-1 해소 유지 |
+| CI 서버 테스트 워크플로 | `.github/workflows/` | ❌ 미포함 | **P0-2 — 11회차 연속 미해결** |
+| oracle-cooldown 단위 테스트 | — | ❌ 부재 | **P1-4 긴급** — status=done이나 테스트 없이 머지된 상태 유지 |
+| oracle-ranking-leaderboard 테스트 | — | ❌ 부재 | **P1-5** — in-flight, AC7(Main.gd 라우팅)·AC8(my_account_id)·AC9(tiebreak) 미구현 |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (7개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | — | ❌ 부재 | P2-1 — unstaged 파일 11개, 위험도 최고 |
+
+### 발견한 문제점 (10회차 대비 신규 변동)
+
+1. **CI 워크플로 계속 미생성** — P0-2가 11회차 연속 블로킹 상태. `client-web-export.yml`만 존재하며 서버 테스트 자동화 없음.
+2. **oracle-cooldown 테스트 여전히 부재** — P1-4, status=done으로 완료됐으나 쿨다운 로직(Redis TTL 60s, HTTP 429, matchId 격리)에 대한 단위 테스트 없음. 사후 보완 미착수.
+3. **oracle-ranking-leaderboard AC 미구현 지속** — spec.md에 AC 9개 확정(tiebreak: `total_wins DESC → created_at ASC`, displayName NULLIF 패턴, LEFT JOIN 필수 명시)됐으나 AC7·AC8·AC9 runner 처리 대기 중.
+4. **Godot unstaged 파일 11개 유지** — 수정 7개(Arena.gd·CharacterCreateScreen.gd·CharacterListScreen.gd·GameState.gd·Main.gd·MatchWaitingScreen.gd·OracleStreamPanel.gd) + 신규 4개(LeaderboardScreen.tscn·SpectateListScreen.tscn·LeaderboardScreen.gd·SpectateListScreen.gd) 전량 무검증 지속. P2-1 위험 최고 수준.
+5. **신규 플로우 추가** — `character-class-guide` 플로우가 draft→queued 전환됨(2a7249b). 해당 플로우 관련 테스트 전략 미정.
+6. **스텁 기반 통합 테스트 구조적 한계 지속** — PostgreSQL, Redis, Gemini 모두 모킹. 실 서비스 회귀 감지 불가.
+
+### 개선 제안 상태 (11회차 기준)
+
+| 우선순위 | 작업 | 상태 | 구현 규모 |
+|----------|------|------|-----------|
+| P0-2 | `.github/workflows/server-test.yml` 생성 (push/PR 트리거, `npm test` 실행) | ⏳ hyeonseok 착수 승인 대기 (11회 연속) | ~20줄 |
+| P1-1 | 실 WebSocket 통합 테스트 (`ws` 클라이언트 + `redis-memory-server`) | 🔲 미착수 | ~100줄 |
+| P1-2 | `pg-mem` 마이그레이션 스모크 테스트 (7개 SQL 순서 적용) | 🔲 미착수 | ~60줄 |
+| P1-3 | 커스텀 assert → `node:test` 표준화 | 🔲 미착수 | ~50줄 |
+| P1-4 | `oracle-cooldown` 쿨다운 로직 단위 테스트 (Redis TTL 60s, HTTP 429, matchId 격리) | 🔴 **긴급** — status=done이나 테스트 없이 머지 상태 지속 | ~40줄 |
+| P1-5 | `oracle-ranking-leaderboard` 정렬·집계 단위 테스트 (tiebreak, LEFT JOIN, displayName NULLIF) | 🔴 in-flight AC7/AC8/AC9 구현 전 작성 필요 | ~40줄 |
+| P2-1 | Playwright E2E: 로그인→캐릭터 생성→신탁 전송 자동화 | 🔲 미착수 — unstaged 파일 11개 위험 최고 | 별도 스펙 필요 |
+| P2-2 | Gemini 응답 계약 테스트 (zod 스키마) | 🔲 미착수 | ~30줄 |
+| P2-3 | 부하 테스트 CI 기준선 등록 (p95 < 1,000ms) | 🔲 미착수 | CI 워크플로 확장 |
+
+**11회차 진단**: 10회차 대비 구조적 변화 없음. `npm test` 정상 동작(P0-1 유지), CI 워크플로(P0-2) 11회차 연속 미해결로 단일 P0 블로커. oracle-cooldown은 done이나 P1-4 사후 보완 미착수, oracle-ranking-leaderboard는 spec 완성도 향상(AC 9개 확정)됐으나 AC7·AC8·AC9 구현 대기 중. Godot unstaged 11개 파일이 무검증 상태로 가장 높은 실질 위험. **hyeonseok에게 P0-2 착수 결정, P1-4 DevourerKing 사후 보완 착수 요청 시급.**
+
+---
+
 ## 2026-04-13 점검 10회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
 
 ### 현재 테스트 커버리지 상태
