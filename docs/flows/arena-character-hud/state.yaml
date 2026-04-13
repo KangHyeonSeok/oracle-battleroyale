@@ -11,3 +11,9 @@ notes: |
   - 의존성: phase-5-client-godot, oracle-ui-design 모두 done ✓
   - match-history runner 완료 후 다음 구현 대상으로 검토 권장
   2026-04-13 태연: draft → queued 전환. 의존성(phase-3-game-server, phase-5-client-godot, oracle-ui-design) 전부 done 확인.
+  2026-04-13 태연 스케줄 스펙 보강:
+  - spec.md status draft→queued 동기화
+  - Main.gd 색상 상수(BG_CARD/ACCENT_PURPLE/TEXT_SECONDARY) 미정의 확인 → spec에 const 추가 가이드 명시
+  - ScrollContainer 래핑 구현 코드 추가 (_char_hud_scroll 변수, SCROLL_MODE_AUTO)
+  - 엣지케이스 8명 초과 처리 코드 가이드 구체화
+  - 미구현: Main.gd 전체 (runner 착수 대기 중, match-history 완료 후 권장)

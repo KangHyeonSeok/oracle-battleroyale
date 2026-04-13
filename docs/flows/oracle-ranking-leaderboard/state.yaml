@@ -39,3 +39,7 @@ notes: |
   - AC9 구현 완료: leaderboard.js ORDER BY에 tiebreak 추가 (total_wins DESC, created_at ASC)
   - AC8 스펙 보강: /auth/me 응답 id 필드 기준 my_account_id 주입 코드 가이드 추가
   - 잔여 미구현: AC7(Main.gd 라우팅), AC8(my_account_id 주입) — runner 처리 대기
+  2026-04-13 태연 스케줄 (5차) 구현 재확인:
+  - Main.gd: _leaderboard_screen 변수 없음, leaderboard_requested 시그널 연결 없음 → AC7 미구현 재확인
+  - AC9 tiebreak: leaderboard.js ORDER BY constellation_points DESC, total_wins DESC, created_at ASC 확인 ✓ (4차에 완료)
+  - 잔여: AC7, AC8 (runner 처리 대기)

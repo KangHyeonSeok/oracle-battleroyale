@@ -1,7 +1,7 @@
 ---
 specId: arena-character-hud
 title: 아레나 캐릭터 상태 HUD
-status: draft
+status: queued
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant
@@ -33,25 +33,45 @@ dependsOn:
 
 **변경 내용만 기술. 기존 코드 유지.**
 
+#### 0. 색상 상수 추가 (Main.gd 스크립트 상단)
+
+Main.gd는 현재 색상 상수를 스크립트 레벨 const로 정의하지 않고 인라인 `Color()` 값을 사용함.
+아래 상수를 스크립트 상단에 추가하거나, 구현 시 인라인 Color 값으로 대체 가능:
+
+```gdscript
+const BG_CARD        := Color(1, 1, 1, 0.06)
+const ACCENT_PURPLE  := Color(0.545, 0.361, 0.965)
+const TEXT_SECONDARY := Color(1, 1, 1, 0.6)
+```
+
+> `_spectator_badge.modulate = Color(0.545, 0.361, 0.965)` 에서 이미 ACCENT_PURPLE 인라인 사용 중. 중복 정의 시 const로 교체 가능.
+
 #### 1. 캐릭터 HUD 스트립 변수 추가
 
 ```gdscript
-var _char_hud_strip: HBoxContainer   # 캐릭터 카드 컨테이너
-var _char_hud_cards: Dictionary = {} # character_id → Control
+var _char_hud_scroll: ScrollContainer  # 가로 스크롤 (8명 초과 대비)
+var _char_hud_strip: HBoxContainer     # 캐릭터 카드 컨테이너
+var _char_hud_cards: Dictionary = {}   # character_id → Control
 ```
 
 #### 2. `_build_ui()` — HUD 하단에 캐릭터 스트립 추가
 
-`_hud` 기존 레이블 3개 이후 추가. 화면 하단 anchor 고정:
+`_hud` 기존 레이블 3개 이후 추가. 화면 하단 anchor 고정.
+8명 초과 대비 ScrollContainer로 감쌈:
 
 ```gdscript
-# ── 캐릭터 상태 스트립 ──
+# ── 캐릭터 상태 스트립 (ScrollContainer 래핑) ──
+_char_hud_scroll = ScrollContainer.new()
+_char_hud_scroll.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+_char_hud_scroll.offset_top = -90
+_char_hud_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+_char_hud_scroll.vertical_scroll_mode   = ScrollContainer.SCROLL_MODE_DISABLED
+_hud.add_child(_char_hud_scroll)
+
 _char_hud_strip = HBoxContainer.new()
-_char_hud_strip.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-_char_hud_strip.position.y = -90
 _char_hud_strip.add_theme_constant_override("separation", 6)
 _char_hud_strip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-_hud.add_child(_char_hud_strip)
+_char_hud_scroll.add_child(_char_hud_strip)
 ```
 
 #### 3. `_refresh_hud()` — 캐릭터 카드 갱신
@@ -208,7 +228,7 @@ func _update_char_hud_card(card: Control, data: Dictionary) -> void:
 | 케이스 | 처리 |
 |--------|------|
 | 관전자 모드 (spectator) | `_selected_character` 없음 → 내 캐릭터 강조 없이 모든 카드 표시 |
-| 캐릭터 8명 초과 | 카드 컨테이너를 ScrollContainer로 래핑하여 수평 스크롤 처리 |
+| 캐릭터 8명 초과 | `_char_hud_scroll` ScrollContainer 수평 스크롤 자동 활성화 (SCROLL_MODE_AUTO) |
 | max_hp = 0 (데이터 오류) | ratio = 0으로 처리, 크래시 방지 |
 | characters 배열 비어있음 | 카드 추가 없이 빈 스트립 유지 |
 
