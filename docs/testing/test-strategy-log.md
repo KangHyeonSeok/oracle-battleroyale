@@ -2,6 +2,49 @@
 
 ---
 
+## 2026-04-13 점검 17회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js / Express (26 모듈) · 클라이언트: Godot 4.3 WebAssembly (unstaged 11파일 지속)
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p99 < 1,000ms | 실측 p99 ≈ 7.3ms |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ $0.005/게임 한도 내 | 정적 계산 ($0.001416 실측) |
+| CI 서버 테스트 워크플로 | `.github/workflows/` | ❌ 미포함 | **P0-2 — 17회차 연속** (spec 생성됨, 착수 승인 대기) |
+| oracle-cooldown 단위 테스트 | `test/oracle-cooldown.test.js` | ❌ 부재 | **P1-4** — spec 테스트 명세 완비, DevourerKing 미착수 |
+| oracle-ranking-leaderboard 단위 테스트 | `test/leaderboard.test.js` | ❌ 부재 | **P1-5** — spec 테스트 명세 완비, DevourerKing 미착수 |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (9개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | — | ❌ 부재 | P2-1 — unstaged 11개 무검증 지속 |
+
+### 발견한 문제점 (16회차 대비)
+
+1. **P0-2 CI 워크플로 17회차 연속 미해결** — `server-test-ci` spec은 완성 상태. push/PR 트리거, Node.js 20, Redis 7, PostgreSQL 15, AC 5개 명세 완비. hyeonseok 착수 승인만 남은 상태에서 진전 없음.
+2. **P1-4·P1-5 DevourerKing 착수 미확인** — oracle-cooldown spec (7케이스), oracle-ranking-leaderboard spec (8케이스) 모두 작성 완료. 구현 완료 모듈에 테스트 없이 라이브 상태 지속.
+3. **Godot unstaged 11파일 무검증 지속** — 수정 7개 + 신규 4개 (LeaderboardScreen, SpectateListScreen). 클라이언트 변경이 테스트 없이 누적.
+4. **스텁 기반 통합 테스트 구조적 한계 지속** — PostgreSQL, Redis, Gemini 전량 모킹. 실 서비스 회귀 감지 불가. P1-1·P1-2 미착수.
+
+### 개선 제안 (우선순위 포함)
+
+| 우선순위 | 작업 | 상태 | 규모 |
+|----------|------|------|------|
+| **P0-2** | `.github/workflows/server-test.yml` — `server-test-ci` spec 기준 구현 | ⏳ **hyeonseok 착수 승인 대기 (17회 연속)** | ~30줄 |
+| **P1-4** | `test/oracle-cooldown.test.js` — Redis TTL 60s mock, HTTP 429, matchId 격리 | 🔴 spec 테스트 명세 완비 — DevourerKing 즉시 착수 가능 | ~50줄 |
+| **P1-5** | `test/leaderboard.test.js` — tiebreak, NULL, limit, displayName fallback | 🔴 spec 테스트 명세 완비 — DevourerKing 즉시 착수 가능 | ~50줄 |
+| **P1-1** | 실 WebSocket 통합 테스트 — `ws` 클라이언트 + `redis-memory-server` | 🔲 미착수 | ~100줄 |
+| **P1-2** | `pg-mem` 마이그레이션 스모크 테스트 — 9개 SQL 순서 적용 검증 | 🔲 미착수 | ~60줄 |
+| **P2-1** | Playwright E2E — `playwright-debug-setup` spec 기준 구현 | 🔲 spec 있음, 미구현 | TBD |
+
+**17회차 진단**: 16회차 대비 테스트 구조 변화 없음. 서버 단위 6개 모두 통과 상태 유지. P0-2는 `server-test-ci` spec이 완성 상태임에도 17회차 연속 착수 보류 — hyeonseok 의사결정 재요청 필요. P1-4·P1-5 DevourerKing 핸드오프 문서 완비 상태 → 착수 확인이 필요한 시점.
+
+---
+
 ## 2026-04-13 점검 16회차 (태연 스케줄 점검 — oracle-battleroyale 스펙 보강)
 
 ### 이번 회차 작업 내용
