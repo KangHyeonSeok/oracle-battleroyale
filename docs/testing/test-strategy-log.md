@@ -2,6 +2,49 @@
 
 ---
 
+## 2026-04-13 점검 21회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js / Express (26 모듈) · 클라이언트: Godot 4.3 WebAssembly (unstaged 11파일 지속)
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 20회차 스탯 누락 버그 수정 후 회귀 없음 확인 |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p99 ≈ 5.3ms | SLA 1,000ms 이하 유지 (20회차 5.9ms 대비 소폭 개선) |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ $0.001416 | 예산 $0.005 이하 유지 |
+| oracle-cooldown 단위 | `test/oracle-cooldown.test.js` | ❌ 부재 | **P1-4** — server-unit-tests-expansion queued (in-flight→queued 재전환, runner 미시작 재확인) |
+| leaderboard 단위 | `test/leaderboard.test.js` | ❌ 부재 | **P1-5** — server-unit-tests-expansion queued 동일 |
+| CI 서버 테스트 워크플로 | `.github/workflows/server-test.yml` | ❌ 미포함 | **P0-2 — 21회차 연속** (server-test-ci needs-review, hyeonseok 착수 승인 대기) |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (9개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | `tests/smoke.spec.js` | ⚠️ canvas 렌더만 검증 | playwright-debug-setup done (JavaScriptBridge 구현 완료), WS·OAuth·매치 플로우 미검증 지속 |
+
+### 발견한 문제점 (20회차 대비)
+
+1. **P0-2 CI 워크플로 21회차 연속 미해결** — `server-test-ci` spec 완비(push/PR 트리거·Node.js 20·Redis 7·PostgreSQL 15·AC 5개). hyeonseok 착수 승인 없이 CI 없는 라이브 배포 21회 연속. 교착 상태 지속.
+2. **server-unit-tests-expansion in-flight → queued 재전환** — 이번 회차 중 flow 상태가 queued → in-flight → queued로 순환됨. runner가 실제로 시작되지 않아 `oracle-cooldown.test.js`·`leaderboard.test.js` 구현 미진행. 상태 전환만 반복되는 패턴 확인.
+3. **20회차 버그 수정 회귀 없음 확인** — `redis-state.js`·`matchmaker.js` 스탯 필드 버그 수정이 21회차에도 안정적으로 유지. p99 5.3ms로 소폭 개선.
+4. **스텁 기반 통합 테스트 구조적 한계 지속** — `e2e-flow.test.js`가 PostgreSQL·Redis·Gemini를 전량 Module stub으로 대체. `redis-memory-server`(devDependency 설치됨) 21회 연속 미활용.
+5. **Godot 클라이언트 unstaged 11파일 무검증 지속** — `playwright-debug-setup` done 이후에도 신규 GDScript 변경분이 E2E 없이 라이브 상태.
+
+### 개선 제안 (우선순위 포함)
+
+| 우선순위 | 작업 | 상태 | 규모 |
+|----------|------|------|------|
+| **P0-2** | `.github/workflows/server-test.yml` — `server-test-ci` spec 기준 구현 | ⏳ **needs-review — hyeonseok 착수 승인 대기 (21회 연속)** | ~30줄 |
+| **P1-4+P1-5** | `test/oracle-cooldown.test.js` + `test/leaderboard.test.js` — `server-unit-tests-expansion` spec 기준 구현 | 🟡 **queued — runner 착수 대기 (상태 순환 반복)** | ~100줄 합계 |
+| **P1-1** | 실 WebSocket 통합 테스트 — `ws` 클라이언트 + `redis-memory-server` 활용 | 🔲 미착수 (라이브러리 기설치, 장벽 낮음) | ~100줄 |
+| **P1-2** | `pg-mem` 마이그레이션 스모크 테스트 — 9개 SQL 순서 적용 검증 | 🔲 미착수 | ~60줄 |
+| **P2-1** | Playwright E2E 확장 — WS 연결·OAuth·매치 플로우 검증 (JavaScriptBridge 준비됨) | 🔲 spec 있음, smoke 수준 구현만 존재 | TBD |
+
+**21회차 진단**: 6/6 전체 통과로 20회차 버그 수정 안정성 확인. 그러나 server-unit-tests-expansion flow가 in-flight↔queued 상태를 반복하며 실제 runner 착수가 이루어지지 않는 패턴이 재확인됨 — flow 상태 관리가 아닌 실제 실행 여부를 판단 기준으로 삼을 필요. P0-2 CI는 21회차 연속 보류 — hyeonseok로부터 승인 or 명시적 보류 결정이 필요한 시점.
+
+---
+
 ## 2026-04-13 점검 20회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
 
 ### 현재 테스트 커버리지 상태
