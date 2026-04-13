@@ -1,9 +1,9 @@
 specId: server-test-ci
-status: queued
+status: needs-review
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T00:00:00.000Z
-updatedAt: 2026-04-13T17:00:00.000Z
+updatedAt: 2026-04-13T10:03:10.068Z
 notes: |
   2026-04-13 태연 신규 draft:
   - test-strategy-log 15회차 기준 P0-2 블로커 — CI 워크플로 15회 연속 미해결

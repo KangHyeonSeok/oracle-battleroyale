@@ -1,0 +1,62 @@
+name: Playwright Screenshot
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: '테스트할 URL (기본: 최근 배포 URL)'
+        required: false
+        default: 'https://oracle-battleroyale.vercel.app'
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        working-directory: tests
+        run: |
+          npm install
+          npx playwright install chromium --with-deps
+
+      - name: Run Playwright tests
+        working-directory: tests
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }}
+        run: npx playwright test || true  # 실패해도 스크린샷은 저장
+
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: tests/test-results/
+
+      - name: Send screenshots to Slack
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          RUN_URL="https://github.com/KangHyeonSeok/oracle-battleroyale/actions/runs/${GITHUB_RUN_ID}"
+          # 텍스트 결과 먼저 전송
+          curl -s -X POST "https://slack.com/api/chat.postMessage" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"channel\": \"C0ANSP7FU91\",
+              \"text\": \"🎭 Playwright 스크린샷 완료\nURL: ${{ github.event.inputs.base_url }}\ncommit: \`${SHORT_SHA}\`\nArtifacts: ${RUN_URL}\"
+            }"
+          # 스크린샷 파일 업로드
+          for f in tests/test-results/*.png; do
+            [ -f "$f" ] || continue
+            curl -s -X POST "https://slack.com/api/files.uploadV2" \
+              -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+              -F "channels=C0ANSP7FU91" \
+              -F "file=@$f" \
+              -F "filename=$(basename $f)"
+          done

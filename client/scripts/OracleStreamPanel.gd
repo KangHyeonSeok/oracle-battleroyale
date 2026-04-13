@@ -3,10 +3,15 @@
 ## Both participants and spectators can send oracles.
 extends Control
 
-const GOLD    := Color(1.0, 0.85, 0.0)
-const PURPLE  := Color(0.55, 0.36, 0.96)
-const SUCCESS := Color(0.3, 0.9, 0.5)
-const FAIL    := Color(0.9, 0.3, 0.3)
+const BG_BASE       := Color(0.071, 0.071, 0.133)
+const BG_CARD       := Color(1, 1, 1, 0.06)
+const BORDER_CARD   := Color(1, 1, 1, 0.12)
+const ACCENT_GOLD   := Color(1.0, 0.843, 0.0)
+const ACCENT_PURPLE := Color(0.545, 0.361, 0.965)
+const TEXT_PRIMARY  := Color(1, 1, 1)
+const TEXT_SECONDARY := Color(1, 1, 1, 0.6)
+const SUCCESS       := Color(0.063, 0.725, 0.506)
+const DANGER        := Color(0.937, 0.267, 0.267)
 const SPECTATOR_COLOR := Color(0.5, 0.8, 1.0)
 
 var is_spectator: bool = false
@@ -18,6 +23,8 @@ var _target_option: OptionButton
 var _oracle_input: LineEdit
 var _cost_lbl: Label
 var _send_btn: Button
+## Container wrapping the oracle-send UI (target, input, send row). Hidden for spectators.
+var _oracle_send_panel: VBoxContainer
 
 func _ready() -> void:
 	_font = ResourceLoader.load("res://fonts/NotoSansKR.ttf") as FontFile
@@ -36,7 +43,7 @@ func _build_ui() -> void:
 
 	var bg := ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = Color(0.05, 0.05, 0.12, 0.92)
+	bg.color = Color(BG_BASE.r, BG_BASE.g, BG_BASE.b, 0.92)
 	add_child(bg)
 
 	var root := VBoxContainer.new()
@@ -51,7 +58,7 @@ func _build_ui() -> void:
 	# Header
 	var header := Label.new()
 	header.text = "신탁 스트림"
-	header.modulate = GOLD
+	header.modulate = ACCENT_GOLD
 	header.add_theme_font_size_override("font_size", 15)
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(header)
@@ -72,10 +79,15 @@ func _build_ui() -> void:
 	var sep := HSeparator.new()
 	root.add_child(sep)
 
+	# Oracle send panel — hidden when is_spectator = true
+	_oracle_send_panel = VBoxContainer.new()
+	_oracle_send_panel.add_theme_constant_override("separation", 4)
+	root.add_child(_oracle_send_panel)
+
 	# Target selector
 	var target_row := HBoxContainer.new()
 	target_row.add_theme_constant_override("separation", 6)
-	root.add_child(target_row)
+	_oracle_send_panel.add_child(target_row)
 
 	var target_lbl := Label.new()
 	target_lbl.text = "대상:"
@@ -96,16 +108,16 @@ func _build_ui() -> void:
 	_oracle_input.add_theme_font_size_override("font_size", 12)
 	_apply_font(_oracle_input)
 	_oracle_input.text_submitted.connect(func(_t: String) -> void: _on_send_pressed())
-	root.add_child(_oracle_input)
+	_oracle_send_panel.add_child(_oracle_input)
 
 	# Send row
 	var send_row := HBoxContainer.new()
 	send_row.add_theme_constant_override("separation", 6)
-	root.add_child(send_row)
+	_oracle_send_panel.add_child(send_row)
 
 	_cost_lbl = Label.new()
 	_cost_lbl.text = "신탁 비용: 50pt"
-	_cost_lbl.modulate = Color(0.7, 0.7, 0.9)
+	_cost_lbl.modulate = TEXT_SECONDARY
 	_cost_lbl.add_theme_font_size_override("font_size", 12)
 	_cost_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_apply_font(_cost_lbl)
@@ -114,11 +126,17 @@ func _build_ui() -> void:
 	_send_btn = Button.new()
 	_send_btn.text = "신탁 전송"
 	_send_btn.custom_minimum_size = Vector2(80, 32)
-	_send_btn.modulate = GOLD
+	_send_btn.modulate = ACCENT_GOLD
 	_send_btn.add_theme_font_size_override("font_size", 12)
 	_apply_font(_send_btn)
 	_send_btn.pressed.connect(_on_send_pressed)
 	send_row.add_child(_send_btn)
+
+## Toggle spectator mode: hides the oracle send UI when spectating.
+func set_spectator_mode(spectating: bool) -> void:
+	is_spectator = spectating
+	if _oracle_send_panel:
+		_oracle_send_panel.visible = not spectating
 
 func add_message(msg: Dictionary) -> void:
 	var row := _make_message_row(msg)
@@ -138,7 +156,7 @@ func _make_message_row(msg: Dictionary) -> Control:
 		"system":
 			var lbl := Label.new()
 			lbl.text = "[시스템] " + msg.get("text", "")
-			lbl.modulate = PURPLE
+			lbl.modulate = ACCENT_PURPLE
 			lbl.add_theme_font_size_override("font_size", 12)
 			lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			_apply_font(lbl)
@@ -175,7 +193,7 @@ func _make_message_row(msg: Dictionary) -> Control:
 
 			var route_lbl := Label.new()
 			route_lbl.text = "%s → %s" % [sender, target]
-			route_lbl.modulate = GOLD
+			route_lbl.modulate = ACCENT_GOLD
 			route_lbl.add_theme_font_size_override("font_size", 12)
 			route_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			_apply_font(route_lbl)
@@ -183,14 +201,14 @@ func _make_message_row(msg: Dictionary) -> Control:
 
 			var badge := Label.new()
 			badge.text = "성공" if success else "실패"
-			badge.modulate = SUCCESS if success else FAIL
+			badge.modulate = SUCCESS if success else DANGER
 			badge.add_theme_font_size_override("font_size", 11)
 			_apply_font(badge)
 			hbox.add_child(badge)
 
 			var body_lbl := Label.new()
 			body_lbl.text = text
-			body_lbl.modulate = Color(0.85, 0.85, 1.0)
+			body_lbl.modulate = TEXT_PRIMARY
 			body_lbl.add_theme_font_size_override("font_size", 12)
 			body_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			_apply_font(body_lbl)

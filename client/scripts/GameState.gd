@@ -38,6 +38,9 @@ var oracle_stream_messages: Array = []
 # Matchmaking queue state
 var queue_participant_count: int = 0
 
+# Death tracking for rankings (list of {id, name, class, turn} in elimination order)
+var death_log: Array = []
+
 func _ready() -> void:
 	WebSocketClient.message_received.connect(_on_message)
 	WebSocketClient.connected_to_server.connect(_on_connected)
@@ -56,6 +59,7 @@ func _on_message(data: Dictionary) -> void:
 		"joined_match":
 			current_match_id = data.get("matchId", -1)
 			is_in_game = true
+			death_log.clear()
 			match_joined.emit(current_match_id)
 		"state_sync":
 			_apply_state(data.get("state", {}))
@@ -64,6 +68,20 @@ func _on_message(data: Dictionary) -> void:
 			characters = data.get("characters", [])
 			alive_count = data.get("aliveCount", 0)
 			var events: Array = data.get("events", [])
+			# Track deaths for rankings
+			for ev in events:
+				if ev.get("type", "") == "death":
+					var dead_char := {}
+					for c in characters:
+						if c.get("id", -1) == ev.get("characterId", -1):
+							dead_char = c
+							break
+					death_log.append({
+						"id":    ev.get("characterId", -1),
+						"name":  ev.get("name", "?"),
+						"class": dead_char.get("class", "?"),
+						"eliminated_turn": ev.get("turn", current_turn),
+					})
 			characters_updated.emit(characters)
 			turn_advanced.emit(current_turn, events)
 			_check_oracle_events(events)

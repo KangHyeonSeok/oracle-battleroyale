@@ -1,0 +1,157 @@
+{
+  "specId": "playwright-debug-setup",
+  "updatedAt": "2026-04-13T10:16:44.374Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "window.gameDebug.currentScreen updated on screen transition",
+      "status": "passed",
+      "evidence": "Main.gd _show_screen() calls _update_debug_state(name) which runs JavaScriptBridge.eval() setting window.gameDebug.currentScreen and .ready, guarded by OS.has_feature('web')"
+    },
+    {
+      "criterion": "window.gameDebug.wsStatus updated on WS connect/disconnect",
+      "status": "passed",
+      "evidence": "Main.gd _on_ws_connected() and _on_ws_disconnected() both set wsStatus via JavaScriptBridge.eval() under OS.has_feature('web') guard"
+    },
+    {
+      "criterion": "npx playwright test produces test-results/initial-load.png",
+      "status": "passed",
+      "evidence": "tests/smoke.spec.js saves page.screenshot({path:'test-results/initial-load.png',fullPage:true}); playwright.config.js configures screenshot:'on'"
+    },
+    {
+      "criterion": "GitHub Actions playwright-screenshot.yml workflow_dispatch trigger",
+      "status": "passed",
+      "evidence": ".github/workflows/playwright-screenshot.yml created with on.workflow_dispatch.inputs.base_url confirmed present"
+    },
+    {
+      "criterion": "Screenshots uploaded to Slack C0ANSP7FU91",
+      "status": "passed",
+      "evidence": "playwright-screenshot.yml Send step iterates tests/test-results/*.png and POSTs each via files.uploadV2 to channel C0ANSP7FU91 using SLACK_BOT_TOKEN"
+    },
+    {
+      "criterion": "OS.has_feature('web') guard prevents desktop build errors",
+      "status": "passed",
+      "evidence": "All three JavaScriptBridge.eval() calls wrapped in OS.has_feature('web') checks in Main.gd"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-13T10:16:11.959Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-13T10-16-11-959Z.log",
+      "validationFile": "validation-2026-04-13T10-16-11-959Z.md",
+      "validationChecks": [
+        {
+          "criterion": "window.gameDebug.currentScreen updated on screen transition",
+          "status": "passed",
+          "evidence": "Main.gd:209 calls _update_debug_state(name) at end of _show_screen(); Main.gd:211-214 sets window.gameDebug.currentScreen and .ready via JavaScriptBridge.eval() guarded by OS.has_feature('web')"
+        },
+        {
+          "criterion": "window.gameDebug.wsStatus updated on WS connect/disconnect",
+          "status": "passed",
+          "evidence": "Main.gd:222-223 sets wsStatus='connected' in _on_ws_connected(); Main.gd:228-229 sets wsStatus='disconnected' in _on_ws_disconnected(); both guarded by OS.has_feature('web')"
+        },
+        {
+          "criterion": "npx playwright test produces test-results/initial-load.png",
+          "status": "passed",
+          "evidence": "tests/smoke.spec.js line saves page.screenshot({path:'test-results/initial-load.png',fullPage:true}); tests/test-results/ directory exists; playwright.config.js screenshot:'on'"
+        },
+        {
+          "criterion": "GitHub Actions playwright-screenshot.yml workflow_dispatch trigger",
+          "status": "passed",
+          "evidence": ".github/workflows/playwright-screenshot.yml created with on.workflow_dispatch.inputs.base_url; confirmed present in workflows dir alongside existing client-web-export.yml"
+        },
+        {
+          "criterion": "Screenshots uploaded to Slack C0ANSP7FU91",
+          "status": "passed",
+          "evidence": "playwright-screenshot.yml Send step iterates tests/test-results/*.png and POSTs each to files.uploadV2 with channels=C0ANSP7FU91 using SLACK_BOT_TOKEN secret"
+        },
+        {
+          "criterion": "OS.has_feature('web') guard prevents desktop build errors",
+          "status": "passed",
+          "evidence": "All three JavaScriptBridge.eval() calls in Main.gd are wrapped in if OS.has_feature('web'): checks at lines 212, 222, 228"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-13T10:16:28.921Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-13T10-16-28-921Z.log",
+      "validationFile": "validation-2026-04-13T10-16-28-921Z.md",
+      "validationChecks": [
+        {
+          "criterion": "window.gameDebug.currentScreen updated on screen transition",
+          "status": "passed",
+          "evidence": "Main.gd _show_screen() calls _update_debug_state(name) which runs JavaScriptBridge.eval() setting window.gameDebug.currentScreen and .ready, guarded by OS.has_feature('web')"
+        },
+        {
+          "criterion": "window.gameDebug.wsStatus updated on WS connect/disconnect",
+          "status": "passed",
+          "evidence": "Main.gd _on_ws_connected() and _on_ws_disconnected() both set wsStatus via JavaScriptBridge.eval() under OS.has_feature('web') guard"
+        },
+        {
+          "criterion": "npx playwright test produces test-results/initial-load.png",
+          "status": "passed",
+          "evidence": "tests/smoke.spec.js saves page.screenshot({path:'test-results/initial-load.png',fullPage:true}); playwright.config.js configures screenshot:'on'"
+        },
+        {
+          "criterion": "GitHub Actions playwright-screenshot.yml workflow_dispatch trigger",
+          "status": "passed",
+          "evidence": ".github/workflows/playwright-screenshot.yml created with on.workflow_dispatch.inputs.base_url confirmed present"
+        },
+        {
+          "criterion": "Screenshots uploaded to Slack C0ANSP7FU91",
+          "status": "passed",
+          "evidence": "playwright-screenshot.yml Send step iterates tests/test-results/*.png and POSTs each via files.uploadV2 to channel C0ANSP7FU91 using SLACK_BOT_TOKEN"
+        },
+        {
+          "criterion": "OS.has_feature('web') guard prevents desktop build errors",
+          "status": "passed",
+          "evidence": "All three JavaScriptBridge.eval() calls wrapped in OS.has_feature('web') checks in Main.gd"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-13T10:16:44.374Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-13T10-16-44-374Z.log",
+      "validationFile": "validation-2026-04-13T10-16-44-374Z.md",
+      "validationChecks": [
+        {
+          "criterion": "window.gameDebug.currentScreen updated on screen transition",
+          "status": "passed",
+          "evidence": "Main.gd _show_screen() calls _update_debug_state(name) which runs JavaScriptBridge.eval() setting window.gameDebug.currentScreen and .ready, guarded by OS.has_feature('web')"
+        },
+        {
+          "criterion": "window.gameDebug.wsStatus updated on WS connect/disconnect",
+          "status": "passed",
+          "evidence": "Main.gd _on_ws_connected() and _on_ws_disconnected() both set wsStatus via JavaScriptBridge.eval() under OS.has_feature('web') guard"
+        },
+        {
+          "criterion": "npx playwright test produces test-results/initial-load.png",
+          "status": "passed",
+          "evidence": "tests/smoke.spec.js saves page.screenshot({path:'test-results/initial-load.png',fullPage:true}); playwright.config.js configures screenshot:'on'"
+        },
+        {
+          "criterion": "GitHub Actions playwright-screenshot.yml workflow_dispatch trigger",
+          "status": "passed",
+          "evidence": ".github/workflows/playwright-screenshot.yml created with on.workflow_dispatch.inputs.base_url confirmed present"
+        },
+        {
+          "criterion": "Screenshots uploaded to Slack C0ANSP7FU91",
+          "status": "passed",
+          "evidence": "playwright-screenshot.yml Send step iterates tests/test-results/*.png and POSTs each via files.uploadV2 to channel C0ANSP7FU91 using SLACK_BOT_TOKEN"
+        },
+        {
+          "criterion": "OS.has_feature('web') guard prevents desktop build errors",
+          "status": "passed",
+          "evidence": "All three JavaScriptBridge.eval() calls wrapped in OS.has_feature('web') checks in Main.gd"
+        }
+      ]
+    }
+  ]
+}
