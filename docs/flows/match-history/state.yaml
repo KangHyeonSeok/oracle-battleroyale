@@ -3,7 +3,7 @@ status: in-flight
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T00:00:00.000Z
-updatedAt: 2026-04-13T10:00:00.000Z
+updatedAt: 2026-04-13T12:00:00.000Z
 notes: |
   2026-04-13 09:00 태연 스펙 리뷰:
   - server/src/history/ 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재 확인
@@ -27,3 +27,7 @@ notes: |
   - 엣지케이스: oracle 없음, oracle 100개 초과 2건 추가
   - MatchDetailScreen: isMe 강조, 신탁 없음 빈 상태 메시지 추가
   - AC8(isMe 강조), AC9(oracleCount) 추가 → 총 9개 AC
+  2026-04-13 태연 스케줄 최종 확인:
+  - CharacterListScreen.gd에 history_requested 시그널·"경기 기록" 버튼 미존재 재확인 (AC6 미구현)
+  - leaderboard_requested 시그널은 있음 → AC6 우선순위 유지
+  - 스펙 AC/엣지케이스 이상 없음 → runner 완료 대기 유지

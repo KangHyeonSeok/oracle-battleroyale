@@ -1,7 +1,7 @@
 ---
 specId: oracle-ranking-leaderboard
 title: 성좌 랭킹 리더보드
-status: queued
+status: in-flight
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant
@@ -198,7 +198,7 @@ cd server && node test/leaderboard.test.js
 | oracle_points 동점 | `total_wins DESC` → 동점 시 `accounts.created_at ASC` (먼저 가입한 순) 로 tiebreak | 동점 처리는 서버 정렬 결과 그대로 표시 |
 | `player_stats` 행 없는 계정 (경기 미참가) | LEFT JOIN 사용 → total_matches=0, total_wins=0, oracle_sent=0, winRate=0 으로 처리 | 표시상 변화 없음 |
 | 로그인하지 않은 상태에서 내 순위 강조 | `myAccountId` 없음 → `isMe=false` 로 모든 행 처리 | accent-purple 강조 행 없음 |
-| displayName 미설정 계정 | `accounts.name` NULL 시 `"(이름 없음)"` fallback | 이탤릭체·dimmed 색상으로 표시 |
+| displayName 빈 문자열 계정 | `users.display_name`은 `NOT NULL`이지만 빈 문자열(`''`) 가능 → `NULLIF(display_name, '') IS NULL` 시 `"(이름 없음)"` fallback 적용 | 이탤릭체·dimmed 색상으로 표시 |
 
 ---
 
@@ -207,6 +207,6 @@ cd server && node test/leaderboard.test.js
 - 인증 불필요 (공개 엔드포인트) — MVP 단계에서 rate limit 없음
 - `player_stats` 집계는 실시간 쿼리 대신 경기 종료 시점 upsert (성능 단순화)
 - `player_stats` 행이 없는 계정에 대해 LEFT JOIN 사용 필수 (신규 계정 오류 방지)
-- displayName은 `accounts` 테이블의 기존 name 또는 Google OAuth 프로필 이름 사용
+- displayName은 `users.display_name` (NOT NULL, 빈 문자열 시 `"(이름 없음)"` fallback 적용)
 - Web Export 환경 고려: `HTTPRequest` 노드 사용 (fetch API 아님)
 - tiebreak 정렬 기준: oracle_points DESC → total_wins DESC → created_at ASC
