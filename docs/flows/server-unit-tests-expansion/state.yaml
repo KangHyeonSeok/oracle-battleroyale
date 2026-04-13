@@ -21,3 +21,11 @@ notes: |
   - oracle-ranking-leaderboard: getLeaderboard() 서버 구현 완료(AC9 tiebreak 포함) ✓
     (AC7/AC8 클라이언트 미구현이나 서버 테스트와 무관)
   - spec.md 동기화 완료
+  2026-04-13 태연 스케줄 spec/state 동기화:
+  - state.yaml: in-flight, spec.md: queued 불일치 발견 → spec.md status in-flight로 수정
+  - 구현 검증:
+    · setRedisClient: oracle/routes.js:34+:182 export 확인 ✓
+    · cooldownKey: 비공개 함수, inline 재현(oracle:cooldown:{userId}:{matchId}) 가이드 정확 ✓
+    · pool.js exports: { pool } 구조 확인 → 테스트 mock `{ pool: poolMock }` 패턴 정확 ✓
+    · leaderboard.js tiebreak: ORDER BY constellation_points DESC, total_wins DESC, created_at ASC (:29-31) ✓
+  - runner 착수 준비 완료

@@ -1,7 +1,7 @@
 ---
 specId: server-unit-tests-expansion
 title: 서버 단위 테스트 확장 (리더보드 + 신탁 쿨다운)
-status: queued
+status: in-flight
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant

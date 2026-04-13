@@ -22,3 +22,14 @@ notes: |
     · :242-243 클래스 선택 시 `_preview_class.text = "클래스: " + cls_str` 업데이트 있음
     · CLASS_DATA, 가이드 패널 변수, _update_class_guide() 없음 → 전체 미구현 확인
   - spec.md에 정확한 line 참조 보강 (수정 대상 파악 용이)
+  2026-04-13 태연 스케줄 스펙 재작성 (긴급 수정):
+  - 기존 spec의 UX 전제 오류 발견: CharacterCreateScreen에는 클래스 선택 버튼 없음
+  - 실제 플로우: 이름+프롬프트 → AI 분석(preview_character WS) → character_preview 수신 → _populate_preview() 호출
+  - 기존 spec은 존재하지 않는 _on_class_selected()를 hook으로 지정 → runner 구현 불가 상태였음
+  - 수정 내용:
+    · hook 포인트: _on_class_selected() → _populate_preview() (:241)
+    · 클래스 버튼 목록 UI 제거 (존재하지 않는 UI)
+    · CLASS_DATA 간소화: speed+desc만 (HP/ATK/DEF는 서버 응답에서 직접 수신)
+    · AC 재정의: 클래스 버튼 관련 → AI 분석 결과 수신 후 가이드 표시
+    · 변경 범위 최소화: _populate_preview() 한 줄 추가 + 라벨 2개 빌드
+  - runner 착수 전 스펙 수정 완료 (구현 차단 해소)

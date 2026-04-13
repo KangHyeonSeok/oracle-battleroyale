@@ -15,26 +15,33 @@ dependsOn:
 # character-class-guide: 캐릭터 클래스 가이드 패널
 
 ## 목표
-캐릭터 생성 화면에서 클래스를 선택할 때, 해당 클래스의 스탯(HP/ATK/DEF/Speed)과 플레이 스타일 설명을 우측 패널에 표시한다. 현재는 클래스 이름만 표시되어 신규 플레이어가 클래스 선택의 의미를 모른 채 생성하는 UX 문제가 있다.
+캐릭터 생성 화면에서 AI 분석 결과로 클래스가 결정된 뒤, 해당 클래스의 플레이 스타일 설명과 이동 속도를 프리뷰 패널에 추가 표시한다. 현재는 클래스 이름·HP/ATK/DEF만 표시되어 신규 플레이어가 클래스의 특성을 파악하기 어렵다.
 
 ## 배경
-- `class-balance` 스펙에서 6개 클래스 스탯 확정됨 (warrior/archer/mage/assassin/berserk/healer)
-- `npc-presets.js`에 동일 스탯 정의됨 (HP/ATK/DEF/Speed + ai_persona 설명)
-- `CharacterCreateScreen.gd`는 현재 클래스 선택 시 "클래스: warrior" 텍스트만 표시
-- 추가 서버 API 불필요 — 클라이언트 하드코딩으로 충분 (스탯은 이미 class-balance에서 확정됨)
+- `CharacterCreateScreen.gd`의 캐릭터 생성 플로우:
+  1. 이름 + 성격 프롬프트 입력
+  2. "AI로 스탯 분석하기" 버튼 클릭 → WS `preview_character` 전송
+  3. 서버 응답 `character_preview` 수신 → `_populate_preview(d)` 호출 (`:232–249`)
+  4. 프리뷰 패널 표시 (클래스명·HP/ATK/DEF·행동 성향)
+  5. "성좌 저장하기" 버튼으로 확정
+- **클래스 선택 버튼 없음** — 클래스는 AI가 결정, 유저가 직접 선택하는 UI 없음
+- 서버 응답에 `class, hp, atk, def`는 있으나 **speed(이동속도)**와 **플레이 스타일 설명**은 없음
+- `class-balance` 스펙에서 6개 클래스 speed + 특성 확정 → 클라이언트 하드코딩으로 보강
 
 ---
 
-## 클래스 데이터 (클라이언트 하드코딩)
+## 클래스 데이터 (클라이언트 하드코딩 — speed + desc 보강용)
 
-| 클래스 | 이름(표시) | Max HP | ATK | DEF | Speed | 특성 |
-|--------|-----------|--------|-----|-----|-------|------|
-| warrior  | 전사 | 150 | 10 | 10 | 1.0 | 균형형 탱커. 가장 가까운 적에게 돌진 |
-| archer   | 궁수 |  85 | 12 |  4 | 1.5 | 원거리 기동형. HP 50% 이하 시 후퇴 우선 |
-| mage     | 마법사 |  70 | 16 |  2 | 0.9 | 고화력 원거리. 접근 시 즉시 후퇴 |
-| assassin | 암살자 |  90 | 14 |  4 | 1.6 | 고속 돌격. 치명타 25% 확률(×2 데미지) |
-| berserk  | 광전사 | 100 | 18 |  3 | 1.3 | 무조건 돌격. HP 낮을수록 데미지 ×1.5 |
-| healer   | 힐러 | 120 |  6 |  8 | 1.0 | 아군 회복 우선. 공격력 약하고 방어 강함 |
+| 클래스 | 이름(표시) | Speed | 특성 |
+|--------|-----------|-------|------|
+| warrior  | 전사 | 1.0 | 균형형 탱커. 가장 가까운 적에게 돌진 |
+| archer   | 궁수 | 1.5 | 원거리 기동형. HP 50% 이하 시 후퇴 우선 |
+| mage     | 마법사 | 0.9 | 고화력 원거리. 접근 시 즉시 후퇴 |
+| assassin | 암살자 | 1.6 | 고속 돌격. 치명타 25% 확률(×2 데미지) |
+| berserk  | 광전사 | 1.3 | 무조건 돌격. HP 낮을수록 데미지 ×1.5 |
+| healer   | 힐러 | 1.0 | 아군 회복 우선. 공격력 약하고 방어 강함 |
+
+> HP/ATK/DEF는 서버 응답에서 직접 수신 (중복 하드코딩 불필요)
 
 ---
 
@@ -48,67 +55,70 @@ dependsOn:
 
 ```gdscript
 const CLASS_DATA := {
-    "warrior":  { "label": "전사",  "hp": 150, "atk": 10, "def": 10, "spd": 1.0, "desc": "균형형 탱커. 가장 가까운 적에게 돌진." },
-    "archer":   { "label": "궁수",  "hp": 85,  "atk": 12, "def": 4,  "spd": 1.5, "desc": "원거리 기동형. HP 50% 이하 시 후퇴 우선." },
-    "mage":     { "label": "마법사","hp": 70,  "atk": 16, "def": 2,  "spd": 0.9, "desc": "고화력 원거리. 접근 시 즉시 후퇴." },
-    "assassin": { "label": "암살자","hp": 90,  "atk": 14, "def": 4,  "spd": 1.6, "desc": "고속 돌격. 치명타 25% 확률(×2 데미지)." },
-    "berserk":  { "label": "광전사","hp": 100, "atk": 18, "def": 3,  "spd": 1.3, "desc": "무조건 돌격. HP 낮을수록 데미지 ×1.5." },
-    "healer":   { "label": "힐러",  "hp": 120, "atk": 6,  "def": 8,  "spd": 1.0, "desc": "아군 회복 우선. 공격력 약하고 방어 강함." },
+    "warrior":  { "label": "전사",  "spd": 1.0, "desc": "균형형 탱커. 가장 가까운 적에게 돌진." },
+    "archer":   { "label": "궁수",  "spd": 1.5, "desc": "원거리 기동형. HP 50% 이하 시 후퇴 우선." },
+    "mage":     { "label": "마법사","spd": 0.9, "desc": "고화력 원거리. 접근 시 즉시 후퇴." },
+    "assassin": { "label": "암살자","spd": 1.6, "desc": "고속 돌격. 치명타 25% 확률(×2 데미지)." },
+    "berserk":  { "label": "광전사","spd": 1.3, "desc": "무조건 돌격. HP 낮을수록 데미지 ×1.5." },
+    "healer":   { "label": "힐러",  "spd": 1.0, "desc": "아군 회복 우선. 공격력 약하고 방어 강함." },
 }
 ```
 
-#### 2. 클래스 가이드 패널 변수 추가
+#### 2. 클래스 가이드 라벨 변수 추가
 
 ```gdscript
-var _class_guide_panel: PanelContainer
-var _guide_hp_lbl:   Label
-var _guide_atk_lbl:  Label
-var _guide_def_lbl:  Label
 var _guide_spd_lbl:  Label
 var _guide_desc_lbl: Label
 ```
 
-#### 3. `_build_ui()` — 클래스 선택 영역 우측에 가이드 패널 추가
+#### 3. `_build_ui()` — 기존 `_preview_panel` VBoxContainer에 가이드 라벨 추가
 
-클래스 버튼 목록 컨테이너와 가이드 패널을 `HBoxContainer`로 감싸 좌우 분할 레이아웃 구성:
+> **훅 포인트**: `_preview_panel`은 `_populate_preview()` 호출 시 visible=true가 됨.
+> 기존 `_preview_class`(`:176`), `_preview_stats`(통계 라벨), `_preview_tend`(행동 성향) 아래에 추가.
 
-```
-HBoxContainer (SIZE_EXPAND_FILL)
-  ├─ VBoxContainer (클래스 버튼 목록, min_width 130px)
-  │     warrior / archer / mage / assassin / berserk / healer 버튼
-  └─ PanelContainer (가이드 패널, SIZE_EXPAND_FILL)
-        VBoxContainer
-          Label "클래스 정보" (헤더, ACCENT_GOLD)
-          Label "❤ HP: —"
-          Label "⚔ 공격: —"
-          Label "🛡 방어: —"
-          Label "💨 속도: —"
-          Separator
-          Label 특성 설명 (autowrap, TEXT_SECONDARY)
-```
-
-#### 4. `_on_class_selected(cls: String)` 함수 수정/추가
-
-> **CharacterCreateScreen.gd 훅 포인트**:
-> - `:25` `var _preview_class: Label` 이미 선언됨
-> - `:242-243` 클래스 선택 시 `_preview_class.text = "클래스: " + cls_str` 이미 있음 → 여기에 `_update_class_guide(cls)` 호출 한 줄 추가
-
-클래스 버튼 pressed 시 호출. 기존 `_preview_class.text` 업데이트에 추가:
+기존 `_preview_panel` 내부의 VBoxContainer(이하 `pvbox`) 아래에 추가:
 
 ```gdscript
-func _on_class_selected(cls: String) -> void:
-    _preview_class.text = "클래스: " + cls.capitalize()
-    _update_class_guide(cls)
+# ── 클래스 가이드 추가 항목 ──
+var sep := HSeparator.new()
+pvbox.add_child(sep)
+
+_guide_spd_lbl = Label.new()
+_guide_spd_lbl.add_theme_font_size_override("font_size", 13)
+_guide_spd_lbl.modulate = TEXT_SECONDARY
+_apply_font(_guide_spd_lbl)
+pvbox.add_child(_guide_spd_lbl)
+
+_guide_desc_lbl = Label.new()
+_guide_desc_lbl.add_theme_font_size_override("font_size", 12)
+_guide_desc_lbl.modulate = TEXT_SECONDARY
+_guide_desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+_apply_font(_guide_desc_lbl)
+pvbox.add_child(_guide_desc_lbl)
+```
+
+#### 4. `_populate_preview()` 수정 — 가이드 업데이트 한 줄 추가
+
+> **훅 포인트**: `_populate_preview(d: Dictionary)` → `:241` (서버 `character_preview` 수신 시 호출됨)
+
+```gdscript
+func _populate_preview(d: Dictionary) -> void:
+    var cls_str: String = (d.get("class", "?") as String).capitalize()
+    _preview_class.text = "클래스: " + cls_str
+    _preview_stats.text = "HP: %d  ATK: %d  DEF: %d" % [
+        d.get("hp", 0), d.get("atk", 0), d.get("def", 0)
+    ]
+    _preview_tend.text = "행동 성향: " + d.get("tendency", "-")
+    _update_class_guide(d.get("class", ""))  # ← 추가 (한 줄)
 
 func _update_class_guide(cls: String) -> void:
     if not CLASS_DATA.has(cls):
+        _guide_spd_lbl.text  = ""
+        _guide_desc_lbl.text = ""
         return
-    var d: Dictionary = CLASS_DATA[cls]
-    _guide_hp_lbl.text   = "❤ HP: %d" % d["hp"]
-    _guide_atk_lbl.text  = "⚔ 공격: %d" % d["atk"]
-    _guide_def_lbl.text  = "🛡 방어: %d" % d["def"]
-    _guide_spd_lbl.text  = "💨 속도: %.1f" % d["spd"]
-    _guide_desc_lbl.text = d["desc"]
+    var cd: Dictionary = CLASS_DATA[cls]
+    _guide_spd_lbl.text  = "💨 속도: %.1f" % cd["spd"]
+    _guide_desc_lbl.text = cd["desc"]
 ```
 
 ---
@@ -117,9 +127,9 @@ func _update_class_guide(cls: String) -> void:
 
 | 파일 | 변경 내용 |
 |------|-----------|
-| `client/scripts/CharacterCreateScreen.gd` | CLASS_DATA 상수, 가이드 패널 UI, `_update_class_guide()` 추가 |
+| `client/scripts/CharacterCreateScreen.gd` | CLASS_DATA 상수, `_guide_spd_lbl`/`_guide_desc_lbl` 변수, `_build_ui()` 라벨 추가, `_populate_preview()`에 `_update_class_guide()` 호출 한 줄 추가 |
 
-서버 변경 없음. 씬 파일(`CharacterCreateScreen.tscn`) 변경 없음 (UI는 GDScript로 빌드됨).
+서버 변경 없음. 씬 파일 변경 없음 (UI는 GDScript로 빌드됨).
 
 ---
 
@@ -130,20 +140,20 @@ func _update_class_guide(cls: String) -> void:
 │  캐릭터 생성                                     │
 │                                                   │
 │  이름: [____________]                             │
+│  성격: [________________________]                 │
 │                                                   │
-│  클래스 선택:                                     │
-│  ┌─────────────┬──────────────────────────────┐  │
-│  │ [전사]      │  클래스 정보                  │  │
-│  │ [궁수]      │  ❤ HP: 85                    │  │
-│  │ [마법사]    │  ⚔ 공격: 12                  │  │
-│  │ [암살자]    │  🛡 방어: 4                   │  │
-│  │ [광전사]    │  💨 속도: 1.5                 │  │
-│  │ [힐러]      │  ─────────────────────────   │  │
-│  │             │  원거리 기동형.               │  │
-│  │             │  HP 50% 이하 시 후퇴 우선.   │  │
-│  └─────────────┴──────────────────────────────┘  │
+│  [AI로 스탯 분석하기]                             │
 │                                                   │
-│  [취소]                            [생성]         │
+│  ┌─────────────────────────────────────────────┐ │
+│  │ 클래스: 궁수                                 │ │
+│  │ HP: 85  ATK: 12  DEF: 4                      │ │
+│  │ 행동 성향: 민첩하고 신중한 전술가             │ │
+│  │ ───────────────────────────────────────────  │ │
+│  │ 💨 속도: 1.5                                 │ │  ← 신규
+│  │ 원거리 기동형. HP 50% 이하 시 후퇴 우선.     │ │  ← 신규
+│  └─────────────────────────────────────────────┘ │
+│                                                   │
+│  [성좌 저장하기]                                  │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -153,11 +163,11 @@ func _update_class_guide(cls: String) -> void:
 
 | AC | 내용 |
 |----|------|
-| AC1 | CharacterCreateScreen에서 클래스 버튼 클릭 시 우측 패널에 HP/ATK/DEF/Speed 수치 업데이트 |
-| AC2 | 특성 설명 텍스트가 패널 하단에 표시 (자동 줄바꿈 적용) |
-| AC3 | 초기 진입 시 첫 번째 클래스(warrior)가 기본 선택 상태로 가이드 패널에 표시 |
-| AC4 | 기존 캐릭터 생성 플로우(이름 입력 → 클래스 선택 → 생성 버튼) 정상 동작 유지 |
-| AC5 | Astraea Nexus 디자인 시스템 색상 상수 사용 (BG_CARD, ACCENT_GOLD, TEXT_PRIMARY, TEXT_SECONDARY) |
+| AC1 | AI 분석 결과 수신(`character_preview`) 후 프리뷰 패널에 `💨 속도: X.X` 표시 |
+| AC2 | 프리뷰 패널 하단에 클래스 특성 설명 텍스트 표시 (자동 줄바꿈 적용) |
+| AC3 | 알 수 없는 클래스 키(`CLASS_DATA.has` 실패) 시 가이드 라벨 빈 문자열 처리 (크래시 없음) |
+| AC4 | 기존 캐릭터 생성 플로우(이름+프롬프트 → AI 분석 → 저장) 정상 동작 유지 |
+| AC5 | `TEXT_SECONDARY` 색상 및 `_apply_font()` 적용 (디자인 시스템 일치) |
 
 ---
 
@@ -165,10 +175,11 @@ func _update_class_guide(cls: String) -> void:
 
 | 케이스 | 처리 |
 |--------|------|
-| 알 수 없는 클래스 키 | `CLASS_DATA.has(cls)` 체크 → 가이드 패널 업데이트 스킵 (기존 표시 유지) |
-| 클래스 미선택 상태에서 생성 버튼 클릭 | 기존 validation 동작 유지 (spec 범위 외) |
+| 알 수 없는 클래스 키 | `CLASS_DATA.has(cls)` 실패 → `_guide_spd_lbl.text = ""`, `_guide_desc_lbl.text = ""` |
+| AI 분석 재시도 | `_populate_preview()` 재호출 → 가이드 라벨 덮어쓰기 (정상) |
+| 저장 전 프리뷰 패널 숨김 상태 | 가이드 라벨은 `_preview_panel` 자식 → 패널 가시성과 연동됨 |
 
 ---
 
 ## 예상 기간
-0.5일 (서버 변경 없음, 클라이언트 단일 파일)
+0.5일 미만 (변경 최소화: `_populate_preview` 한 줄 추가 + 라벨 2개 빌드)
