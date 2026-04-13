@@ -1,9 +1,9 @@
 specId: server-unit-tests-expansion
-status: in-flight
+status: queued
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T15:30:00.000Z
-updatedAt: 2026-04-13T11:00:00.000Z
+updatedAt: 2026-04-13T16:00:00.000Z
 notes: |
   2026-04-13 태연 신규 draft:
   - server-test-ci 스펙 P1-4/P1-5 참조 항목(leaderboard, oracle-cooldown 테스트)이 별도 flow 없이 참조만 된 상태 발견
@@ -29,3 +29,6 @@ notes: |
     · pool.js exports: { pool } 구조 확인 → 테스트 mock `{ pool: poolMock }` 패턴 정확 ✓
     · leaderboard.js tiebreak: ORDER BY constellation_points DESC, total_wins DESC, created_at ASC (:29-31) ✓
   - runner 착수 준비 완료
+  2026-04-13 태연 스케줄: in-flight → queued 재전환
+  - evidence 디렉토리 비어 있음 확인 → runner 실제 미시작 판단
+  - queued 전환 후 runner 시작
