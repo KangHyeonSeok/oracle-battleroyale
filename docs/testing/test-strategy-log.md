@@ -2,6 +2,54 @@
 
 ---
 
+## 2026-04-13 점검 14회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
+
+### 현재 테스트 커버리지 상태
+
+서버: Node.js / Express (26 모듈) · 클라이언트: Godot 4.3 WebAssembly (unstaged 11파일 지속)
+
+| 구분 | 파일 | 실행 결과 | 비고 |
+|------|------|-----------|------|
+| 단위 — 전투 로직 | `test/combat.test.js` | ✅ 17/17 통과 | 커스텀 assert harness |
+| 단위 — 포인트 시스템 | `test/points.test.js` | ✅ 18/18 통과 | 커스텀 assert harness |
+| 단위 — 매치메이킹 | `test/matchmaker.test.js` | ✅ 전체 통과 | Node.js assert |
+| 통합 — E2E 플로우 | `test/e2e-flow.test.js` | ✅ 7단계 통과 | Module stub 기반, 실 DB/Redis 없음 |
+| 부하 — 32명 동시 | `test/load-32players.test.js` | ✅ p99 < 1,000ms | 실측 p99 ≈ 2.3ms |
+| 비용 검증 — Gemini | `test/gemini-cost.test.js` | ✅ $0.005/게임 한도 내 | 정적 계산 ($0.001416 실측) |
+| `npm test` 스크립트 | `package.json` | ✅ 유지 | P0-1 해소 상태 유지 |
+| CI 서버 테스트 워크플로 | `.github/workflows/` | ❌ 미포함 | **P0-2 — 14회차 연속 미해결** |
+| oracle-cooldown 단위 테스트 | — | ❌ 부재 | **P1-4 긴급** — 쿨다운 로직 테스트 계속 없음 |
+| oracle-ranking-leaderboard 단위 테스트 | — | ❌ 부재 | **P1-5 긴급** — tiebreak 구현 완료, 테스트 여전히 없음 |
+| 실 WebSocket 통합 테스트 | — | ❌ 부재 | P1-1 미착수 |
+| DB 마이그레이션 스모크 테스트 | `migrations/` (9개) | ❌ 부재 | P1-2 미착수 |
+| Godot 클라이언트 / Playwright E2E | — | ❌ 부재 | P2-1 — unstaged 11개, 위험 최고 |
+
+### 발견한 문제점 (13회차 대비)
+
+1. **P0-2 CI 워크플로 14회차 연속 미해결** — `server-test.yml` 부재 상태 유지. push/PR 트리거 없음. 승인 의사결정이 계속 블로킹.
+2. **P1-4·P1-5 테스트 계속 미작성** — oracle-cooldown (Redis TTL 60s, 429 반환, matchId 격리), oracle-ranking-leaderboard (tiebreak, NULL 처리) 모두 구현 완료 상태에서 단위 테스트 0개. 13회차와 동일.
+3. **Godot unstaged 11파일 무검증 지속** — 수정 7개 + 신규 4개 (LeaderboardScreen, SpectateListScreen). character-class-guide 완료 후 추가 수정 예상으로 누적 가속 가능.
+4. **스텁 기반 통합 테스트 구조적 한계** — PostgreSQL, Redis, Gemini 전량 모킹. 실 서비스 회귀 감지 불가 상태 14회차 지속.
+5. **P1-1·P1-2 미착수 지속** — 실 WebSocket 통합 테스트, DB 마이그레이션 스모크 테스트 모두 착수 없음.
+
+### 개선 제안 (우선순위 포함)
+
+| 우선순위 | 작업 | 상태 | 규모 |
+|----------|------|------|------|
+| **P0-2** | `.github/workflows/server-test.yml` 생성 — push/PR 트리거, `npm test` 실행, Node.js 20 매트릭스 | ⏳ hyeonseok 착수 승인 대기 (14회 연속) | ~20줄 |
+| **P1-4** | `oracle-cooldown` 단위 테스트 — Redis TTL 60s mock, HTTP 429 응답, matchId별 격리 검증 | 🔴 **긴급** — DevourerKing 즉시 작성 권고 | ~40줄 |
+| **P1-5** | `oracle-ranking-leaderboard` 정렬 단위 테스트 — tiebreak(total_wins DESC, created_at ASC), LEFT JOIN NULL 케이스, displayName NULLIF | 🔴 **긴급** — AC9 구현 완료, 테스트 없이 라이브 위험 | ~40줄 |
+| **P1-1** | 실 WebSocket 통합 테스트 — `ws` 클라이언트 + `redis-memory-server` | 🔲 미착수 | ~100줄 |
+| **P1-2** | `pg-mem` 마이그레이션 스모크 테스트 — 9개 SQL 순서 적용 검증 | 🔲 미착수 | ~60줄 |
+| **P1-3** | 커스텀 assert → `node:test` 표준화 | 🔲 낮은 긴급도 | ~50줄 |
+| **P2-1** | Playwright E2E — 로그인→캐릭터 생성→신탁 전송 자동화 | 🔲 별도 스펙 필요 | TBD |
+| **P2-2** | Gemini 응답 계약 테스트 (zod 스키마) | 🔲 미착수 | ~30줄 |
+| **P2-3** | 부하 테스트 CI 기준선 등록 (p95 < 1,000ms) | 🔲 CI 워크플로 확장 후 | TBD |
+
+**14회차 진단**: 13회차 대비 구조적 변화 없음. 서버 단위 테스트 6개 모두 통과 상태 유지. P0-2(CI 워크플로) 14회 연속 블로킹 — 승인 의사결정이 최우선 아이템. P1-4·P1-5 구현 완료 후 테스트 방치 패턴 지속 — DevourerKing 핸드오프 즉시 필요. Godot unstaged 11파일 무검증 누적 위험 계속 증가. **P0-2 CI 승인 + P1-4·P1-5 DevourerKing 테스트 착수가 다음 액션 아이템.**
+
+---
+
 ## 2026-04-13 점검 13회차 (태연 스케줄 점검 — oracle-battleroyale 테스트 전략)
 
 ### 현재 테스트 커버리지 상태
