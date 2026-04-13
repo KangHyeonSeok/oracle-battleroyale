@@ -1,12 +1,13 @@
 specId: arena-character-hud
-status: draft
+status: queued
 lastError: null
 retryCount: 0
 createdAt: 2026-04-13T14:00:00.000Z
-updatedAt: 2026-04-13T14:00:00.000Z
+updatedAt: 2026-04-13T14:30:00.000Z
 notes: |
   2026-04-13 태연 신규 draft:
   - 아레나 HUD에 캐릭터별 HP bar가 없어 신탁 전략 판단 어려움 → UX 갭
   - Main.gd 단일 파일 수정, 서버 변경 없음
   - 의존성: phase-5-client-godot, oracle-ui-design 모두 done ✓
   - match-history runner 완료 후 다음 구현 대상으로 검토 권장
+  2026-04-13 태연: draft → queued 전환. 의존성(phase-3-game-server, phase-5-client-godot, oracle-ui-design) 전부 done 확인.
