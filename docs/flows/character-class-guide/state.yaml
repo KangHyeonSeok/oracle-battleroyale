@@ -16,3 +16,9 @@ notes: |
   - AC 5개, 엣지케이스 2개 완성 → runner 시작
   2026-04-13 태연 스케줄: queued → in-flight
   - runner started (PARTNER_RUNNER_NOTIFY_CHANNEL=C0ANSP7FU91)
+  2026-04-13 태연 스케줄 스펙 보강:
+  - CharacterCreateScreen.gd 현재 상태 확인:
+    · :25 `var _preview_class: Label` 존재
+    · :242-243 클래스 선택 시 `_preview_class.text = "클래스: " + cls_str` 업데이트 있음
+    · CLASS_DATA, 가이드 패널 변수, _update_class_guide() 없음 → 전체 미구현 확인
+  - spec.md에 정확한 line 참조 보강 (수정 대상 파악 용이)

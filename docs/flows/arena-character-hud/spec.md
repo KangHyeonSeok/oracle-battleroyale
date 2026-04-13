@@ -76,6 +76,11 @@ _char_hud_scroll.add_child(_char_hud_strip)
 
 #### 3. `_refresh_hud()` — 캐릭터 카드 갱신
 
+> **Main.gd 훅 포인트**:
+> - `_on_chars_updated()` → `:284` (GameState.characters_updated 시그널 핸들러) — 이미 `_refresh_hud()` 호출함
+> - `_refresh_hud()` → `:398` (기존 pts/turn/alive 갱신) — 여기에 `_refresh_char_hud_strip()` 한 줄만 추가
+> - `GameState.characters_updated.connect(_on_chars_updated)` → `:61` — 시그널 연결 이미 완료
+
 `GameState.characters` 기준으로 카드 추가/갱신:
 
 ```gdscript

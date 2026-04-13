@@ -43,3 +43,8 @@ notes: |
   - Main.gd: _leaderboard_screen 변수 없음, leaderboard_requested 시그널 연결 없음 → AC7 미구현 재확인
   - AC9 tiebreak: leaderboard.js ORDER BY constellation_points DESC, total_wins DESC, created_at ASC 확인 ✓ (4차에 완료)
   - 잔여: AC7, AC8 (runner 처리 대기)
+  2026-04-13 태연 스케줄 (6차) 구현 재확인:
+  - LeaderboardScreen.gd:17 `var my_account_id: int = -1` 선언 확인 ✓ (AC8 클라이언트 측 완료)
+  - LeaderboardScreen.gd:151 accountId == my_account_id 강조 로직 구현 ✓
+  - spec.md AC8 "LeaderboardScreen.gd에서 var my_account_id 변수 선언 필요" → 이미 완료. 구현 가이드 수정 반영
+  - 잔여: AC7(Main.gd 초기화+라우팅), AC8(Main.gd _fetch_my_account_id() 호출만 미구현)

@@ -89,6 +89,10 @@ HBoxContainer (SIZE_EXPAND_FILL)
 
 #### 4. `_on_class_selected(cls: String)` 함수 수정/추가
 
+> **CharacterCreateScreen.gd 훅 포인트**:
+> - `:25` `var _preview_class: Label` 이미 선언됨
+> - `:242-243` 클래스 선택 시 `_preview_class.text = "클래스: " + cls_str` 이미 있음 → 여기에 `_update_class_guide(cls)` 호출 한 줄 추가
+
 클래스 버튼 pressed 시 호출. 기존 `_preview_class.text` 업데이트에 추가:
 
 ```gdscript

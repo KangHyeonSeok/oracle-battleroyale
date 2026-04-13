@@ -49,12 +49,16 @@ dependsOn:
 
 ### 구현 가이드
 
+> ⚠️ **주의**: `getLeaderboard(limit)` 함수는 `pool` 인자를 받지 않음. `pool`은 `server/src/db/pool.js`에서 모듈 수준으로 require됨.
+> 따라서 `require.cache` 방식으로 `../src/db/pool` 모듈 전체를 mock 한 뒤 `getLeaderboard`를 require해야 함.
+
 ```js
 /**
  * leaderboard.test.js — Unit tests for oracle-ranking-leaderboard spec
  * Run: node test/leaderboard.test.js
  *
- * Mocks the DB pool to test leaderboard.js sorting/tiebreak logic without real Postgres.
+ * Mocks the DB pool via require.cache injection (same pattern as points.test.js).
+ * getLeaderboard(limit) — pool은 모듈 레벨 require이므로 cache injection 사용.
  */
 'use strict';
 
@@ -64,11 +68,28 @@ function assert(cond, label) {
   else { console.error(`  ✗ ${label}`); failed++; }
 }
 
-// Mock DB rows (returned by pool.query stub)
-// Each mock scenario overrides the query result
+// --- Mock pool before requiring leaderboard.js ---
+let mockRows = [];
+const poolMock = {
+  query: async () => ({ rows: mockRows }),
+};
+require.cache[require.resolve('../src/db/pool')] = {
+  id: require.resolve('../src/db/pool'),
+  filename: require.resolve('../src/db/pool'),
+  loaded: true,
+  exports: { pool: poolMock },
+};
 
-// ... getLeaderboard(pool, limit) 함수 단위로 테스트
-// pool.query mock → 지정 rows 반환 → getLeaderboard 결과 검증
+const { getLeaderboard } = require('../src/leaderboard/leaderboard');
+
+// 각 테스트마다 mockRows를 교체하여 시나리오 설정
+// 예: 기본 정렬 테스트
+mockRows = [
+  { rank: '1', account_id: 1, display_name: '알파', oracle_points: '100', total_wins: '5', total_matches: '10', win_rate: '50', oracle_sent: '20' },
+  // ... 나머지 rows
+];
+const result = await getLeaderboard(20);
+assert(result[0].oraclePoints === 100, '기본 정렬: 첫 항목 oraclePoints=100');
 
 // 실행 종료 시:
 if (failed > 0) { console.error(`\n${failed} test(s) failed`); process.exit(1); }
@@ -79,7 +100,14 @@ else { console.log(`\nAll ${passed} tests passed`); }
 
 ## 파일 2: `server/test/oracle-cooldown.test.js` (신규)
 
-테스트 환경: Redis mock (in-memory Map 또는 `ioredis-mock`)
+테스트 환경: Redis mock (in-memory Map) + `setRedisClient()` 주입
+
+> ⚠️ **접근 방식**: `cooldownKey` 함수는 `oracle/routes.js`에서 비공개. `setRedisClient(client)` 는 exported되므로,
+> `redisMock`을 주입 후 `cooldownKey`는 inline 재현(`oracle:cooldown:{userId}:{matchId}`)으로 테스트.
+> HTTP 429/200 검증은 쿨다운 키 존재 여부를 Redis mock에서 직접 확인하는 방식으로 대체.
+> 전체 HTTP 라우트 테스트가 필요하면 `supertest` devDependency 추가 후 별도 e2e 테스트로 분리 권장.
+
+
 
 | # | 케이스 | 검증 내용 |
 |---|--------|-----------|

@@ -203,7 +203,7 @@ func _on_me_response(result, code, _headers, body) -> void:
 ```
 
 - `_leaderboard_screen` 초기화 직후 `_fetch_my_account_id()` 호출
-- `LeaderboardScreen.gd`에서 `var my_account_id: int = -1` 변수 선언 필요
+- `LeaderboardScreen.gd:17` `var my_account_id: int = -1` 및 강조 로직(`:151`) **이미 구현 완료** — Main.gd에서 주입 코드만 추가하면 됨
 
 ---
 

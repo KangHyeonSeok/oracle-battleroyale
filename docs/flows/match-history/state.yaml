@@ -41,3 +41,9 @@ notes: |
     · 핸들러 함수 4개 (_on_history_requested, _on_match_history_back, _on_match_detail_requested, _on_match_detail_back)
   2026-04-13 태연 스케줄 스펙 보강 (6차):
   - 엣지케이스 추가: winner_character_id = NULL (비정상 종료 경기) → winner 필드 null 반환, 클라이언트 "—" 표시
+  2026-04-13 태연 스케줄 스펙 보강 (7차):
+  - CharacterListScreen.gd 현재 시그널 목록 재확인: create_character_requested, join_match_requested, leaderboard_requested, spectate_requested
+  - history_requested 시그널 없음, "경기 기록" 버튼 없음 → AC6 미구현 재확인
+  - server/src/history/ 디렉토리 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재 재확인
+  - Main.gd spectate 라우팅 패턴(_spectate_list_screen: :179-184) 확인 → Main.gd 코드 가이드 패턴 일치 확인
+  - 스펙 전체(AC 9개, 엣지케이스 8개, Main.gd 코드 가이드) 완비 → runner 착수 준비 완료
