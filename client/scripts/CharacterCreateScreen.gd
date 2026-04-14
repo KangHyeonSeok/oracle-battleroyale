@@ -237,6 +237,15 @@ func _on_ws_message(data: Dictionary) -> void:
 		"character_created":
 			_save_btn.disabled = false
 			character_created.emit(data.get("character", {}))
+		"error":
+			_analyze_btn.disabled = false
+			_loading_lbl.text = "오류: " + data.get("message", "알 수 없는 오류")
+			_loading_lbl.modulate = DANGER
+			_loading_lbl.visible = true
+			await get_tree().create_timer(3.0).timeout
+			_loading_lbl.text = "AI 분석 중..."
+			_loading_lbl.modulate = ACCENT_PURPLE
+			_loading_lbl.visible = false
 
 func _populate_preview(d: Dictionary) -> void:
 	var cls_str: String = (d.get("class", "?") as String).capitalize()
