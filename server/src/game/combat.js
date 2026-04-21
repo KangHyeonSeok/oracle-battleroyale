@@ -2,22 +2,24 @@
  * Combat Resolution Module
  *
  * Game constants:
- *   Map:          800×800 px
+ *   Map:          8000×8000 px (100×100 tiles, 1 tile = 80px)
  *   Melee range:  80 px  → base damage 15/turn
- *   Ranged range: 300 px → base damage 10/turn
- *   Move speed:   120 px/turn
+ *   Ranged range: 320 px → base damage 10/turn
+ *   Move speed:   200 px/turn
  *
  * Damage formula:
  *   effective_damage = max(1, base_damage * (atk/10) - def * 0.5)
  *   Assassin crit: 25% chance × 2
+ *
+ * FFA policy: healer heals self only (confirmed 2026-04-17)
  */
 
-const MAP_SIZE = 800;
+const MAP_SIZE = 8000;
 const MELEE_RANGE = 80;
-const RANGED_RANGE = 300;
+const RANGED_RANGE = 320;
 const MELEE_DAMAGE = 15;
 const RANGED_DAMAGE = 10;
-const MOVE_SPEED = 120;
+const MOVE_SPEED = 200;
 // CHARACTER_HP kept for backwards compatibility but deprecated — use character.max_hp instead
 const CHARACTER_HP = 100; // @deprecated
 
@@ -108,24 +110,7 @@ function findNearestEnemy(character, allCharacters) {
   return nearest;
 }
 
-/**
- * Find the ally with lowest hp_percent (for healer).
- */
-function findLowestHpAlly(actor, allCharacters) {
-  let lowest = null;
-  let lowestPct = Infinity;
-  for (const other of allCharacters) {
-    if (other.id === actor.id || !other.alive) continue;
-    // In a 1v1 or FFA context all others are enemies; healer heals itself if no true ally
-    const maxHp = other.max_hp || CHARACTER_HP;
-    const pct = other.hp / maxHp;
-    if (pct < lowestPct) {
-      lowestPct = pct;
-      lowest = other;
-    }
-  }
-  return lowest;
-}
+// findLowestHpAlly removed — FFA policy: healer heals self only (confirmed 2026-04-17)
 
 /**
  * Build per-character game state snapshot for AI engine.
@@ -239,15 +224,14 @@ function resolveAction(actor, action, dmgMult, allCharacters) {
     }
 
     case 'heal': {
-      // Healer heals the ally with the lowest HP% (or self if no allies)
+      // FFA policy: healer heals self only (confirmed 2026-04-17)
       const cooldown = actor.heal_cooldown || 0;
       if (cooldown > 0) {
         actor.heal_cooldown = cooldown - 1;
         // Fall back to ranged attack while on cooldown
         return resolveAction(actor, 'attack_ranged', dmgMult, allCharacters);
       }
-      const target = findLowestHpAlly(actor, allCharacters);
-      const healTarget = target || actor;
+      const healTarget = actor;
       const maxHp = healTarget.max_hp || CHARACTER_HP;
       const before = healTarget.hp;
       healTarget.hp = Math.min(maxHp, healTarget.hp + 20);
