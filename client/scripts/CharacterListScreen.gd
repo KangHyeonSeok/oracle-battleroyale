@@ -64,26 +64,26 @@ func _build_ui() -> void:
 
 	var rank_btn := Button.new()
 	rank_btn.text = "랭킹 🏆"
-	rank_btn.custom_minimum_size = Vector2(90, 36)
-	rank_btn.add_theme_font_size_override("font_size", 14)
+	rank_btn.custom_minimum_size = Vector2(70, 44)
+	rank_btn.add_theme_font_size_override("font_size", 15)
 	rank_btn.modulate = ACCENT_PURPLE
 	_apply_font(rank_btn)
 	rank_btn.pressed.connect(func() -> void: leaderboard_requested.emit())
 	top_row.add_child(rank_btn)
 
 	var spectate_btn := Button.new()
-	spectate_btn.text = "관전하기 👁"
-	spectate_btn.custom_minimum_size = Vector2(110, 36)
-	spectate_btn.add_theme_font_size_override("font_size", 14)
+	spectate_btn.text = "관전 👁"
+	spectate_btn.custom_minimum_size = Vector2(70, 44)
+	spectate_btn.add_theme_font_size_override("font_size", 15)
 	spectate_btn.modulate = ACCENT_PURPLE
 	_apply_font(spectate_btn)
 	spectate_btn.pressed.connect(func() -> void: spectate_requested.emit())
 	top_row.add_child(spectate_btn)
 
 	var history_btn := Button.new()
-	history_btn.text = "경기 기록"
-	history_btn.custom_minimum_size = Vector2(90, 36)
-	history_btn.add_theme_font_size_override("font_size", 14)
+	history_btn.text = "기록"
+	history_btn.custom_minimum_size = Vector2(60, 44)
+	history_btn.add_theme_font_size_override("font_size", 15)
 	history_btn.modulate = ACCENT_PURPLE
 	_apply_font(history_btn)
 	history_btn.pressed.connect(func() -> void: history_requested.emit())
