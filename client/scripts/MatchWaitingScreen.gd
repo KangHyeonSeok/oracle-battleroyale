@@ -5,9 +5,15 @@ extends Control
 signal match_found(match_id: int)
 signal cancelled
 
-const GOLD   := Color(1.0, 0.85, 0.0)
-const BG     := Color(0.07, 0.07, 0.14)
-const PURPLE := Color(0.55, 0.36, 0.96)
+const BG_BASE       := Color(0.071, 0.071, 0.133)
+const BG_CARD       := Color(1, 1, 1, 0.06)
+const BORDER_CARD   := Color(1, 1, 1, 0.12)
+const ACCENT_GOLD   := Color(1.0, 0.843, 0.0)
+const ACCENT_PURPLE := Color(0.545, 0.361, 0.965)
+const TEXT_PRIMARY  := Color(1, 1, 1)
+const TEXT_SECONDARY := Color(1, 1, 1, 0.6)
+const SUCCESS       := Color(0.063, 0.725, 0.506)
+const DANGER        := Color(0.937, 0.267, 0.267)
 
 var _font: FontFile = null
 
@@ -36,7 +42,7 @@ func _build_ui() -> void:
 
 	var bg := ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = BG
+	bg.color = BG_BASE
 	add_child(bg)
 
 	var root := VBoxContainer.new()
@@ -51,7 +57,7 @@ func _build_ui() -> void:
 	# Title
 	var title := Label.new()
 	title.text = "매칭 대기 중"
-	title.modulate = GOLD
+	title.modulate = ACCENT_GOLD
 	title.add_theme_font_size_override("font_size", 20)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(title)
@@ -60,16 +66,16 @@ func _build_ui() -> void:
 	# Character card
 	var card := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.12, 0.12, 0.22)
-	style.corner_radius_top_left     = 8
-	style.corner_radius_top_right    = 8
-	style.corner_radius_bottom_left  = 8
-	style.corner_radius_bottom_right = 8
+	style.bg_color = BG_CARD
+	style.corner_radius_top_left     = 12
+	style.corner_radius_top_right    = 12
+	style.corner_radius_bottom_left  = 12
+	style.corner_radius_bottom_right = 12
 	style.border_width_left   = 1
 	style.border_width_right  = 1
 	style.border_width_top    = 1
 	style.border_width_bottom = 1
-	style.border_color = GOLD
+	style.border_color = BORDER_CARD
 	card.add_theme_stylebox_override("panel", style)
 	root.add_child(card)
 
@@ -79,7 +85,7 @@ func _build_ui() -> void:
 
 	_char_name_lbl = Label.new()
 	_char_name_lbl.text = "성좌명"
-	_char_name_lbl.modulate = GOLD
+	_char_name_lbl.modulate = TEXT_PRIMARY
 	_char_name_lbl.add_theme_font_size_override("font_size", 16)
 	_char_name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(_char_name_lbl)
@@ -95,7 +101,7 @@ func _build_ui() -> void:
 	# Participant count
 	_count_lbl = Label.new()
 	_count_lbl.text = "0 / 32"
-	_count_lbl.modulate = GOLD
+	_count_lbl.modulate = ACCENT_GOLD
 	_count_lbl.add_theme_font_size_override("font_size", 36)
 	_count_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(_count_lbl)
@@ -103,7 +109,7 @@ func _build_ui() -> void:
 
 	var count_sub := Label.new()
 	count_sub.text = "참가자"
-	count_sub.modulate = Color(0.6, 0.6, 0.8)
+	count_sub.modulate = TEXT_SECONDARY
 	count_sub.add_theme_font_size_override("font_size", 13)
 	count_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(count_sub)
@@ -112,7 +118,7 @@ func _build_ui() -> void:
 	# Timer
 	_timer_lbl = Label.new()
 	_timer_lbl.text = "대기 중... 00:00"
-	_timer_lbl.modulate = PURPLE
+	_timer_lbl.modulate = TEXT_PRIMARY
 	_timer_lbl.add_theme_font_size_override("font_size", 15)
 	_timer_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(_timer_lbl)
@@ -121,7 +127,7 @@ func _build_ui() -> void:
 	# NPC notice
 	var npc_lbl := Label.new()
 	npc_lbl.text = "참가자 부족 시 NPC로 자동 충원됩니다"
-	npc_lbl.modulate = Color(0.6, 0.6, 0.7)
+	npc_lbl.modulate = TEXT_SECONDARY
 	npc_lbl.add_theme_font_size_override("font_size", 12)
 	npc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(npc_lbl)

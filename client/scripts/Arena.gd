@@ -20,6 +20,9 @@ const C_OBSTACLE  := Color(0.22, 0.22, 0.27)
 const C_OBS_EDGE  := Color(1.0, 1.0, 1.0, 0.18)
 const C_BORDER    := Color(1.0, 1.0, 1.0, 0.25)
 
+## Set to true when the local player is watching as a spectator (not a participant).
+var spectator_mode: bool = false
+
 var _obstacles: Array[Rect2] = []
 
 func _ready() -> void:

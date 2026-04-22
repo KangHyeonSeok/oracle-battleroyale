@@ -1,0 +1,33 @@
+specId: arena-character-hud
+status: in-flight
+lastError: null
+retryCount: 0
+createdAt: 2026-04-13T14:00:00.000Z
+updatedAt: 2026-04-13T15:00:00.000Z
+notes: |
+  2026-04-13 태연 신규 draft:
+  - 아레나 HUD에 캐릭터별 HP bar가 없어 신탁 전략 판단 어려움 → UX 갭
+  - Main.gd 단일 파일 수정, 서버 변경 없음
+  - 의존성: phase-5-client-godot, oracle-ui-design 모두 done ✓
+  - match-history runner 완료 후 다음 구현 대상으로 검토 권장
+  2026-04-13 태연: draft → queued 전환. 의존성(phase-3-game-server, phase-5-client-godot, oracle-ui-design) 전부 done 확인.
+  2026-04-13 태연 스케줄 스펙 보강:
+  - spec.md status draft→queued 동기화
+  - Main.gd 색상 상수(BG_CARD/ACCENT_PURPLE/TEXT_SECONDARY) 미정의 확인 → spec에 const 추가 가이드 명시
+  - ScrollContainer 래핑 구현 코드 추가 (_char_hud_scroll 변수, SCROLL_MODE_AUTO)
+  - 엣지케이스 8명 초과 처리 코드 가이드 구체화
+  - 미구현: Main.gd 전체 (runner 착수 대기 중, match-history 완료 후 권장)
+  2026-04-13 태연 스케줄 스펙 보강 (2차):
+  - spec.md status queued→in-flight 동기화 (state.yaml과 일치)
+  - _make_char_hud_card()에 vbox.name = "VBoxContainer" 누락 수정 → get_node() 경로 보장
+  - 미구현: Main.gd 전체 (runner 착수 대기 중)
+  2026-04-13 태연 스케줄 스펙 보강 (3차):
+  - Main.gd 훅 포인트 line 참조 추가:
+    · _on_chars_updated() :284 — characters_updated 시그널 핸들러 (이미 _refresh_hud() 호출)
+    · _refresh_hud() :398 — _refresh_char_hud_strip() 한 줄만 추가
+    · GameState.characters_updated.connect(:61) — 시그널 연결 이미 완료
+  - 미구현: Main.gd 전체 (_char_hud_scroll/_char_hud_strip 변수, _build_ui 스트립 추가, _refresh_char_hud_strip 함수들)
+  2026-04-13 태연 스케줄 구현 갭 재확인:
+  - Main.gd: _char_hud 관련 변수/함수 전무 재확인
+  - 스펙 완비 상태(AC 6개, 엣지케이스 4개, 전체 코드 가이드) → runner 구현 대기 중
+  - match-history runner 완료 후 착수 권장 (Main.gd 동시 수정 충돌 방지)

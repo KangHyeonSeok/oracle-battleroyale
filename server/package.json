@@ -1,0 +1,33 @@
+{
+  "name": "oracle-battleroyale-server",
+  "version": "1.0.0",
+  "description": "Oracle Battle Royale Game Server",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "migrate": "node src/db/migrate.js",
+    "test": "node test/combat.test.js && node test/points.test.js && node test/e2e-flow.test.js && node test/matchmaker.test.js && node test/load-32players.test.js && node test/gemini-cost.test.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "connect-redis": "^7.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-session": "^1.18.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.11.3",
+    "redis": "^4.6.13",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "nodemon": "^3.1.0",
+    "redis-memory-server": "^0.16.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

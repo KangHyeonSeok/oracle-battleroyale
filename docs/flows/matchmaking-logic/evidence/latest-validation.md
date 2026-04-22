@@ -1,0 +1,33 @@
+# matchmaking-logic Validation
+
+- Status: completed
+- Action: completed-spec
+- UpdatedAt: 2026-04-10T06:21:51.784Z
+- Detail: test-validator: All 6 acceptance criteria confirmed passed per validation evidence. Implementation covers matchmaker.js, migration SQL, WS handler integration, and all three test scenarios. No gaps or partial items found.
+
+## Acceptance Criteria Review
+
+1. AC1: 32명 대기열 진입 시 즉시 매치 시작, match_starting 브로드캐스트
+Status: passed
+Evidence: Test 1 passes: 32 enqueues trigger immediate tryStartMatch(), match_starting broadcast with playerCount=32, npcCount=0, startsIn=5
+
+2. AC2: 60초 후 실제 플레이어 n명 + NPC (32-n)명으로 매치 시작
+Status: passed
+Evidence: Test 2 passes: 10 players enqueued, timeout fires tryStartMatch(), fillWithNPCs(22) called, match_starting shows playerCount=10, npcCount=22
+
+3. AC3: 동일 계정 중복 진입 시 기존 대기 자동 취소 후 재진입 (queue에 1개만 존재)
+Status: passed
+Evidence: Test 3 passes: enqueue(42,100) then enqueue(42,200) results in queue.length=1 with characterId=200
+
+4. AC4: queue_leave 전송 시 대기열에서 제거, queue_update 브로드캐스트
+Status: passed
+Evidence: Test 4 passes: dequeue(7) removes entry, queue.length=0, queue_update with count=0 broadcast to all clients
+
+5. AC5: queue_update 이벤트가 진입/이탈마다 실시간으로 전체 대기자에게 전달됨
+Status: passed
+Evidence: Test 4 confirms ≥2 queue_update messages via _broadcastQueueUpdate() iterating wss.clients on both join and leave
+
+6. AC6: 매치 생성 후 matches 테이블에 레코드 존재 확인
+Status: passed
+Evidence: Tests 1 and 2 both verify matchRecords.length >= 1 after _startMatch(); INSERT INTO matches executed in _startMatch()
+

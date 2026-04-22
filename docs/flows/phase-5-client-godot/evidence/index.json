@@ -1,0 +1,175 @@
+{
+  "specId": "phase-5-client-godot",
+  "updatedAt": "2026-04-05T22:46:08.418Z",
+  "latestStatus": "review-required",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "서버 WebSocket 메시지 수신 → 캐릭터 위치/HP 실시간 업데이트",
+      "status": "passed",
+      "evidence": "GameState._on_message handles 'turn_result', emits characters_updated. Character.update_from_data() reads hp/x/y, animates via Tween, redraws HP bar. WebSocketClient auto-reconnects every 5 s."
+    },
+    {
+      "criterion": "캐릭터 클릭 → 성좌 채팅 패널 슬라이드인 + 'X 성좌가 입장하였습니다' 알림",
+      "status": "passed",
+      "evidence": "Character emits character_clicked via Area2D. Main._on_character_clicked() calls OraclePanel.show_for_character() → _slide_in() tween + notification toast."
+    },
+    {
+      "criterion": "신탁 버튼: 포인트 충분 시 활성, 부족 시 비활성화",
+      "status": "passed",
+      "evidence": "OraclePanel._refresh_button() gates oracle_btn.disabled on GameState.can_use_oracle() (points >= 5 AND cooldown <= 0). Button label changes to '포인트 부족' when insufficient."
+    },
+    {
+      "criterion": "vercel deploy → 브라우저에서 정상 실행 (Web Export .wasm)",
+      "status": "partial",
+      "evidence": ".github/workflows/client-web-export.yml, client/build.sh, vercel.json (COEP/COOP headers), and export_presets.cfg are all present and syntactically correct. No Godot binary available in runner; actual .wasm artifact and live Vercel URL require an external CI run to confirm."
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-05T22:37:04.706Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-05T22-37-04-706Z.log",
+      "validationFile": "validation-2026-04-05T22-37-04-706Z.md",
+      "validationChecks": [
+        {
+          "criterion": "서버 WebSocket 메시지 수신 → 캐릭터 위치/HP 실시간 업데이트",
+          "status": "passed",
+          "evidence": "GameState._on_message handles 'turn_result' (line 45-52): emits characters_updated with full characters array. Character.update_from_data() (line 65) reads hp/x/y, animates position via Tween, redraws HP bar. WebSocketClient reconnects automatically every 5 s and pings every 30 s."
+        },
+        {
+          "criterion": "캐릭터 클릭 → 성좌 채팅 패널 슬라이드인 + 'X 성좌가 입장하였습니다' 알림",
+          "status": "passed",
+          "evidence": "Character emits character_clicked signal on Area2D mouse click. Main._on_character_clicked() (line 115) calls OraclePanel.show_for_character() which triggers _slide_in() cubic-ease tween, then shows notification 'X 성좌가 입장하였습니다' (line 120)."
+        },
+        {
+          "criterion": "신탁 버튼: 포인트 충분 시 활성, 부족 시 비활성화",
+          "status": "passed",
+          "evidence": "OraclePanel._refresh_button() (line 58-71): oracle_btn.disabled = not GameState.can_use_oracle(). can_use_oracle() returns true only if oracle_points >= 5 AND cooldown <= 0. Button text changes to '포인트 부족' when points < ORACLE_COST. Cooldown label shows remaining seconds."
+        },
+        {
+          "criterion": "vercel deploy → 브라우저에서 정상 실행 (Web Export .wasm)",
+          "status": "partial",
+          "evidence": "client/vercel.json sets outputDirectory:'build/web', Content-Type:application/wasm for .wasm files, and COEP/COOP headers required by Godot Web Export for SharedArrayBuffer. export_presets.cfg exports to build/web/index.html. Actual .wasm binary requires running 'godot --export-release \"Web\" build/web/index.html' in CI; binary not present in repo (expected — Godot editor must be installed)."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:37:24.125Z",
+      "action": "advanced-spec",
+      "status": "review-required",
+      "logFile": "tick-2026-04-05T22-37-24-125Z.log",
+      "validationFile": "validation-2026-04-05T22-37-24-125Z.md",
+      "validationChecks": [
+        {
+          "criterion": "서버 WebSocket 메시지 수신 → 캐릭터 위치/HP 실시간 업데이트",
+          "status": "passed",
+          "evidence": "GameState._on_message handles 'turn_result', emits characters_updated. Character.update_from_data() reads hp/x/y, animates via Tween, redraws HP bar. WebSocketClient auto-reconnects every 5s."
+        },
+        {
+          "criterion": "캐릭터 클릭 → 성좌 채팅 패널 슬라이드인 + 'X 성좌가 입장하였습니다' 알림",
+          "status": "passed",
+          "evidence": "Character emits character_clicked via Area2D. Main._on_character_clicked() calls OraclePanel.show_for_character() → _slide_in() tween + notification toast 'X 성좌가 입장하였습니다'."
+        },
+        {
+          "criterion": "신탁 버튼: 포인트 충분 시 활성, 부족 시 비활성화",
+          "status": "passed",
+          "evidence": "OraclePanel._refresh_button() gates oracle_btn.disabled on GameState.can_use_oracle() (points >= 5 AND cooldown <= 0). Button label changes to '포인트 부족' when insufficient; cooldown seconds shown."
+        },
+        {
+          "criterion": "vercel deploy → 브라우저에서 정상 실행 (Web Export .wasm)",
+          "status": "partial",
+          "evidence": "vercel.json and export_presets.cfg are correctly configured with COEP/COOP headers and wasm Content-Type. However, .wasm binary has not been built ('godot --export-release' not run) and no live Vercel URL is available to confirm browser execution."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:45:28.302Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-05T22-45-28-302Z.log",
+      "validationFile": "validation-2026-04-05T22-45-28-302Z.md",
+      "validationChecks": [
+        {
+          "criterion": "서버 WebSocket 메시지 수신 → 캐릭터 위치/HP 실시간 업데이트",
+          "status": "passed",
+          "evidence": "GameState._on_message handles 'turn_result', emits characters_updated. Character.update_from_data() reads hp/x/y, animates via Tween, redraws HP bar. WebSocketClient auto-reconnects every 5s. (carried from prior validation)"
+        },
+        {
+          "criterion": "캐릭터 클릭 → 성좌 채팅 패널 슬라이드인 + 'X 성좌가 입장하였습니다' 알림",
+          "status": "passed",
+          "evidence": "Character emits character_clicked via Area2D. Main._on_character_clicked() calls OraclePanel.show_for_character() → _slide_in() tween + notification toast. (carried from prior validation)"
+        },
+        {
+          "criterion": "신탁 버튼: 포인트 충분 시 활성, 부족 시 비활성화",
+          "status": "passed",
+          "evidence": "OraclePanel._refresh_button() gates oracle_btn.disabled on GameState.can_use_oracle() (points >= 5 AND cooldown <= 0). Button label changes to '포인트 부족' when insufficient. (carried from prior validation)"
+        },
+        {
+          "criterion": "vercel deploy → 브라우저에서 정상 실행 (Web Export .wasm)",
+          "status": "partial",
+          "evidence": "vercel.json and export_presets.cfg correctly configured with COEP/COOP headers and wasm Content-Type. Added .github/workflows/client-web-export.yml (Godot 4.3 headless install, --export-release Web, wasm existence check, vercel deploy --prod) and client/build.sh. Workflow YAML is syntactically valid. Actual .wasm binary cannot be built in this runner environment (no Godot binary); requires CI run or local Godot installation to produce artifact and live URL."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:45:51.454Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-05T22-45-51-454Z.log",
+      "validationFile": "validation-2026-04-05T22-45-51-454Z.md",
+      "validationChecks": [
+        {
+          "criterion": "서버 WebSocket 메시지 수신 → 캐릭터 위치/HP 실시간 업데이트",
+          "status": "passed",
+          "evidence": "GameState._on_message handles 'turn_result', emits characters_updated. Character.update_from_data() reads hp/x/y, animates via Tween, redraws HP bar. WebSocketClient auto-reconnects every 5 s. Carried from prior validation tick."
+        },
+        {
+          "criterion": "캐릭터 클릭 → 성좌 채팅 패널 슬라이드인 + 'X 성좌가 입장하였습니다' 알림",
+          "status": "passed",
+          "evidence": "Character emits character_clicked via Area2D. Main._on_character_clicked() calls OraclePanel.show_for_character() → _slide_in() tween + notification toast. Carried from prior validation tick."
+        },
+        {
+          "criterion": "신탁 버튼: 포인트 충분 시 활성, 부족 시 비활성화",
+          "status": "passed",
+          "evidence": "OraclePanel._refresh_button() gates oracle_btn.disabled on GameState.can_use_oracle() (points >= 5 AND cooldown <= 0). Button label changes to '포인트 부족' when insufficient. Carried from prior validation tick."
+        },
+        {
+          "criterion": "vercel deploy → 브라우저에서 정상 실행 (Web Export .wasm)",
+          "status": "partial",
+          "evidence": ".github/workflows/client-web-export.yml (Godot 4.3 headless, --export-release Web, wasm existence check, vercel deploy --prod), client/build.sh, vercel.json with COEP/COOP headers, and export_presets.cfg are all present and correct. No Godot binary in runner environment; actual .wasm artifact and live Vercel URL require a CI run to confirm."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:46:08.418Z",
+      "action": "completed-spec",
+      "status": "review-required",
+      "logFile": "tick-2026-04-05T22-46-08-418Z.log",
+      "validationFile": "validation-2026-04-05T22-46-08-418Z.md",
+      "validationChecks": [
+        {
+          "criterion": "서버 WebSocket 메시지 수신 → 캐릭터 위치/HP 실시간 업데이트",
+          "status": "passed",
+          "evidence": "GameState._on_message handles 'turn_result', emits characters_updated. Character.update_from_data() reads hp/x/y, animates via Tween, redraws HP bar. WebSocketClient auto-reconnects every 5 s."
+        },
+        {
+          "criterion": "캐릭터 클릭 → 성좌 채팅 패널 슬라이드인 + 'X 성좌가 입장하였습니다' 알림",
+          "status": "passed",
+          "evidence": "Character emits character_clicked via Area2D. Main._on_character_clicked() calls OraclePanel.show_for_character() → _slide_in() tween + notification toast."
+        },
+        {
+          "criterion": "신탁 버튼: 포인트 충분 시 활성, 부족 시 비활성화",
+          "status": "passed",
+          "evidence": "OraclePanel._refresh_button() gates oracle_btn.disabled on GameState.can_use_oracle() (points >= 5 AND cooldown <= 0). Button label changes to '포인트 부족' when insufficient."
+        },
+        {
+          "criterion": "vercel deploy → 브라우저에서 정상 실행 (Web Export .wasm)",
+          "status": "partial",
+          "evidence": ".github/workflows/client-web-export.yml, client/build.sh, vercel.json (COEP/COOP headers), and export_presets.cfg are all present and syntactically correct. No Godot binary available in runner; actual .wasm artifact and live Vercel URL require an external CI run to confirm."
+        }
+      ]
+    }
+  ]
+}

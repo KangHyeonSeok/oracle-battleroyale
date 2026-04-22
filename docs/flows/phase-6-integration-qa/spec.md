@@ -1,11 +1,11 @@
 ---
 specId: phase-6-integration-qa
 title: 통합 & QA
-status: queued
+status: done
 runnerProfile: developer
 runnerExecution: assistant
 createdAt: 2026-04-05
-updatedAt: 2026-04-05
+updatedAt: 2026-04-13
 dependsOn:
   - phase-4-oracle-system
   - phase-5-client-godot

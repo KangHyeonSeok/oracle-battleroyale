@@ -1,0 +1,157 @@
+{
+  "specId": "phase-4-oracle-system",
+  "updatedAt": "2026-04-05T22:28:00.848Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "신탁 메시지 → Gemini 분류 → 유형(강화/방해/유혹) + 대상 추출",
+      "status": "passed",
+      "evidence": "oracle/intent.js extractOracleIntent() calls Gemini with structured prompt returning buff/debuff/lure classification and actionOverride; keyword fallback included."
+    },
+    {
+      "criterion": "credulity 판정: 성공 시 override_queue에 삽입, 다음 턴 AI 행동에 반영",
+      "status": "passed",
+      "evidence": "oracle/credulity.js rolls Math.random()*100 < credulity for debuff/lure; on success pushOverride() inserts into Redis game:match:{id}:override_queue. turn-scheduler.js consumes overrides via popCharacterOverrides() before evaluateAction()."
+    },
+    {
+      "criterion": "쿨다운: 동일 플레이어 분당 1회 초과 시 거부 응답",
+      "status": "passed",
+      "evidence": "oracle/routes.js lines 87-93: Redis key oracle:cooldown:{userId}:{matchId} with EX=60s; returns HTTP 429 with remaining TTL on violation."
+    },
+    {
+      "criterion": "포인트 부족 시 신탁 거부, 포인트 차감 정확성 검증",
+      "status": "passed",
+      "evidence": "routes.js returns HTTP 402 when points < 5; oracle/points.js deductOracleCost() uses atomic UPDATE ... WHERE constellation_points >= 5 RETURNING to prevent race conditions. Survival +1/turn, win +5, dramatic reversal awarded from turn-scheduler."
+    },
+    {
+      "criterion": "DB migration: credulity column added to characters",
+      "status": "passed",
+      "evidence": "server/migrations/003_oracle_credulity.sql: ALTER TABLE characters ADD COLUMN IF NOT EXISTS credulity INTEGER NOT NULL DEFAULT 50; redis-state.js carries credulity into character state."
+    },
+    {
+      "criterion": "Node.js syntax validation on all new oracle files",
+      "status": "passed",
+      "evidence": "node --check on all 5 new oracle files, turn-scheduler.js, and app.js returned exit 0 with ALL OK."
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-05T22:27:26.766Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-05T22-27-26-766Z.log",
+      "validationFile": "validation-2026-04-05T22-27-26-766Z.md",
+      "validationChecks": [
+        {
+          "criterion": "신탁 메시지 → Gemini 분류 → 유형(강화/방해/유혹) + 대상 추출",
+          "status": "passed",
+          "evidence": "server/src/oracle/intent.js: extractOracleIntent() calls Gemini with a structured prompt that classifies buff/debuff/lure and returns actionOverride. Keyword fallback included for environments without GEMINI_API_KEY."
+        },
+        {
+          "criterion": "credulity 판정: 성공 시 override_queue에 삽입, 다음 턴 AI 행동에 반영",
+          "status": "passed",
+          "evidence": "oracle/credulity.js: buff always succeeds; debuff/lure rolls Math.random()*100 < credulity. On success routes.js calls pushOverride() into Redis LIST game:match:{id}:override_queue. turn-scheduler.js calls popCharacterOverrides() per character before evaluateAction(), applying override instead of AI decision."
+        },
+        {
+          "criterion": "쿨다운: 동일 플레이어 분당 1회 초과 시 거부 응답",
+          "status": "passed",
+          "evidence": "oracle/routes.js lines 87-93: Redis key oracle:cooldown:{userId}:{matchId} with EX=60s checked before processing; returns HTTP 429 with remaining TTL if set."
+        },
+        {
+          "criterion": "포인트 부족 시 신탁 거부, 포인트 차감 정확성 검증",
+          "status": "passed",
+          "evidence": "routes.js: fast check req.user.constellation_points < 5 returns 402. oracle/points.js deductOracleCost() uses atomic UPDATE ... WHERE constellation_points >= 5 RETURNING, throwing if no row updated. Survival +1/turn, win +5, dramatic reversal +15 (5+10) in awardSurvivalPoints/awardWinPoints called from turn-scheduler."
+        },
+        {
+          "criterion": "DB migration: credulity column added to characters",
+          "status": "passed",
+          "evidence": "server/migrations/003_oracle_credulity.sql: ALTER TABLE characters ADD COLUMN IF NOT EXISTS credulity INTEGER NOT NULL DEFAULT 50. match-routes.js participant query updated to include c.credulity; redis-state.js buildInitialState carries it into character state."
+        },
+        {
+          "criterion": "Node.js syntax validation",
+          "status": "passed",
+          "evidence": "node --check on all 5 new oracle files + turn-scheduler.js + app.js all returned exit 0 with 'ALL OK'."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:27:42.899Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-05T22-27-42-899Z.log",
+      "validationFile": "validation-2026-04-05T22-27-42-899Z.md",
+      "validationChecks": [
+        {
+          "criterion": "신탁 메시지 → Gemini 분류 → 유형(강화/방해/유혹) + 대상 추출",
+          "status": "passed",
+          "evidence": "oracle/intent.js extractOracleIntent() calls Gemini with structured prompt returning buff/debuff/lure classification and actionOverride; keyword fallback included."
+        },
+        {
+          "criterion": "credulity 판정: 성공 시 override_queue에 삽입, 다음 턴 AI 행동에 반영",
+          "status": "passed",
+          "evidence": "oracle/credulity.js rolls Math.random()*100 < credulity for debuff/lure; on success pushOverride() inserts into Redis game:match:{id}:override_queue. turn-scheduler.js consumes overrides via popCharacterOverrides() before evaluateAction()."
+        },
+        {
+          "criterion": "쿨다운: 동일 플레이어 분당 1회 초과 시 거부 응답",
+          "status": "passed",
+          "evidence": "oracle/routes.js lines 87-93: Redis key oracle:cooldown:{userId}:{matchId} with EX=60s; returns HTTP 429 with remaining TTL on violation."
+        },
+        {
+          "criterion": "포인트 부족 시 신탁 거부, 포인트 차감 정확성 검증",
+          "status": "passed",
+          "evidence": "routes.js returns HTTP 402 when points < 5; oracle/points.js deductOracleCost() uses atomic UPDATE ... WHERE constellation_points >= 5 RETURNING to prevent race conditions. Survival +1/turn, win +5, dramatic reversal +15 awarded from turn-scheduler."
+        },
+        {
+          "criterion": "DB migration: credulity column added to characters",
+          "status": "passed",
+          "evidence": "server/migrations/003_oracle_credulity.sql: ALTER TABLE characters ADD COLUMN IF NOT EXISTS credulity INTEGER NOT NULL DEFAULT 50; redis-state.js carries credulity into character state."
+        },
+        {
+          "criterion": "Node.js syntax validation on all new oracle files",
+          "status": "passed",
+          "evidence": "node --check on all 5 new oracle files, turn-scheduler.js, and app.js returned exit 0 with ALL OK."
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-05T22:28:00.848Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-05T22-28-00-848Z.log",
+      "validationFile": "validation-2026-04-05T22-28-00-848Z.md",
+      "validationChecks": [
+        {
+          "criterion": "신탁 메시지 → Gemini 분류 → 유형(강화/방해/유혹) + 대상 추출",
+          "status": "passed",
+          "evidence": "oracle/intent.js extractOracleIntent() calls Gemini with structured prompt returning buff/debuff/lure classification and actionOverride; keyword fallback included."
+        },
+        {
+          "criterion": "credulity 판정: 성공 시 override_queue에 삽입, 다음 턴 AI 행동에 반영",
+          "status": "passed",
+          "evidence": "oracle/credulity.js rolls Math.random()*100 < credulity for debuff/lure; on success pushOverride() inserts into Redis game:match:{id}:override_queue. turn-scheduler.js consumes overrides via popCharacterOverrides() before evaluateAction()."
+        },
+        {
+          "criterion": "쿨다운: 동일 플레이어 분당 1회 초과 시 거부 응답",
+          "status": "passed",
+          "evidence": "oracle/routes.js lines 87-93: Redis key oracle:cooldown:{userId}:{matchId} with EX=60s; returns HTTP 429 with remaining TTL on violation."
+        },
+        {
+          "criterion": "포인트 부족 시 신탁 거부, 포인트 차감 정확성 검증",
+          "status": "passed",
+          "evidence": "routes.js returns HTTP 402 when points < 5; oracle/points.js deductOracleCost() uses atomic UPDATE ... WHERE constellation_points >= 5 RETURNING to prevent race conditions. Survival +1/turn, win +5, dramatic reversal awarded from turn-scheduler."
+        },
+        {
+          "criterion": "DB migration: credulity column added to characters",
+          "status": "passed",
+          "evidence": "server/migrations/003_oracle_credulity.sql: ALTER TABLE characters ADD COLUMN IF NOT EXISTS credulity INTEGER NOT NULL DEFAULT 50; redis-state.js carries credulity into character state."
+        },
+        {
+          "criterion": "Node.js syntax validation on all new oracle files",
+          "status": "passed",
+          "evidence": "node --check on all 5 new oracle files, turn-scheduler.js, and app.js returned exit 0 with ALL OK."
+        }
+      ]
+    }
+  ]
+}

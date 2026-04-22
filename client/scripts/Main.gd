@@ -14,28 +14,34 @@ extends Node2D
 
 const CHARACTER_SCENE := preload("res://scenes/Character.tscn")
 
-const CHAR_LIST_SCRIPT   := preload("res://scripts/CharacterListScreen.gd")
-const CHAR_CREATE_SCRIPT := preload("res://scripts/CharacterCreateScreen.gd")
-const MATCH_WAIT_SCRIPT  := preload("res://scripts/MatchWaitingScreen.gd")
-const ORACLE_STREAM_SCRIPT := preload("res://scripts/OracleStreamPanel.gd")
-const GAME_RESULT_SCRIPT := preload("res://scripts/GameResultScreen.gd")
-const NOTIF_SCRIPT       := preload("res://scripts/NotificationManager.gd")
+const CHAR_LIST_SCRIPT      := preload("res://scripts/CharacterListScreen.gd")
+const CHAR_CREATE_SCRIPT    := preload("res://scripts/CharacterCreateScreen.gd")
+const MATCH_WAIT_SCRIPT     := preload("res://scripts/MatchWaitingScreen.gd")
+const ORACLE_STREAM_SCRIPT  := preload("res://scripts/OracleStreamPanel.gd")
+const GAME_RESULT_SCRIPT    := preload("res://scripts/GameResultScreen.gd")
+const NOTIF_SCRIPT          := preload("res://scripts/NotificationManager.gd")
+const SPECTATE_LIST_SCRIPT  := preload("res://scripts/SpectateListScreen.gd")
 
 var _char_nodes: Dictionary = {}
 var _korean_font: FontFile = null
 
 # UI screens
-var _char_list_screen:   Control
-var _char_create_screen: Control
-var _match_wait_screen:  Control
-var _oracle_stream:      Control
-var _game_result_screen: Control
+var _char_list_screen:    Control
+var _char_create_screen:  Control
+var _match_wait_screen:   Control
+var _oracle_stream:       Control
+var _game_result_screen:  Control
+var _spectate_list_screen: Control
+
+# Spectator state
+var _is_spectating: bool = false
 
 # HUD
-var _hud:       Control
-var _pts_lbl:   Label
-var _turn_lbl:  Label
-var _alive_lbl: Label
+var _hud:            Control
+var _pts_lbl:        Label
+var _turn_lbl:       Label
+var _alive_lbl:      Label
+var _spectator_badge: Label
 
 # Notifications
 var _notifs: VBoxContainer
@@ -93,6 +99,7 @@ func _build_ui() -> void:
 	ui.add_child(_char_list_screen)
 	_char_list_screen.create_character_requested.connect(_on_create_character_requested)
 	_char_list_screen.join_match_requested.connect(_on_join_match_requested)
+	_char_list_screen.spectate_requested.connect(_on_spectate_requested)
 
 	# ── CharacterCreateScreen ──
 	_char_create_screen = Control.new()
@@ -140,6 +147,19 @@ func _build_ui() -> void:
 	_apply_font(_alive_lbl)
 	_hud.add_child(_alive_lbl)
 
+	# Spectator badge (shown only in spectator mode)
+	_spectator_badge = Label.new()
+	_spectator_badge.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_spectator_badge.offset_top    = 4.0
+	_spectator_badge.offset_bottom = 28.0
+	_spectator_badge.text = "👁 관전 중"
+	_spectator_badge.modulate = Color(0.545, 0.361, 0.965)  # ACCENT_PURPLE
+	_spectator_badge.add_theme_font_size_override("font_size", 15)
+	_spectator_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_spectator_badge.visible = false
+	_apply_font(_spectator_badge)
+	_hud.add_child(_spectator_badge)
+
 	# ── OracleStreamPanel (right side, shown during arena) ──
 	_oracle_stream = Control.new()
 	_oracle_stream.set_script(ORACLE_STREAM_SCRIPT)
@@ -154,6 +174,15 @@ func _build_ui() -> void:
 	ui.add_child(_game_result_screen)
 	_game_result_screen.play_again_requested.connect(_on_play_again)
 	_game_result_screen.main_menu_requested.connect(_on_main_menu)
+
+	# ── SpectateListScreen ──
+	_spectate_list_screen = Control.new()
+	_spectate_list_screen.set_script(SPECTATE_LIST_SCRIPT)
+	_spectate_list_screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_spectate_list_screen.visible = false
+	ui.add_child(_spectate_list_screen)
+	_spectate_list_screen.back_requested.connect(_on_spectate_back)
+	_spectate_list_screen.spectate_match_requested.connect(_on_spectate_match_requested)
 
 	# ── Notification manager ──
 	_notifs = VBoxContainer.new()
@@ -170,12 +199,19 @@ func _build_ui() -> void:
 # ── Screen transitions ────────────────────────────────────────────────────────
 
 func _show_screen(name: String) -> void:
-	_char_list_screen.visible   = name == "char_list"
-	_char_create_screen.visible = name == "char_create"
-	_match_wait_screen.visible  = name == "match_wait"
-	_hud.visible                = name == "arena"
-	_oracle_stream.visible      = name == "arena"
-	_game_result_screen.visible = name == "result"
+	_char_list_screen.visible    = name == "char_list"
+	_char_create_screen.visible  = name == "char_create"
+	_match_wait_screen.visible   = name == "match_wait"
+	_hud.visible                 = name == "arena"
+	_oracle_stream.visible       = name == "arena"
+	_game_result_screen.visible  = name == "result"
+	_spectate_list_screen.visible = name == "spectate_list"
+	_update_debug_state(name)
+
+func _update_debug_state(screen: String) -> void:
+	if OS.has_feature("web"):
+		var js := "window.gameDebug = window.gameDebug || {}; window.gameDebug.currentScreen = '%s'; window.gameDebug.ready = true;" % screen
+		JavaScriptBridge.eval(js)
 
 # ── Connection ────────────────────────────────────────────────────────────────
 
@@ -183,10 +219,14 @@ func _on_ws_connected() -> void:
 	_update_conn_label(true)
 	_notifs.show_notification("서버에 연결되었습니다")
 	WebSocketClient.send({"type": "get_characters"})
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.gameDebug = window.gameDebug || {}; window.gameDebug.wsStatus = 'connected';")
 
 func _on_ws_disconnected() -> void:
 	_update_conn_label(false)
 	_notifs.show_notification("연결이 끊어졌습니다. 재연결 중…")
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.gameDebug = window.gameDebug || {}; window.gameDebug.wsStatus = 'disconnected';")
 
 func _update_conn_label(connected: bool) -> void:
 	if connected:
@@ -242,7 +282,14 @@ func _on_match_cancelled() -> void:
 
 func _on_match_joined(match_id: int) -> void:
 	_show_screen("arena")
-	_notifs.show_notification("매치 #%d 입장" % match_id)
+	if _is_spectating:
+		_oracle_stream.call("set_spectator_mode", true)
+		_spectator_badge.visible = true
+		_notifs.show_notification("경기 #%d 관전 시작" % match_id)
+	else:
+		_oracle_stream.call("set_spectator_mode", false)
+		_spectator_badge.visible = false
+		_notifs.show_notification("매치 #%d 입장" % match_id)
 
 func _on_chars_updated(chars: Array) -> void:
 	_sync_char_nodes(chars)
@@ -258,19 +305,62 @@ func _on_turn_advanced(turn: int, events: Array) -> void:
 				_notifs.show_notification("🔮 신탁이 %s 에게 개입하였습니다" % ev.get("name", "?"))
 
 func _on_game_ended(winner_id: int, winner_name: String) -> void:
-	# Build result data for GameResultScreen
+	# Build rankings: winner first, then eliminated in reverse order (last out = 2nd, etc.)
+	var rankings: Array = []
+	# Winner row
+	if winner_id >= 0:
+		var winner_cls := "?"
+		for c in GameState.characters:
+			if c.get("id", -1) == winner_id:
+				winner_cls = c.get("class", "?")
+				break
+		rankings.append({
+			"name": winner_name,
+			"class": winner_cls,
+			"eliminated_turn": -1,
+		})
+	# Eliminated in reverse order (later deaths = better rank)
+	var deaths := GameState.death_log.duplicate()
+	deaths.reverse()
+	for entry in deaths:
+		rankings.append(entry)
+
 	var result := {
 		"winner_name": winner_name if winner_id >= 0 else "무승부",
-		"rankings": [],
+		"rankings": rankings,
 		"points_summary": {
 			"oracle_spent": 100 - GameState.oracle_points,
 			"participation_bonus": 50,
 			"winner_bonus": 200 if winner_id >= 0 else 0
 		}
 	}
+	# Spectators return to spectate list; participants see the result screen
+	if _is_spectating:
+		_is_spectating = false
+		_spectator_badge.visible = false
+		_oracle_stream.call("set_spectator_mode", false)
+		_clear_char_nodes()
+		_show_screen("spectate_list")
+		_spectate_list_screen.call("fetch_matches")
+		_notifs.show_notification("경기가 종료되었습니다. 목록으로 복귀합니다.")
+		return
+
 	_game_result_screen.call("show_result", result)
 	_show_screen("result")
 	_clear_char_nodes()
+
+# ── Spectate ─────────────────────────────────────────────────────────────────
+
+func _on_spectate_requested() -> void:
+	_show_screen("spectate_list")
+	_spectate_list_screen.call("fetch_matches")
+
+func _on_spectate_back() -> void:
+	_show_screen("char_list")
+
+func _on_spectate_match_requested(match_id: int) -> void:
+	_is_spectating = true
+	WebSocketClient.send({"type": "spectate", "matchId": match_id})
 
 # ── Result screen ─────────────────────────────────────────────────────────────
 

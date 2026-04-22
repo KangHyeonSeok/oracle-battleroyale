@@ -1,0 +1,33 @@
+# oracle-ranking-leaderboard Validation
+
+- Status: completed
+- Action: completed-spec
+- UpdatedAt: 2026-04-12T04:35:44.283Z
+- Detail: test-validator: All 6 acceptance criteria are evidenced as passed by the prior spec-validator tick. Migration, server routes, game logic upserts, and Godot client files are all implemented and verified via node --check. No gaps found.
+
+## Acceptance Criteria Review
+
+1. AC1 — GET /leaderboard returns oracle_points DESC top 20
+Status: passed
+Evidence: leaderboard.js queries ORDER BY constellation_points DESC LIMIT $1 (default 20); routes.js exposes GET /leaderboard; registered in app.js; node --check passed
+
+2. AC2 — match win increments player_stats.total_wins+1 and total_matches+1
+Status: passed
+Evidence: finaliseMatch in turn-scheduler.js upserts player_stats for every non-NPC participant: total_matches+1 always, total_wins+$isWinner; node --check passed
+
+3. AC3 — oracle send increments player_stats.oracle_sent+1
+Status: passed
+Evidence: oracle/routes.js step 10 does INSERT ... ON CONFLICT DO UPDATE SET oracle_sent+1 immediately after point deduction; node --check passed
+
+4. AC4 — LeaderboardScreen rank-1 entry shows accent-gold badge
+Status: passed
+Evidence: LeaderboardScreen.gd: is_top3 = rank<=3 sets border_color=ACCENT_GOLD, bg_color=Color(ACCENT_GOLD,0.12), rank emoji badge [🥇,🥈,🥉]
+
+5. AC5 — logged-in player row highlighted with accent-purple border
+Status: passed
+Evidence: LeaderboardScreen.gd: is_mine = entry.accountId==my_account_id → style.border_color=ACCENT_PURPLE, bg_color=Color(ACCENT_PURPLE,0.12)
+
+6. AC6 — 랭킹 보기 navigates to LeaderboardScreen; 돌아가기 returns to CharacterListScreen
+Status: passed
+Evidence: CharacterListScreen.gd emits leaderboard_requested signal via 랭킹 🏆 button; LeaderboardScreen.gd emits back_requested signal via 돌아가기 button — matches signal-based navigation pattern used throughout project
+

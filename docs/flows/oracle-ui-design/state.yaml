@@ -1,0 +1,9 @@
+status: done
+lastError: null
+retryCount: 0
+updatedAt: 2026-04-13T09:00:00.000Z
+notes: |
+  AC1 색상 상수 불일치 → 해소 확인 (2026-04-13 태연 스펙 리뷰).
+  CharacterListScreen, CharacterCreateScreen, MatchWaitingScreen, OracleStreamPanel
+  4개 파일 모두 BG_BASE/BG_CARD/TEXT_PRIMARY/TEXT_SECONDARY/SUCCESS/DANGER 정의 확인.
+  FAIL → DANGER 리네임도 완료. reviewNote 클리어.

@@ -1,0 +1,19 @@
+specId: server-test-ci
+status: done
+lastError: null
+retryCount: 0
+createdAt: 2026-04-13T00:00:00.000Z
+updatedAt: 2026-04-13T21:30:00.000Z
+notes: |
+  2026-04-13 태연 신규 draft:
+  - test-strategy-log 15회차 기준 P0-2 블로커 — CI 워크플로 15회 연속 미해결
+  - 기존 npm test 통과 6개 테스트를 자동화하는 단순 YAML (~30줄)
+  - GEMINI_API_KEY secret 불필요 (정적 계산 테스트 기반 확인)
+  - DevourerKing 구현 대상으로 핸드오프 권장
+  - hyeonseok 착수 승인 항목 — 직접 구현은 승인 후 진행
+  2026-04-13 태연 스케줄 확인:
+  - .github/workflows/server-test.yml 실제 파일 존재 확인 ✓
+  - spec.md에 명시된 YAML 내용과 완전히 일치 ✓
+  - AC1/AC4/AC5 구현 완료로 판단 → status done 전환
+  - AC2(npm test 전체 통과): server-unit-tests-expansion(leaderboard.test.js + oracle-cooldown.test.js) 완료 후 충족 가능
+  - AC3(PR blocking): repository settings에서 branch protection rule 설정 필요 (GitHub 관리 작업)

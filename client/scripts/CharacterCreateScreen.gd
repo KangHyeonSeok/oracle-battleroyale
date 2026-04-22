@@ -5,9 +5,15 @@ extends Control
 signal back_requested
 signal character_created(data: Dictionary)
 
-const GOLD   := Color(1.0, 0.85, 0.0)
-const BG     := Color(0.07, 0.07, 0.14)
-const PURPLE := Color(0.55, 0.36, 0.96)
+const BG_BASE       := Color(0.071, 0.071, 0.133)
+const BG_CARD       := Color(1, 1, 1, 0.06)
+const BORDER_CARD   := Color(1, 1, 1, 0.12)
+const ACCENT_GOLD   := Color(1.0, 0.843, 0.0)
+const ACCENT_PURPLE := Color(0.545, 0.361, 0.965)
+const TEXT_PRIMARY  := Color(1, 1, 1)
+const TEXT_SECONDARY := Color(1, 1, 1, 0.6)
+const SUCCESS       := Color(0.063, 0.725, 0.506)
+const DANGER        := Color(0.937, 0.267, 0.267)
 
 var _font: FontFile = null
 
@@ -38,7 +44,7 @@ func _build_ui() -> void:
 
 	var bg := ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = BG
+	bg.color = BG_BASE
 	add_child(bg)
 
 	var root := VBoxContainer.new()
@@ -63,7 +69,7 @@ func _build_ui() -> void:
 
 	var title := Label.new()
 	title.text = "새 성좌 만들기"
-	title.modulate = GOLD
+	title.modulate = ACCENT_GOLD
 	title.add_theme_font_size_override("font_size", 20)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -78,7 +84,7 @@ func _build_ui() -> void:
 	# Step 1: Name
 	var step1_lbl := Label.new()
 	step1_lbl.text = "STEP 1 — 성좌명을 입력하세요"
-	step1_lbl.modulate = Color(0.7, 0.7, 1.0)
+	step1_lbl.modulate = TEXT_SECONDARY
 	step1_lbl.add_theme_font_size_override("font_size", 14)
 	_apply_font(step1_lbl)
 	root.add_child(step1_lbl)
@@ -93,7 +99,7 @@ func _build_ui() -> void:
 	# Step 2: Prompt
 	var step2_lbl := Label.new()
 	step2_lbl.text = "STEP 2 — 소환 주문을 입력하세요 (AI가 스탯을 추출합니다)"
-	step2_lbl.modulate = Color(0.7, 0.7, 1.0)
+	step2_lbl.modulate = TEXT_SECONDARY
 	step2_lbl.add_theme_font_size_override("font_size", 14)
 	_apply_font(step2_lbl)
 	root.add_child(step2_lbl)
@@ -109,7 +115,7 @@ func _build_ui() -> void:
 	_analyze_btn = Button.new()
 	_analyze_btn.text = "AI로 스탯 분석하기"
 	_analyze_btn.custom_minimum_size = Vector2(0, 40)
-	_analyze_btn.modulate = GOLD
+	_analyze_btn.modulate = ACCENT_GOLD
 	_analyze_btn.add_theme_font_size_override("font_size", 15)
 	_apply_font(_analyze_btn)
 	_analyze_btn.pressed.connect(_on_analyze_pressed)
@@ -118,7 +124,7 @@ func _build_ui() -> void:
 	# Loading label
 	_loading_lbl = Label.new()
 	_loading_lbl.text = "AI 분석 중..."
-	_loading_lbl.modulate = PURPLE
+	_loading_lbl.modulate = ACCENT_PURPLE
 	_loading_lbl.add_theme_font_size_override("font_size", 14)
 	_loading_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_loading_lbl.visible = false
@@ -134,7 +140,7 @@ func _build_ui() -> void:
 	_save_btn = Button.new()
 	_save_btn.text = "성좌 저장하기"
 	_save_btn.custom_minimum_size = Vector2(0, 44)
-	_save_btn.modulate = GOLD
+	_save_btn.modulate = ACCENT_GOLD
 	_save_btn.add_theme_font_size_override("font_size", 16)
 	_save_btn.visible = false
 	_apply_font(_save_btn)
@@ -144,16 +150,16 @@ func _build_ui() -> void:
 func _build_preview_panel() -> Control:
 	var panel := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.10, 0.10, 0.20)
-	style.corner_radius_top_left     = 8
-	style.corner_radius_top_right    = 8
-	style.corner_radius_bottom_left  = 8
-	style.corner_radius_bottom_right = 8
+	style.bg_color = BG_CARD
+	style.corner_radius_top_left     = 12
+	style.corner_radius_top_right    = 12
+	style.corner_radius_bottom_left  = 12
+	style.corner_radius_bottom_right = 12
 	style.border_width_left   = 1
 	style.border_width_right  = 1
 	style.border_width_top    = 1
 	style.border_width_bottom = 1
-	style.border_color = GOLD
+	style.border_color = ACCENT_GOLD
 	panel.add_theme_stylebox_override("panel", style)
 
 	var vbox := VBoxContainer.new()
@@ -162,14 +168,14 @@ func _build_preview_panel() -> Control:
 
 	var prev_title := Label.new()
 	prev_title.text = "STEP 3 — 성좌 미리보기"
-	prev_title.modulate = Color(0.7, 0.7, 1.0)
+	prev_title.modulate = TEXT_SECONDARY
 	prev_title.add_theme_font_size_override("font_size", 13)
 	_apply_font(prev_title)
 	vbox.add_child(prev_title)
 
 	_preview_class = Label.new()
 	_preview_class.text = "클래스: -"
-	_preview_class.modulate = GOLD
+	_preview_class.modulate = ACCENT_GOLD
 	_preview_class.add_theme_font_size_override("font_size", 15)
 	_apply_font(_preview_class)
 	vbox.add_child(_preview_class)
@@ -182,7 +188,7 @@ func _build_preview_panel() -> Control:
 
 	_preview_tend = Label.new()
 	_preview_tend.text = "행동 성향: -"
-	_preview_tend.modulate = Color(0.8, 0.8, 1.0)
+	_preview_tend.modulate = TEXT_SECONDARY
 	_preview_tend.add_theme_font_size_override("font_size", 13)
 	_apply_font(_preview_tend)
 	vbox.add_child(_preview_tend)
@@ -231,6 +237,15 @@ func _on_ws_message(data: Dictionary) -> void:
 		"character_created":
 			_save_btn.disabled = false
 			character_created.emit(data.get("character", {}))
+		"error":
+			_analyze_btn.disabled = false
+			_loading_lbl.text = "오류: " + data.get("message", "알 수 없는 오류")
+			_loading_lbl.modulate = DANGER
+			_loading_lbl.visible = true
+			await get_tree().create_timer(3.0).timeout
+			_loading_lbl.text = "AI 분석 중..."
+			_loading_lbl.modulate = ACCENT_PURPLE
+			_loading_lbl.visible = false
 
 func _populate_preview(d: Dictionary) -> void:
 	var cls_str: String = (d.get("class", "?") as String).capitalize()

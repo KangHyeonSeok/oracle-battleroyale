@@ -5,10 +5,19 @@ extends Control
 
 signal create_character_requested
 signal join_match_requested(character_id: int)
+signal leaderboard_requested
+signal spectate_requested
+signal history_requested
 
-const GOLD   := Color(1.0, 0.85, 0.0)
-const BG     := Color(0.07, 0.07, 0.14)
-const PURPLE := Color(0.55, 0.36, 0.96)
+const BG_BASE      := Color(0.071, 0.071, 0.133)
+const BG_CARD      := Color(1, 1, 1, 0.06)
+const BORDER_CARD  := Color(1, 1, 1, 0.12)
+const ACCENT_GOLD  := Color(1.0, 0.843, 0.0)
+const ACCENT_PURPLE := Color(0.545, 0.361, 0.965)
+const TEXT_PRIMARY := Color(1, 1, 1)
+const TEXT_SECONDARY := Color(1, 1, 1, 0.82)
+const SUCCESS      := Color(0.063, 0.725, 0.506)
+const DANGER       := Color(0.937, 0.267, 0.267)
 
 var _font: FontFile = null
 var _card_container: VBoxContainer
@@ -28,7 +37,7 @@ func _build_ui() -> void:
 	# Background
 	var bg := ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = BG
+	bg.color = BG_BASE
 	add_child(bg)
 
 	var root := VBoxContainer.new()
@@ -40,20 +49,51 @@ func _build_ui() -> void:
 	root.offset_bottom = -16.0
 	add_child(root)
 
-	# Title
+	# Top row: title + ranking button
+	var top_row := HBoxContainer.new()
+	root.add_child(top_row)
+
 	var title := Label.new()
 	title.text = "나의 성좌"
-	title.modulate = GOLD
-	title.add_theme_font_size_override("font_size", 22)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.modulate = ACCENT_GOLD
+	title.add_theme_font_size_override("font_size", 28)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_apply_font(title)
-	root.add_child(title)
+	top_row.add_child(title)
+
+	var rank_btn := Button.new()
+	rank_btn.text = "랭킹 🏆"
+	rank_btn.custom_minimum_size = Vector2(90, 36)
+	rank_btn.add_theme_font_size_override("font_size", 14)
+	rank_btn.modulate = ACCENT_PURPLE
+	_apply_font(rank_btn)
+	rank_btn.pressed.connect(func() -> void: leaderboard_requested.emit())
+	top_row.add_child(rank_btn)
+
+	var spectate_btn := Button.new()
+	spectate_btn.text = "관전하기 👁"
+	spectate_btn.custom_minimum_size = Vector2(110, 36)
+	spectate_btn.add_theme_font_size_override("font_size", 14)
+	spectate_btn.modulate = ACCENT_PURPLE
+	_apply_font(spectate_btn)
+	spectate_btn.pressed.connect(func() -> void: spectate_requested.emit())
+	top_row.add_child(spectate_btn)
+
+	var history_btn := Button.new()
+	history_btn.text = "경기 기록"
+	history_btn.custom_minimum_size = Vector2(90, 36)
+	history_btn.add_theme_font_size_override("font_size", 14)
+	history_btn.modulate = ACCENT_PURPLE
+	_apply_font(history_btn)
+	history_btn.pressed.connect(func() -> void: history_requested.emit())
+	top_row.add_child(history_btn)
 
 	# Subtitle
 	var sub := Label.new()
 	sub.text = "출전할 성좌를 선택하거나 새 성좌를 만드세요"
-	sub.modulate = Color(0.7, 0.7, 0.9)
-	sub.add_theme_font_size_override("font_size", 13)
+	sub.modulate = TEXT_SECONDARY
+	sub.add_theme_font_size_override("font_size", 15)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(sub)
 	root.add_child(sub)
@@ -70,7 +110,7 @@ func _build_ui() -> void:
 
 	_empty_lbl = Label.new()
 	_empty_lbl.text = "아직 성좌가 없습니다. 새 성좌를 만들어보세요!"
-	_empty_lbl.modulate = Color(0.6, 0.6, 0.8)
+	_empty_lbl.modulate = TEXT_SECONDARY
 	_empty_lbl.add_theme_font_size_override("font_size", 14)
 	_empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_empty_lbl.visible = false
@@ -80,9 +120,9 @@ func _build_ui() -> void:
 	# Bottom button
 	var create_btn := Button.new()
 	create_btn.text = "+ 새 성좌 만들기"
-	create_btn.custom_minimum_size = Vector2(0, 44)
-	create_btn.modulate = GOLD
-	create_btn.add_theme_font_size_override("font_size", 16)
+	create_btn.custom_minimum_size = Vector2(0, 56)
+	create_btn.modulate = ACCENT_GOLD
+	create_btn.add_theme_font_size_override("font_size", 20)
 	_apply_font(create_btn)
 	create_btn.pressed.connect(func() -> void: create_character_requested.emit())
 	root.add_child(create_btn)
@@ -103,16 +143,16 @@ func _make_card(data: Dictionary) -> Control:
 	card.custom_minimum_size = Vector2(0, 80)
 
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.12, 0.12, 0.22)
-	style.corner_radius_top_left     = 8
-	style.corner_radius_top_right    = 8
-	style.corner_radius_bottom_left  = 8
-	style.corner_radius_bottom_right = 8
+	style.bg_color = BG_CARD
+	style.corner_radius_top_left     = 12
+	style.corner_radius_top_right    = 12
+	style.corner_radius_bottom_left  = 12
+	style.corner_radius_bottom_right = 12
 	style.border_width_left   = 1
 	style.border_width_right  = 1
 	style.border_width_top    = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(0.3, 0.3, 0.5)
+	style.border_color = BORDER_CARD
 	card.add_theme_stylebox_override("panel", style)
 
 	var hbox := HBoxContainer.new()
@@ -127,7 +167,7 @@ func _make_card(data: Dictionary) -> Control:
 
 	var name_lbl := Label.new()
 	name_lbl.text = data.get("name", "알 수 없음")
-	name_lbl.modulate = GOLD
+	name_lbl.modulate = TEXT_PRIMARY
 	name_lbl.add_theme_font_size_override("font_size", 16)
 	_apply_font(name_lbl)
 	info.add_child(name_lbl)
@@ -140,7 +180,7 @@ func _make_card(data: Dictionary) -> Control:
 		data.get("atk", 0),
 		data.get("def", 0)
 	]
-	stats_lbl.modulate = Color(0.8, 0.8, 1.0)
+	stats_lbl.modulate = TEXT_SECONDARY
 	stats_lbl.add_theme_font_size_override("font_size", 13)
 	_apply_font(stats_lbl)
 	info.add_child(stats_lbl)
@@ -148,7 +188,7 @@ func _make_card(data: Dictionary) -> Control:
 	var rate := data.get("win_rate", 0.0) as float
 	var rate_lbl := Label.new()
 	rate_lbl.text = "승률 %.0f%%" % (rate * 100.0)
-	rate_lbl.modulate = Color(0.6, 0.9, 0.6)
+	rate_lbl.modulate = SUCCESS
 	rate_lbl.add_theme_font_size_override("font_size", 12)
 	_apply_font(rate_lbl)
 	info.add_child(rate_lbl)
@@ -157,7 +197,7 @@ func _make_card(data: Dictionary) -> Control:
 	var join_btn := Button.new()
 	join_btn.text = "경기 참가"
 	join_btn.custom_minimum_size = Vector2(80, 0)
-	join_btn.modulate = GOLD
+	join_btn.modulate = ACCENT_GOLD
 	_apply_font(join_btn)
 	var cid: int = data.get("id", -1)
 	join_btn.pressed.connect(func() -> void: join_match_requested.emit(cid))
