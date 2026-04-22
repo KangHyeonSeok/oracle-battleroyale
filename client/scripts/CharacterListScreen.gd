@@ -98,6 +98,16 @@ func _build_ui() -> void:
 	_apply_font(sub)
 	root.add_child(sub)
 
+	# Create button (above card list — avoids browser chrome overlap on mobile)
+	var create_btn := Button.new()
+	create_btn.text = "+ 새 성좌 만들기"
+	create_btn.custom_minimum_size = Vector2(0, 56)
+	create_btn.modulate = ACCENT_GOLD
+	create_btn.add_theme_font_size_override("font_size", 20)
+	_apply_font(create_btn)
+	create_btn.pressed.connect(func() -> void: create_character_requested.emit())
+	root.add_child(create_btn)
+
 	# Scroll area for cards
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -116,16 +126,6 @@ func _build_ui() -> void:
 	_empty_lbl.visible = false
 	_apply_font(_empty_lbl)
 	_card_container.add_child(_empty_lbl)
-
-	# Bottom button
-	var create_btn := Button.new()
-	create_btn.text = "+ 새 성좌 만들기"
-	create_btn.custom_minimum_size = Vector2(0, 56)
-	create_btn.modulate = ACCENT_GOLD
-	create_btn.add_theme_font_size_override("font_size", 20)
-	_apply_font(create_btn)
-	create_btn.pressed.connect(func() -> void: create_character_requested.emit())
-	root.add_child(create_btn)
 
 func refresh(chars: Array) -> void:
 	# Clear existing cards (keep _empty_lbl)
