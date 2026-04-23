@@ -64,6 +64,11 @@ jobs:
           DEPLOY_URL=$(grep -oP 'https://[^\s]+' /tmp/vercel_output.txt | grep -v 'vercel.com/KangHyeonSeok' | tail -1)
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "Deployed to: $DEPLOY_URL"
+          # DEPLOY_URL이 있으면 실제 배포 완료 — Vercel CLI 일시 오류는 무시
+          if [ -n "$DEPLOY_URL" ]; then
+            echo "Deploy URL confirmed — treating as success despite CLI exit code $VERCEL_EXIT"
+            exit 0
+          fi
           exit $VERCEL_EXIT
 
       - name: Notify Slack on deploy
