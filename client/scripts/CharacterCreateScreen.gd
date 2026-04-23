@@ -29,6 +29,7 @@ var _font: FontFile = null
 var _name_input:    LineEdit
 var _prompt_input:  TextEdit
 var _analyze_btn:   Button
+var _random_btn:    Button
 var _loading_lbl:   Label
 var _preview_panel: Control
 var _preview_class: Label
@@ -124,15 +125,30 @@ func _build_ui() -> void:
 	_apply_font(_prompt_input)
 	root.add_child(_prompt_input)
 
-	# Analyze button
+	# Button row: Analyze + Random
+	var btn_row := HBoxContainer.new()
+	btn_row.add_theme_constant_override("separation", 12)
+	root.add_child(btn_row)
+
 	_analyze_btn = Button.new()
 	_analyze_btn.text = "AI로 스탯 분석하기"
 	_analyze_btn.custom_minimum_size = Vector2(0, 56)
+	_analyze_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_analyze_btn.modulate = ACCENT_GOLD
 	_analyze_btn.add_theme_font_size_override("font_size", 20)
 	_apply_font(_analyze_btn)
 	_analyze_btn.pressed.connect(_on_analyze_pressed)
-	root.add_child(_analyze_btn)
+	btn_row.add_child(_analyze_btn)
+
+	_random_btn = Button.new()
+	_random_btn.text = "🎲 랜덤 생성"
+	_random_btn.custom_minimum_size = Vector2(0, 56)
+	_random_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_random_btn.modulate = ACCENT_PURPLE
+	_random_btn.add_theme_font_size_override("font_size", 20)
+	_apply_font(_random_btn)
+	_random_btn.pressed.connect(_on_random_pressed)
+	btn_row.add_child(_random_btn)
 
 	# Loading label
 	_loading_lbl = Label.new()
@@ -225,6 +241,16 @@ func _build_preview_panel() -> Control:
 
 	return panel
 
+func _on_random_pressed() -> void:
+	_random_btn.disabled = true
+	_analyze_btn.disabled = true
+	_loading_lbl.text = "AI 생성 중..."
+	_loading_lbl.modulate = ACCENT_PURPLE
+	_loading_lbl.visible = true
+	_preview_panel.visible = false
+	_save_btn.visible = false
+	WebSocketClient.send({"type": "random_character"})
+
 func _on_analyze_pressed() -> void:
 	var name_val := _name_input.text.strip_edges()
 	var prompt_val := _prompt_input.text.strip_edges()
@@ -263,7 +289,12 @@ func _on_ws_message(data: Dictionary) -> void:
 		"character_preview":
 			_loading_lbl.visible = false
 			_analyze_btn.disabled = false
+			_random_btn.disabled = false
 			_preview_data = data.get("character", {})
+			var name_from_server: String = _preview_data.get("name", "")
+			if not name_from_server.is_empty():
+				_name_input.text = name_from_server
+				_pending_name = name_from_server
 			_populate_preview(_preview_data)
 			_preview_panel.visible = true
 			_save_btn.visible = true
@@ -272,6 +303,7 @@ func _on_ws_message(data: Dictionary) -> void:
 			character_created.emit(data.get("character", {}))
 		"error":
 			_analyze_btn.disabled = false
+			_random_btn.disabled = false
 			_save_btn.disabled = false
 			_loading_lbl.text = "오류: " + data.get("message", "알 수 없는 오류")
 			_loading_lbl.modulate = DANGER

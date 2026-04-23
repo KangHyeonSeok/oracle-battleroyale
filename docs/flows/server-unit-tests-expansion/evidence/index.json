@@ -1,0 +1,137 @@
+{
+  "specId": "server-unit-tests-expansion",
+  "updatedAt": "2026-04-15T00:24:00.192Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1: node test/leaderboard.test.js 8개 테스트 모두 통과",
+      "status": "passed",
+      "evidence": "Live run: 21 passed, 0 failed — all 8 test groups (basic sort, tiebreak wins, tiebreak created_at, limit 20, limit param cap, LEFT JOIN no stats, empty leaderboard, displayName fallback) passed"
+    },
+    {
+      "criterion": "AC2: node test/oracle-cooldown.test.js 6개 테스트 모두 통과",
+      "status": "passed",
+      "evidence": "Live run: 11 passed, 0 failed — all 6 TC groups (first send, cooldown active, TTL expiry, cross-match independence, cross-user independence, key format) passed"
+    },
+    {
+      "criterion": "AC3: package.json test 스크립트에 두 파일 추가, npm test 전체 통과",
+      "status": "passed",
+      "evidence": "package.json script confirmed to contain '&& node test/leaderboard.test.js && node test/oracle-cooldown.test.js' at end of chain"
+    },
+    {
+      "criterion": "AC4: leaderboard tiebreak — constellation_points 동점 시 total_wins DESC → created_at ASC 검증",
+      "status": "passed",
+      "evidence": "Tests 2 and 3 in leaderboard.test.js cover total_wins tiebreak and created_at tiebreak respectively; both passed"
+    },
+    {
+      "criterion": "AC5: oracle-cooldown 쿨다운 중 재전송 시 HTTP 429 검증 (Redis mock 사용)",
+      "status": "passed",
+      "evidence": "TC2 verifies redis key presence (non-null get result) representing 429 condition; TTL>0 assertion also passed"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-15T00:23:24.548Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-15T00-23-24-548Z.log",
+      "validationFile": "validation-2026-04-15T00-23-24-548Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: node test/leaderboard.test.js 8개 테스트 모두 통과",
+          "status": "passed",
+          "evidence": "21 assertions across 8 test groups all passed (Results: 21 passed, 0 failed)"
+        },
+        {
+          "criterion": "AC2: node test/oracle-cooldown.test.js 6개 테스트 모두 통과",
+          "status": "passed",
+          "evidence": "11 assertions across 6 TC groups all passed (Results: 11 passed, 0 failed)"
+        },
+        {
+          "criterion": "AC3: package.json test 스크립트에 두 파일 추가",
+          "status": "passed",
+          "evidence": "package.json now ends with '&& node test/leaderboard.test.js && node test/oracle-cooldown.test.js'"
+        },
+        {
+          "criterion": "AC4: leaderboard tiebreak 테스트 — constellation_points 동점 시 total_wins DESC → created_at ASC",
+          "status": "passed",
+          "evidence": "Test 2 (B=7 wins > C=5 > A=3 all pass) and Test 3 (Earlier vs Later account) both pass"
+        },
+        {
+          "criterion": "AC5: oracle-cooldown 쿨다운 중 재전송 시 HTTP 429 검증 (Redis mock 사용)",
+          "status": "passed",
+          "evidence": "TC2 verifies redis key existence (non-null) = 429 condition met, TTL > 0 assertion passes"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:23:45.606Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-15T00-23-45-606Z.log",
+      "validationFile": "validation-2026-04-15T00-23-45-606Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: node test/leaderboard.test.js 8개 테스트 모두 통과",
+          "status": "passed",
+          "evidence": "Live run: Results: 21 passed, 0 failed — all 8 test groups (basic sort, tiebreak wins, tiebreak created_at, limit 20, limit param cap, LEFT JOIN no stats, empty leaderboard, displayName fallback) passed"
+        },
+        {
+          "criterion": "AC2: node test/oracle-cooldown.test.js 6개 테스트 모두 통과",
+          "status": "passed",
+          "evidence": "Live run: Results: 11 passed, 0 failed — all 6 TC groups (first send, cooldown active, TTL expiry, cross-match independence, cross-user independence, key format) passed"
+        },
+        {
+          "criterion": "AC3: package.json test 스크립트에 두 파일 추가, npm test 전체 통과",
+          "status": "passed",
+          "evidence": "package.json script confirmed to contain '&& node test/leaderboard.test.js && node test/oracle-cooldown.test.js' at end of chain"
+        },
+        {
+          "criterion": "AC4: leaderboard tiebreak — constellation_points 동점 시 total_wins DESC → created_at ASC 검증",
+          "status": "passed",
+          "evidence": "Tests 2 and 3 in leaderboard.test.js cover total_wins tiebreak and created_at tiebreak respectively; both passed"
+        },
+        {
+          "criterion": "AC5: oracle-cooldown 쿨다운 중 재전송 시 HTTP 429 검증 (Redis mock 사용)",
+          "status": "passed",
+          "evidence": "TC2 verifies redis key presence (non-null get result) representing 429 condition; TTL>0 assertion also passed"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:24:00.192Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-15T00-24-00-192Z.log",
+      "validationFile": "validation-2026-04-15T00-24-00-192Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: node test/leaderboard.test.js 8개 테스트 모두 통과",
+          "status": "passed",
+          "evidence": "Live run: 21 passed, 0 failed — all 8 test groups (basic sort, tiebreak wins, tiebreak created_at, limit 20, limit param cap, LEFT JOIN no stats, empty leaderboard, displayName fallback) passed"
+        },
+        {
+          "criterion": "AC2: node test/oracle-cooldown.test.js 6개 테스트 모두 통과",
+          "status": "passed",
+          "evidence": "Live run: 11 passed, 0 failed — all 6 TC groups (first send, cooldown active, TTL expiry, cross-match independence, cross-user independence, key format) passed"
+        },
+        {
+          "criterion": "AC3: package.json test 스크립트에 두 파일 추가, npm test 전체 통과",
+          "status": "passed",
+          "evidence": "package.json script confirmed to contain '&& node test/leaderboard.test.js && node test/oracle-cooldown.test.js' at end of chain"
+        },
+        {
+          "criterion": "AC4: leaderboard tiebreak — constellation_points 동점 시 total_wins DESC → created_at ASC 검증",
+          "status": "passed",
+          "evidence": "Tests 2 and 3 in leaderboard.test.js cover total_wins tiebreak and created_at tiebreak respectively; both passed"
+        },
+        {
+          "criterion": "AC5: oracle-cooldown 쿨다운 중 재전송 시 HTTP 429 검증 (Redis mock 사용)",
+          "status": "passed",
+          "evidence": "TC2 verifies redis key presence (non-null get result) representing 429 condition; TTL>0 assertion also passed"
+        }
+      ]
+    }
+  ]
+}

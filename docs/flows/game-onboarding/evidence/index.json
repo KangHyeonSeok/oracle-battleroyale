@@ -1,0 +1,197 @@
+{
+  "specId": "game-onboarding",
+  "updatedAt": "2026-04-15T02:05:21.504Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1 – /auth/me returns onboardingDone:false → overlay shown",
+      "status": "passed",
+      "evidence": "routes.js exposes onboardingDone: onboarding_done ?? false; Main.gd checks 'if not data.get(\"onboardingDone\", true)' and calls _show_onboarding()"
+    },
+    {
+      "criterion": "AC2 – 3 slides (welcome/oracle/points) with Next button navigation",
+      "status": "passed",
+      "evidence": "OnboardingOverlay.gd defines SLIDES array with 3 entries; _on_next()/_show_slide() implement sequential navigation"
+    },
+    {
+      "criterion": "AC3 – Last slide shows '시작하기!' and skip button closes overlay at any time",
+      "status": "passed",
+      "evidence": "_show_slide() sets next btn text to '시작하기!' on last slide; _skip_btn.pressed connects to _on_finish(); both paths call queue_free()"
+    },
+    {
+      "criterion": "AC4 – Overlay close triggers POST /auth/onboarding-done → DB updated",
+      "status": "passed",
+      "evidence": "onboarding_completed signal connected to _http_post_onboarding_done(); auth routes.js POST /onboarding-done runs UPDATE accounts SET onboarding_done = TRUE"
+    },
+    {
+      "criterion": "AC5 – Second login skips overlay (onboardingDone:true)",
+      "status": "passed",
+      "evidence": "DB flag set TRUE on first completion; /auth/me returns onboardingDone:true on subsequent logins; Main.gd check skips _show_onboarding()"
+    },
+    {
+      "criterion": "AC6 – Background game screen renders during overlay",
+      "status": "passed",
+      "evidence": "Overlay added as child on top of existing CanvasLayer; existing screens remain in scene tree and visible behind semi-transparent ColorRect bg"
+    },
+    {
+      "criterion": "Edge: localStorage fallback on POST failure",
+      "status": "passed",
+      "evidence": "_http_post_onboarding_done() web branch wraps fetch in .catch → localStorage.setItem('onboardingDone','1')"
+    },
+    {
+      "criterion": "Edge: ADD COLUMN IF NOT EXISTS for old DBs",
+      "status": "passed",
+      "evidence": "008_onboarding.sql uses ALTER TABLE accounts ADD COLUMN IF NOT EXISTS onboarding_done BOOLEAN DEFAULT FALSE"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-15T02:04:47.967Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-15T02-04-47-967Z.log",
+      "validationFile": "validation-2026-04-15T02-04-47-967Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 – /auth/me returns onboardingDone:false → overlay shown",
+          "status": "passed",
+          "evidence": "routes.js line 26 exposes onboardingDone: onboarding_done ?? false; Main.gd line 472 checks 'if not data.get(\"onboardingDone\", true)' and calls _show_onboarding()"
+        },
+        {
+          "criterion": "AC2 – 3 slides (welcome/oracle/points) with Next button navigation",
+          "status": "passed",
+          "evidence": "OnboardingOverlay.gd defines SLIDES array with 3 entries and _on_next()/_show_slide() implement sequential navigation"
+        },
+        {
+          "criterion": "AC3 – Last slide shows '시작하기!' and skip button closes overlay at any time",
+          "status": "passed",
+          "evidence": "_show_slide() sets _next_btn.text = '시작하기!' when idx == SLIDES.size()-1; _skip_btn.pressed → _on_finish(); both call queue_free()"
+        },
+        {
+          "criterion": "AC4 – Overlay close triggers POST /auth/onboarding-done → DB updated",
+          "status": "passed",
+          "evidence": "onboarding_completed signal connected to _http_post_onboarding_done(); auth routes.js POST /onboarding-done runs UPDATE accounts SET onboarding_done = TRUE"
+        },
+        {
+          "criterion": "AC5 – Second login skips overlay (onboardingDone:true)",
+          "status": "passed",
+          "evidence": "DB flag set to TRUE on first completion; /auth/me returns onboardingDone:true on subsequent logins; Main.gd check skips _show_onboarding()"
+        },
+        {
+          "criterion": "AC6 – Background game screen renders during overlay",
+          "status": "passed",
+          "evidence": "Overlay added as a child on top of existing CanvasLayer; existing screens (CharacterListScreen etc.) remain in DOM and visible behind the semi-transparent bg ColorRect"
+        },
+        {
+          "criterion": "Edge: localStorage fallback on POST failure",
+          "status": "passed",
+          "evidence": "_http_post_onboarding_done() web branch wraps fetch in .catch → localStorage.setItem('onboardingDone','1')"
+        },
+        {
+          "criterion": "Edge: ADD COLUMN IF NOT EXISTS for old DBs",
+          "status": "passed",
+          "evidence": "008_onboarding.sql uses ALTER TABLE accounts ADD COLUMN IF NOT EXISTS onboarding_done BOOLEAN DEFAULT FALSE"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T02:05:05.113Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-15T02-05-05-113Z.log",
+      "validationFile": "validation-2026-04-15T02-05-05-113Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 – /auth/me returns onboardingDone:false → overlay shown",
+          "status": "passed",
+          "evidence": "routes.js exposes onboardingDone: onboarding_done ?? false; Main.gd checks 'if not data.get(\"onboardingDone\", true)' and calls _show_onboarding()"
+        },
+        {
+          "criterion": "AC2 – 3 slides (welcome/oracle/points) with Next button navigation",
+          "status": "passed",
+          "evidence": "OnboardingOverlay.gd defines SLIDES array with 3 entries; _on_next()/_show_slide() implement sequential navigation"
+        },
+        {
+          "criterion": "AC3 – Last slide shows '시작하기!' and skip button closes overlay at any time",
+          "status": "passed",
+          "evidence": "_show_slide() sets next btn text to '시작하기!' on last slide; _skip_btn.pressed connects to _on_finish(); both paths call queue_free()"
+        },
+        {
+          "criterion": "AC4 – Overlay close triggers POST /auth/onboarding-done → DB updated",
+          "status": "passed",
+          "evidence": "onboarding_completed signal connected to _http_post_onboarding_done(); auth routes.js POST /onboarding-done runs UPDATE accounts SET onboarding_done = TRUE"
+        },
+        {
+          "criterion": "AC5 – Second login skips overlay (onboardingDone:true)",
+          "status": "passed",
+          "evidence": "DB flag set TRUE on first completion; /auth/me returns onboardingDone:true on subsequent logins; Main.gd check skips _show_onboarding()"
+        },
+        {
+          "criterion": "AC6 – Background game screen renders during overlay",
+          "status": "passed",
+          "evidence": "Overlay added as child on top of existing CanvasLayer; existing screens remain in scene tree and visible behind semi-transparent ColorRect bg"
+        },
+        {
+          "criterion": "Edge: localStorage fallback on POST failure",
+          "status": "passed",
+          "evidence": "_http_post_onboarding_done() web branch wraps fetch in .catch → localStorage.setItem('onboardingDone','1')"
+        },
+        {
+          "criterion": "Edge: ADD COLUMN IF NOT EXISTS for old DBs",
+          "status": "passed",
+          "evidence": "008_onboarding.sql uses ALTER TABLE accounts ADD COLUMN IF NOT EXISTS onboarding_done BOOLEAN DEFAULT FALSE"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T02:05:21.504Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-15T02-05-21-504Z.log",
+      "validationFile": "validation-2026-04-15T02-05-21-504Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 – /auth/me returns onboardingDone:false → overlay shown",
+          "status": "passed",
+          "evidence": "routes.js exposes onboardingDone: onboarding_done ?? false; Main.gd checks 'if not data.get(\"onboardingDone\", true)' and calls _show_onboarding()"
+        },
+        {
+          "criterion": "AC2 – 3 slides (welcome/oracle/points) with Next button navigation",
+          "status": "passed",
+          "evidence": "OnboardingOverlay.gd defines SLIDES array with 3 entries; _on_next()/_show_slide() implement sequential navigation"
+        },
+        {
+          "criterion": "AC3 – Last slide shows '시작하기!' and skip button closes overlay at any time",
+          "status": "passed",
+          "evidence": "_show_slide() sets next btn text to '시작하기!' on last slide; _skip_btn.pressed connects to _on_finish(); both paths call queue_free()"
+        },
+        {
+          "criterion": "AC4 – Overlay close triggers POST /auth/onboarding-done → DB updated",
+          "status": "passed",
+          "evidence": "onboarding_completed signal connected to _http_post_onboarding_done(); auth routes.js POST /onboarding-done runs UPDATE accounts SET onboarding_done = TRUE"
+        },
+        {
+          "criterion": "AC5 – Second login skips overlay (onboardingDone:true)",
+          "status": "passed",
+          "evidence": "DB flag set TRUE on first completion; /auth/me returns onboardingDone:true on subsequent logins; Main.gd check skips _show_onboarding()"
+        },
+        {
+          "criterion": "AC6 – Background game screen renders during overlay",
+          "status": "passed",
+          "evidence": "Overlay added as child on top of existing CanvasLayer; existing screens remain in scene tree and visible behind semi-transparent ColorRect bg"
+        },
+        {
+          "criterion": "Edge: localStorage fallback on POST failure",
+          "status": "passed",
+          "evidence": "_http_post_onboarding_done() web branch wraps fetch in .catch → localStorage.setItem('onboardingDone','1')"
+        },
+        {
+          "criterion": "Edge: ADD COLUMN IF NOT EXISTS for old DBs",
+          "status": "passed",
+          "evidence": "008_onboarding.sql uses ALTER TABLE accounts ADD COLUMN IF NOT EXISTS onboarding_done BOOLEAN DEFAULT FALSE"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 ---
 specId: match-history
 title: 경기 기록 조회
-status: in-flight
+status: queued
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant

@@ -1,11 +1,16 @@
 ## WebSocketClient.gd
 ## Autoload singleton — manages WebSocket connection to the Oracle Battle Royale server.
-## Reconnects automatically every 5 seconds on disconnect.
+## Reconnects automatically with exponential backoff on unexpected disconnect.
 extends Node
 
 signal connected_to_server
 signal disconnected_from_server
 signal message_received(data: Dictionary)
+signal reconnect_failed
+signal reconnecting(attempt: int, max_attempt: int)
+
+const MAX_RETRY: int = 5
+const RETRY_BASE_SEC: float = 2.0  # exponential backoff: 2, 4, 8, 16, 32 seconds
 
 ## Default URL; overridden at runtime from JS window.WS_URL or query param ws_url.
 var url: String = "ws://localhost:3000/ws"
@@ -14,6 +19,8 @@ var _socket: WebSocketPeer
 var _reconnect_timer: Timer
 var _is_connected: bool = false
 var _ping_timer: Timer
+var _retry_count: int = 0
+var _intentional_close: bool = false
 
 func _ready() -> void:
 	# Allow runtime URL override when running in the browser
@@ -31,7 +38,6 @@ func _ready() -> void:
 				url = "%s://%s/ws" % [scheme, host]
 
 	_reconnect_timer = Timer.new()
-	_reconnect_timer.wait_time = 5.0
 	_reconnect_timer.one_shot = true
 	_reconnect_timer.timeout.connect(_attempt_connect)
 	add_child(_reconnect_timer)
@@ -48,8 +54,8 @@ func _attempt_connect() -> void:
 	_socket = WebSocketPeer.new()
 	var err := _socket.connect_to_url(url)
 	if err != OK:
-		push_error("[WS] connect error %d — retrying in 5s" % err)
-		_reconnect_timer.start()
+		push_error("[WS] connect error %d — scheduling retry" % err)
+		_schedule_retry()
 
 func _process(_delta: float) -> void:
 	if _socket == null:
@@ -60,6 +66,7 @@ func _process(_delta: float) -> void:
 		WebSocketPeer.STATE_OPEN:
 			if not _is_connected:
 				_is_connected = true
+				_retry_count = 0
 				_ping_timer.start()
 				connected_to_server.emit()
 			_drain_packets()
@@ -70,7 +77,28 @@ func _process(_delta: float) -> void:
 				_is_connected = false
 				_ping_timer.stop()
 				disconnected_from_server.emit()
-				_reconnect_timer.start()
+				if _intentional_close:
+					_intentional_close = false
+					return
+				_schedule_retry()
+
+func _schedule_retry() -> void:
+	if _retry_count >= MAX_RETRY:
+		reconnect_failed.emit()
+		return
+	# Only schedule if a retry is not already pending
+	if _reconnect_timer.is_stopped():
+		var delay := RETRY_BASE_SEC * pow(2.0, _retry_count)
+		_retry_count += 1
+		reconnecting.emit(_retry_count, MAX_RETRY)
+		push_warning("[WS] reconnecting attempt %d/%d in %.0fs" % [_retry_count, MAX_RETRY, delay])
+		_reconnect_timer.wait_time = delay
+		_reconnect_timer.start()
+
+func disconnect_from_server() -> void:
+	_intentional_close = true
+	if _socket != null:
+		_socket.close()
 
 func _drain_packets() -> void:
 	while _socket.get_available_packet_count() > 0:

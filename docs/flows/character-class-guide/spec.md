@@ -1,7 +1,7 @@
 ---
 specId: character-class-guide
 title: 캐릭터 클래스 가이드 패널
-status: in-flight
+status: queued
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant

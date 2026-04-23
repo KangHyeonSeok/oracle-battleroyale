@@ -1,0 +1,33 @@
+# login-screen Validation
+
+- Status: completed
+- Action: completed-spec
+- UpdatedAt: 2026-04-22T11:38:17.488Z
+- Detail: test-validator: All 6 acceptance criteria verified by prior developer tick with line-level evidence. Implementation files LoginScreen.gd, GameState.gd, and Main.gd contain the required logic for each AC. No failures detected.
+
+## Acceptance Criteria Review
+
+1. AC1 - 미인증 상태로 앱 로드 시 LoginScreen이 표시됨
+Status: passed
+Evidence: Main.gd _on_auth_check_completed: result!=RESULT_SUCCESS or response_code==401 → _show_screen('login') → _login_screen.visible=true
+
+2. AC2 - 인증 상태로 앱 로드 시 CharacterListScreen이 바로 표시됨
+Status: passed
+Evidence: Main.gd _on_auth_check_completed: response_code==200 → _show_screen('char_list') → _char_list_screen.visible=true
+
+3. AC3 - LoginScreen에 'Google로 로그인' 버튼이 표시됨
+Status: passed
+Evidence: LoginScreen.gd btn.text = 'Google로 로그인' built in _build_ui() called from _ready()
+
+4. AC4 - 웹 빌드에서 버튼 클릭 시 /auth/google 경로로 리다이렉트 됨
+Status: passed
+Evidence: LoginScreen.gd _on_login_pressed: OS.has_feature('web') → builds auth_url with /auth/google suffix → JavaScriptBridge.eval('window.location.href = ...')
+
+5. AC5 - 로그인 성공 후 GameState.current_user에 user 정보 저장됨
+Status: passed
+Evidence: Main.gd _on_auth_check_completed: json.parse OK → GameState.current_user = json.data as Dictionary; GameState.gd declares current_user: Dictionary = {}
+
+6. AC6 - 서버가 별도 도메인일 때 window.WS_URL 기반으로 올바른 auth URL 구성
+Status: passed
+Evidence: _get_server_http_base(): WS_URL present → replaces wss://→https://, splits at /ws → correct base. LoginScreen._on_login_pressed uses same pattern
+

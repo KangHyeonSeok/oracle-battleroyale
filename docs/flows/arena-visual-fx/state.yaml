@@ -1,0 +1,18 @@
+specId: arena-visual-fx
+status: in-flight
+lastError: null
+retryCount: 0
+createdAt: 2026-04-15T00:00:00.000Z
+updatedAt: 2026-04-15T09:54:00.000Z
+notes: >
+  2026-04-15 태연 신규 draft:
+
+  - 현재 전투 결과가 텍스트 로그만으로 전달 → 시각 피드백 전무
+
+  - Arena.gd에 _fx_layer(z_index 10) 추가, Line2D + Tween으로 이펙트 처리
+
+  - 근접(빨간)/원거리(황금) 공격선, 피격 플래시, 사망 페이드 구현
+
+  - 서버 변경 없음 (WS 메시지 events 배열 기존 포맷 활용)
+
+  - 의존성: phase-5-client-godot, arena-character-hud 모두 done ✓

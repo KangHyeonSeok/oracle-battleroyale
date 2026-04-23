@@ -54,7 +54,7 @@ const { loadMatchState } = require('../game/redis-state');
 const { matchmaker } = require('../game/matchmaker');
 const { getPoints } = require('../oracle/points');
 const { pool } = require('../db/pool');
-const { extractRulesTable } = require('../ai/gemini');
+const { extractRulesTable, generateRandomCharacter } = require('../ai/gemini');
 const { extractOracleIntent } = require('../oracle/intent');
 const { checkCredulity } = require('../oracle/credulity');
 const { pushOverride } = require('../oracle/override-queue');
@@ -199,6 +199,26 @@ async function handleMessage(ws, msg) {
           atk: stats.atk,
           def: stats.def,
           tendency: (rulesTable.default_action || 'idle').replace(/_/g, ' '),
+        },
+      });
+      break;
+    }
+
+    case 'random_character': {
+      if (!userId) {
+        sendToClient(ws, { type: 'error', message: 'Not authenticated' });
+        return;
+      }
+      const randomChar = await generateRandomCharacter();
+      sendToClient(ws, {
+        type: 'character_preview',
+        character: {
+          name:     String(randomChar.name    || '랜덤 성좌').trim(),
+          class:    String(randomChar.class   || 'warrior'),
+          hp:       Number(randomChar.hp)     || 100,
+          atk:      Number(randomChar.atk)    || 20,
+          def:      Number(randomChar.def)    || 10,
+          tendency: String(randomChar.tendency || '알 수 없음'),
         },
       });
       break;

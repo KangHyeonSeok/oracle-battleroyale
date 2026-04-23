@@ -1,54 +1,100 @@
 specId: match-history
-status: in-flight
+status: done
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T00:00:00.000Z
-updatedAt: 2026-04-13T13:00:00.000Z
-notes: |
+updatedAt: 2026-04-15T00:15:28.236Z
+notes: >
   2026-04-13 09:00 태연 스펙 리뷰:
+
   - server/src/history/ 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재 확인
+
   - spec.md AC7(빈 기록 상태), 엣지케이스(404/403/401) 보강 완료
+
   2026-04-13 09:30 runner 시작 → in-flight 전환
+
   2026-04-13 10:00 spec.md status 동기화 완료 (queued → in-flight)
+
   2026-04-13 태연 스케줄 재검토:
+
   - CharacterListScreen.gd에 "경기 기록" 버튼(AC6) 미구현 확인
+
   - Main.gd에 match_history/match_detail 화면 라우팅 미구현 확인
+
   - server/src/history/ 디렉토리 미생성 확인
+
   - 구현 갭 전체 스펙 AC와 일치 → runner 완료 대기 유지
+
   2026-04-13 태연 스케줄 재검토 #2:
+
   - spec.md 파일목록에 CharacterListScreen.gd 누락 확인 → 추가 완료 (AC6)
+
   - GET /history limit 상한(50) 제약 명시 추가
+
   2026-04-13 태연 스케줄 재검토 #3:
+
   - GET /history에 status='done' 필터 및 ended_at DESC 정렬 명시
+
   - 엣지케이스: 캐릭터 삭제 후 기록 → LEFT JOIN + "(삭제됨)" 처리 추가
+
   2026-04-13 태연 스케줄 재검토 #4:
+
   - GET /history/:matchId 응답에 oracleCount 필드 및 oracle 100개 limit 추가
+
   - oracles[].isMe 필드 추가 (내 신탁 구분)
+
   - 엣지케이스: oracle 없음, oracle 100개 초과 2건 추가
+
   - MatchDetailScreen: isMe 강조, 신탁 없음 빈 상태 메시지 추가
+
   - AC8(isMe 강조), AC9(oracleCount) 추가 → 총 9개 AC
+
   2026-04-13 태연 스케줄 최종 확인:
+
   - CharacterListScreen.gd에 history_requested 시그널·"경기 기록" 버튼 미존재 재확인 (AC6 미구현)
+
   - leaderboard_requested 시그널은 있음 → AC6 우선순위 유지
+
   - 스펙 AC/엣지케이스 이상 없음 → runner 완료 대기 유지
+
   2026-04-13 태연 스케줄 스펙 보강 (5차):
-  - CharacterListScreen 버튼이 직접 Main.gd 함수 호출하는 패턴 → signal 방출 패턴으로 수정 (leaderboard/spectate와 일치)
+
+  - CharacterListScreen 버튼이 직접 Main.gd 함수 호출하는 패턴 → signal 방출 패턴으로 수정
+  (leaderboard/spectate와 일치)
+
   - spec.md 파일목록 설명 업데이트: "signal history_requested 추가 + emit" 명시
+
   - Main.gd 연결 코드 가이드 섹션 신규 추가 (spectate/leaderboard 패턴 기반)
     · MatchHistoryScreen/MatchDetailScreen 인스턴스 초기화 코드
     · back_requested/detail_requested/history_requested 시그널 연결 코드
     · _show_screen() 가시성 토글 라인
     · 핸들러 함수 4개 (_on_history_requested, _on_match_history_back, _on_match_detail_requested, _on_match_detail_back)
   2026-04-13 태연 스케줄 스펙 보강 (6차):
-  - 엣지케이스 추가: winner_character_id = NULL (비정상 종료 경기) → winner 필드 null 반환, 클라이언트 "—" 표시
+
+  - 엣지케이스 추가: winner_character_id = NULL (비정상 종료 경기) → winner 필드 null 반환, 클라이언트
+  "—" 표시
+
   2026-04-13 태연 스케줄 스펙 보강 (7차):
-  - CharacterListScreen.gd 현재 시그널 목록 재확인: create_character_requested, join_match_requested, leaderboard_requested, spectate_requested
+
+  - CharacterListScreen.gd 현재 시그널 목록 재확인: create_character_requested,
+  join_match_requested, leaderboard_requested, spectate_requested
+
   - history_requested 시그널 없음, "경기 기록" 버튼 없음 → AC6 미구현 재확인
-  - server/src/history/ 디렉토리 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재 재확인
-  - Main.gd spectate 라우팅 패턴(_spectate_list_screen: :179-184) 확인 → Main.gd 코드 가이드 패턴 일치 확인
+
+  - server/src/history/ 디렉토리 미존재, MatchHistoryScreen.gd/MatchDetailScreen.gd 미존재
+  재확인
+
+  - Main.gd spectate 라우팅 패턴(_spectate_list_screen: :179-184) 확인 → Main.gd 코드 가이드
+  패턴 일치 확인
+
   - 스펙 전체(AC 9개, 엣지케이스 8개, Main.gd 코드 가이드) 완비 → runner 착수 준비 완료
+
   2026-04-13 태연 스케줄 구현 갭 재확인:
+
   - server/src/history/ 디렉토리 미생성 확인 (routes.js, queries.js 없음)
+
   - MatchHistoryScreen.gd, MatchDetailScreen.gd 미생성 확인
+
   - Main.gd leaderboard/match_history/match_detail 라우팅 전무 확인
+
   - 스펙 완비 상태, runner 구현 대기 중

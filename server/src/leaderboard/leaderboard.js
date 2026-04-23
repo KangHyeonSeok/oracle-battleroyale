@@ -10,6 +10,7 @@ const { pool } = require('../db/pool');
  * @returns {Promise<Array>}
  */
 async function getLeaderboard(limit = 20) {
+  const safeLimit = Math.min(Math.max(1, Number(limit) || 20), 100);
   const { rows } = await pool.query(
     `SELECT
        ROW_NUMBER() OVER (ORDER BY u.constellation_points DESC) AS rank,
@@ -30,7 +31,7 @@ async function getLeaderboard(limit = 20) {
               COALESCE(ps.total_wins, 0) DESC,
               u.created_at ASC
      LIMIT $1`,
-    [limit]
+    [safeLimit]
   );
 
   return rows.map((r) => ({

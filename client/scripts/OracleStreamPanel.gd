@@ -116,7 +116,7 @@ func _build_ui() -> void:
 	_oracle_send_panel.add_child(send_row)
 
 	_cost_lbl = Label.new()
-	_cost_lbl.text = "신탁 비용: 50pt"
+	_cost_lbl.text = "신탁 비용: %dpt" % GameState.ORACLE_COST
 	_cost_lbl.modulate = TEXT_SECONDARY
 	_cost_lbl.add_theme_font_size_override("font_size", 12)
 	_cost_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL

@@ -1,0 +1,147 @@
+{
+  "specId": "connection-resilience",
+  "updatedAt": "2026-04-15T02:03:02.480Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1: 연결 끊김 시 2초 후 자동 재연결 시도",
+      "status": "passed",
+      "evidence": "STATE_CLOSED handler calls _schedule_retry(); first delay = 2.0 * pow(2.0, 0) = 2.0s"
+    },
+    {
+      "criterion": "AC2: 재연결 성공 시 게임 화면 유지, 상태는 서버 다음 메시지로 복구",
+      "status": "passed",
+      "evidence": "On STATE_OPEN after reconnect, _retry_count reset to 0 and connected_to_server emitted; no screen transition triggered"
+    },
+    {
+      "criterion": "AC3: 지수 백오프 적용 (2→4→8→16→32초)",
+      "status": "passed",
+      "evidence": "delay = RETRY_BASE_SEC * pow(2.0, _retry_count) with _retry_count 0..4 yields 2, 4, 8, 16, 32 seconds"
+    },
+    {
+      "criterion": "AC4: 5회 실패 시 reconnect_failed 시그널 → 에러 팝업",
+      "status": "passed",
+      "evidence": "_schedule_retry() emits reconnect_failed when _retry_count >= MAX_RETRY (5); Main.gd shows AcceptDialog"
+    },
+    {
+      "criterion": "AC5: 의도적 disconnect는 재연결 트리거 안 함",
+      "status": "passed",
+      "evidence": "disconnect_from_server() sets _intentional_close = true; STATE_CLOSED handler returns early, skipping _schedule_retry()"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-15T02:02:31.622Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-15T02-02-31-622Z.log",
+      "validationFile": "validation-2026-04-15T02-02-31-622Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 — 연결 끊김 시 2초 후 자동 재연결 시도",
+          "status": "passed",
+          "evidence": "STATE_CLOSED handler calls _schedule_retry(); first call computes delay = 2.0 * pow(2.0, 0) = 2.0s and starts _reconnect_timer"
+        },
+        {
+          "criterion": "AC2 — 재연결 성공 시 게임 화면 유지, 상태는 서버 다음 메시지로 복구",
+          "status": "passed",
+          "evidence": "On STATE_OPEN after reconnect, _retry_count is reset to 0 and connected_to_server is emitted; no screen transition triggered — existing server message handlers restore state"
+        },
+        {
+          "criterion": "AC3 — 재연결 실패 시 지수 백오프 적용 (2→4→8→16→32초)",
+          "status": "passed",
+          "evidence": "delay = RETRY_BASE_SEC * pow(2.0, _retry_count) with _retry_count 0..4 yields 2, 4, 8, 16, 32 seconds"
+        },
+        {
+          "criterion": "AC4 — 5회 실패 시 reconnect_failed 시그널 → 에러 팝업",
+          "status": "passed",
+          "evidence": "_schedule_retry() emits reconnect_failed when _retry_count >= MAX_RETRY (5); Main.gd _on_ws_reconnect_failed() creates and shows AcceptDialog"
+        },
+        {
+          "criterion": "AC5 — 의도적 disconnect는 재연결 트리거 안 함",
+          "status": "passed",
+          "evidence": "disconnect_from_server() sets _intentional_close = true before close(); STATE_CLOSED handler returns early when flag is true, skipping _schedule_retry()"
+        },
+        {
+          "criterion": "Edge case — 재연결 타이머 중복 생성 방지",
+          "status": "passed",
+          "evidence": "_schedule_retry() checks _reconnect_timer.is_stopped() before setting wait_time and starting"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T02:02:47.974Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-15T02-02-47-974Z.log",
+      "validationFile": "validation-2026-04-15T02-02-47-974Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 연결 끊김 시 2초 후 자동 재연결 시도",
+          "status": "passed",
+          "evidence": "STATE_CLOSED handler calls _schedule_retry(); first delay = 2.0 * pow(2.0, 0) = 2.0s"
+        },
+        {
+          "criterion": "AC2: 재연결 성공 시 게임 화면 유지, 상태는 서버 다음 메시지로 복구",
+          "status": "passed",
+          "evidence": "On STATE_OPEN after reconnect, _retry_count reset to 0 and connected_to_server emitted; no screen transition triggered"
+        },
+        {
+          "criterion": "AC3: 지수 백오프 적용 (2→4→8→16→32초)",
+          "status": "passed",
+          "evidence": "delay = RETRY_BASE_SEC * pow(2.0, _retry_count) with _retry_count 0..4 yields 2, 4, 8, 16, 32 seconds"
+        },
+        {
+          "criterion": "AC4: 5회 실패 시 reconnect_failed 시그널 → 에러 팝업",
+          "status": "passed",
+          "evidence": "_schedule_retry() emits reconnect_failed when _retry_count >= MAX_RETRY (5); Main.gd shows AcceptDialog"
+        },
+        {
+          "criterion": "AC5: 의도적 disconnect는 재연결 트리거 안 함",
+          "status": "passed",
+          "evidence": "disconnect_from_server() sets _intentional_close = true; STATE_CLOSED handler returns early, skipping _schedule_retry()"
+        },
+        {
+          "criterion": "Edge case: 재연결 타이머 중복 생성 방지",
+          "status": "passed",
+          "evidence": "_schedule_retry() checks _reconnect_timer.is_stopped() before setting wait_time and starting"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T02:03:02.480Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-15T02-03-02-480Z.log",
+      "validationFile": "validation-2026-04-15T02-03-02-480Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: 연결 끊김 시 2초 후 자동 재연결 시도",
+          "status": "passed",
+          "evidence": "STATE_CLOSED handler calls _schedule_retry(); first delay = 2.0 * pow(2.0, 0) = 2.0s"
+        },
+        {
+          "criterion": "AC2: 재연결 성공 시 게임 화면 유지, 상태는 서버 다음 메시지로 복구",
+          "status": "passed",
+          "evidence": "On STATE_OPEN after reconnect, _retry_count reset to 0 and connected_to_server emitted; no screen transition triggered"
+        },
+        {
+          "criterion": "AC3: 지수 백오프 적용 (2→4→8→16→32초)",
+          "status": "passed",
+          "evidence": "delay = RETRY_BASE_SEC * pow(2.0, _retry_count) with _retry_count 0..4 yields 2, 4, 8, 16, 32 seconds"
+        },
+        {
+          "criterion": "AC4: 5회 실패 시 reconnect_failed 시그널 → 에러 팝업",
+          "status": "passed",
+          "evidence": "_schedule_retry() emits reconnect_failed when _retry_count >= MAX_RETRY (5); Main.gd shows AcceptDialog"
+        },
+        {
+          "criterion": "AC5: 의도적 disconnect는 재연결 트리거 안 함",
+          "status": "passed",
+          "evidence": "disconnect_from_server() sets _intentional_close = true; STATE_CLOSED handler returns early, skipping _schedule_retry()"
+        }
+      ]
+    }
+  ]
+}

@@ -1,13 +1,16 @@
 specId: oracle-ranking-leaderboard
-status: in-flight
+status: done
 lastError: null
 retryCount: 0
 createdAt: 2026-04-12T04:35:44.283Z
-updatedAt: 2026-04-13T15:30:00.000Z
-notes: |
+updatedAt: 2026-04-15T00:18:21.516Z
+notes: >
   2026-04-12 초안 작성 (draft): 기본 구조, AC, 파일 목록 포함
+
   2026-04-13 태연 스케줄 재검토:
+
   - state.yaml status=done 오기 발견 (spec=draft와 불일치) → ready로 수정
+
   - spec.md draft→ready 전환: 엣지케이스 5개 추가
     - 빈 리더보드(경기 미진행) 처리
     - oracle_points 동점 tiebreak 기준 (total_wins DESC → created_at ASC)
@@ -15,55 +18,111 @@ notes: |
     - 비로그인 시 내 순위 강조 없음 처리
     - displayName NULL fallback "(이름 없음)"
   - 제약에 LEFT JOIN 필수, tiebreak 정렬 기준 명시 추가
+
   2026-04-13 태연 스케줄 구현 갭 발견:
+
   - 서버: leaderboard.js + routes.js + migration 007 완료 ✓
+
   - LeaderboardScreen.gd 존재 ✓
+
   - CharacterListScreen.gd: "랭킹 🏆" 버튼 + leaderboard_requested 시그널 ✓
+
   - Main.gd: leaderboard_requested 시그널 미연결, LeaderboardScreen 미초기화 ✗
+
   - → AC7 추가 (Main.gd 연결 필수), status ready 유지 (구현 대기 중)
+
   2026-04-13 태연 스케줄 심층 검토 (2차):
-  - leaderboard.js 실제 구현 확인: FROM users (not accounts), ORDER BY constellation_points DESC
+
+  - leaderboard.js 실제 구현 확인: FROM users (not accounts), ORDER BY
+  constellation_points DESC
+
   - tiebreak(total_wins DESC → created_at ASC) 미구현 → AC9 추가
+
   - 응답에 accountId 포함됨 (is_mine 체크용) → spec 응답 예시 업데이트
+
   - matchResult.js 미존재 → turn-scheduler.js(:258) 구현 확인
+
   - oracle.js 미존재 → oracle/routes.js(:143) 구현 확인
+
   - my_account_id 미설정 메커니즘 → AC8 추가 (GET /me 또는 WS session)
+
   - spec.md: 구현 상태 반영, AC 9개로 확장, Main.gd 코드 가이드 추가
+
   - 미구현: AC7(Main.gd 라우팅), AC8(my_account_id 주입), AC9(tiebreak)
+
   2026-04-13 태연 스케줄 스펙 보강 (3차):
+
   - spec.md status queued→in-flight 동기화 (state.yaml과 일치)
-  - displayName 엣지케이스 수정: users.display_name NOT NULL 확인 → NULL fallback 대신 빈 문자열 fallback으로 수정 (NULLIF 패턴)
+
+  - displayName 엣지케이스 수정: users.display_name NOT NULL 확인 → NULL fallback 대신 빈
+  문자열 fallback으로 수정 (NULLIF 패턴)
+
   - 제약 displayName 출처를 users.display_name으로 명확화
+
   - 잔여 미구현: AC7, AC8, AC9 (runner 처리 대기)
+
   2026-04-13 태연 스케줄 (4차):
-  - AC9 구현 완료: leaderboard.js ORDER BY에 tiebreak 추가 (total_wins DESC, created_at ASC)
+
+  - AC9 구현 완료: leaderboard.js ORDER BY에 tiebreak 추가 (total_wins DESC, created_at
+  ASC)
+
   - AC8 스펙 보강: /auth/me 응답 id 필드 기준 my_account_id 주입 코드 가이드 추가
+
   - 잔여 미구현: AC7(Main.gd 라우팅), AC8(my_account_id 주입) — runner 처리 대기
+
   2026-04-13 태연 스케줄 (5차) 구현 재확인:
-  - Main.gd: _leaderboard_screen 변수 없음, leaderboard_requested 시그널 연결 없음 → AC7 미구현 재확인
-  - AC9 tiebreak: leaderboard.js ORDER BY constellation_points DESC, total_wins DESC, created_at ASC 확인 ✓ (4차에 완료)
+
+  - Main.gd: _leaderboard_screen 변수 없음, leaderboard_requested 시그널 연결 없음 → AC7
+  미구현 재확인
+
+  - AC9 tiebreak: leaderboard.js ORDER BY constellation_points DESC, total_wins
+  DESC, created_at ASC 확인 ✓ (4차에 완료)
+
   - 잔여: AC7, AC8 (runner 처리 대기)
+
   2026-04-13 태연 스케줄 (6차) 구현 재확인:
-  - LeaderboardScreen.gd:17 `var my_account_id: int = -1` 선언 확인 ✓ (AC8 클라이언트 측 완료)
+
+  - LeaderboardScreen.gd:17 `var my_account_id: int = -1` 선언 확인 ✓ (AC8 클라이언트 측
+  완료)
+
   - LeaderboardScreen.gd:151 accountId == my_account_id 강조 로직 구현 ✓
-  - spec.md AC8 "LeaderboardScreen.gd에서 var my_account_id 변수 선언 필요" → 이미 완료. 구현 가이드 수정 반영
+
+  - spec.md AC8 "LeaderboardScreen.gd에서 var my_account_id 변수 선언 필요" → 이미 완료. 구현
+  가이드 수정 반영
+
   - 잔여: AC7(Main.gd 초기화+라우팅), AC8(Main.gd _fetch_my_account_id() 호출만 미구현)
+
   2026-04-13 태연 스케줄 (8차) 구현 갭 수정:
-  - displayName NULLIF fallback: leaderboard.js SQL에 COALESCE(NULLIF(u.display_name, ''), '(이름 없음)') 적용 완료 ✓
+
+  - displayName NULLIF fallback: leaderboard.js SQL에
+  COALESCE(NULLIF(u.display_name, ''), '(이름 없음)') 적용 완료 ✓
     (기존: u.display_name 단순 반환 → 빈 문자열 케이스 미처리)
   - server-unit-tests-expansion spec.md 테스트 가이드 수정:
     · top-level await → async IIFE 패턴으로 수정 (Node.js 호환)
     · mockRows row 타입: 숫자 필드 문자열 → Number 타입으로 수정
     · 테스트 케이스 8 displayName fallback 가이드 구체화
   2026-04-13 태연 스케줄 (7차) 스펙 보강:
-  - AC8 코드 가이드: http://SERVER_URL 플레이스홀더 → OS.get_environment("SERVER_URL") 패턴으로 수정
+
+  - AC8 코드 가이드: http://SERVER_URL 플레이스홀더 → OS.get_environment("SERVER_URL") 패턴으로
+  수정
     (LeaderboardScreen.gd :115-118 동일 패턴 기준)
-  - _on_me_response 시그니처를 Main.gd 타입 표기 스타일로 수정 (PackedStringArray, PackedByteArray)
+  - _on_me_response 시그니처를 Main.gd 타입 표기 스타일로 수정 (PackedStringArray,
+  PackedByteArray)
+
   - _fetch_my_account_id() 호출 위치 명확화: _build_ui() 내 LeaderboardScreen 블록 끝
+
   - /auth/me 응답 형식 출처 명시: server/src/auth/routes.js:26
+
   - 잔여: AC7, AC8 (runner 처리 대기)
+
   2026-04-13 태연 스케줄 구현 갭 재확인:
-  - Main.gd: _leaderboard_screen 변수 없음, leaderboard_requested 시그널 연결 없음 재확인 → AC7/AC8 미구현
-  - 서버(leaderboard.js, routes.js), LeaderboardScreen.gd, CharacterListScreen 버튼 모두 구현 완료 ✓
+
+  - Main.gd: _leaderboard_screen 변수 없음, leaderboard_requested 시그널 연결 없음 재확인 →
+  AC7/AC8 미구현
+
+  - 서버(leaderboard.js, routes.js), LeaderboardScreen.gd, CharacterListScreen 버튼
+  모두 구현 완료 ✓
+
   - AC9 tiebreak 구현 완료 ✓
+
   - 잔여: AC7, AC8만 남음 → Main.gd 단일 파일 수정으로 해소 가능

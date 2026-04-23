@@ -1,0 +1,157 @@
+{
+  "specId": "login-screen",
+  "updatedAt": "2026-04-22T11:38:17.488Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1 - 미인증 상태로 앱 로드 시 LoginScreen이 표시됨",
+      "status": "passed",
+      "evidence": "Main.gd _on_auth_check_completed: result!=RESULT_SUCCESS or response_code==401 → _show_screen('login') → _login_screen.visible=true"
+    },
+    {
+      "criterion": "AC2 - 인증 상태로 앱 로드 시 CharacterListScreen이 바로 표시됨",
+      "status": "passed",
+      "evidence": "Main.gd _on_auth_check_completed: response_code==200 → _show_screen('char_list') → _char_list_screen.visible=true"
+    },
+    {
+      "criterion": "AC3 - LoginScreen에 'Google로 로그인' 버튼이 표시됨",
+      "status": "passed",
+      "evidence": "LoginScreen.gd btn.text = 'Google로 로그인' built in _build_ui() called from _ready()"
+    },
+    {
+      "criterion": "AC4 - 웹 빌드에서 버튼 클릭 시 /auth/google 경로로 리다이렉트 됨",
+      "status": "passed",
+      "evidence": "LoginScreen.gd _on_login_pressed: OS.has_feature('web') → builds auth_url with /auth/google suffix → JavaScriptBridge.eval('window.location.href = ...')"
+    },
+    {
+      "criterion": "AC5 - 로그인 성공 후 GameState.current_user에 user 정보 저장됨",
+      "status": "passed",
+      "evidence": "Main.gd _on_auth_check_completed: json.parse OK → GameState.current_user = json.data as Dictionary; GameState.gd declares current_user: Dictionary = {}"
+    },
+    {
+      "criterion": "AC6 - 서버가 별도 도메인일 때 window.WS_URL 기반으로 올바른 auth URL 구성",
+      "status": "passed",
+      "evidence": "_get_server_http_base(): WS_URL present → replaces wss://→https://, splits at /ws → correct base. LoginScreen._on_login_pressed uses same pattern"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-22T11:37:43.460Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-22T11-37-43-460Z.log",
+      "validationFile": "validation-2026-04-22T11-37-43-460Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 - 미인증 상태로 앱 로드 시 LoginScreen이 표시됨",
+          "status": "passed",
+          "evidence": "_on_auth_check_completed: result!=RESULT_SUCCESS or response_code==401 → _show_screen('login') → _login_screen.visible=true (Main.gd:499-502, 274)"
+        },
+        {
+          "criterion": "AC2 - 인증 상태로 앱 로드 시 CharacterListScreen이 바로 표시됨",
+          "status": "passed",
+          "evidence": "_on_auth_check_completed: response_code==200 → _show_screen('char_list') → _char_list_screen.visible=true (Main.gd:503-507)"
+        },
+        {
+          "criterion": "AC3 - LoginScreen에 'Google로 로그인' 버튼이 표시됨",
+          "status": "passed",
+          "evidence": "LoginScreen.gd:58 btn.text = 'Google로 로그인', built in _build_ui() called from _ready()"
+        },
+        {
+          "criterion": "AC4 - 웹 빌드에서 버튼 클릭 시 /auth/google 경로로 리다이렉트 됨",
+          "status": "passed",
+          "evidence": "LoginScreen.gd:79-99 _on_login_pressed: OS.has_feature('web') → builds auth_url with /auth/google suffix → JavaScriptBridge.eval('window.location.href = ...')"
+        },
+        {
+          "criterion": "AC5 - 로그인 성공 후 GameState.current_user에 user 정보 저장됨",
+          "status": "passed",
+          "evidence": "_on_auth_check_completed: json.parse OK → GameState.current_user = json.data as Dictionary (Main.gd:504-506); GameState.gd:45 declares current_user: Dictionary = {}"
+        },
+        {
+          "criterion": "AC6 - 서버가 별도 도메인일 때 window.WS_URL 기반으로 올바른 auth URL 구성",
+          "status": "passed",
+          "evidence": "_get_server_http_base() (Main.gd:485-498): WS_URL present → replaces wss://→https://, splits at /ws → correct base. LoginScreen._on_login_pressed uses same pattern (LoginScreen.gd:81-89)"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-22T11:38:00.707Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-22T11-38-00-707Z.log",
+      "validationFile": "validation-2026-04-22T11-38-00-707Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 - 미인증 상태로 앱 로드 시 LoginScreen이 표시됨",
+          "status": "passed",
+          "evidence": "Main.gd _on_auth_check_completed: result!=RESULT_SUCCESS or response_code==401 → _show_screen('login') → _login_screen.visible=true"
+        },
+        {
+          "criterion": "AC2 - 인증 상태로 앱 로드 시 CharacterListScreen이 바로 표시됨",
+          "status": "passed",
+          "evidence": "Main.gd _on_auth_check_completed: response_code==200 → _show_screen('char_list') → _char_list_screen.visible=true"
+        },
+        {
+          "criterion": "AC3 - LoginScreen에 'Google로 로그인' 버튼이 표시됨",
+          "status": "passed",
+          "evidence": "LoginScreen.gd btn.text = 'Google로 로그인' built in _build_ui() called from _ready()"
+        },
+        {
+          "criterion": "AC4 - 웹 빌드에서 버튼 클릭 시 /auth/google 경로로 리다이렉트 됨",
+          "status": "passed",
+          "evidence": "LoginScreen.gd _on_login_pressed: OS.has_feature('web') → builds auth_url with /auth/google suffix → JavaScriptBridge.eval('window.location.href = ...')"
+        },
+        {
+          "criterion": "AC5 - 로그인 성공 후 GameState.current_user에 user 정보 저장됨",
+          "status": "passed",
+          "evidence": "Main.gd _on_auth_check_completed: json.parse OK → GameState.current_user = json.data as Dictionary; GameState.gd declares current_user: Dictionary = {}"
+        },
+        {
+          "criterion": "AC6 - 서버가 별도 도메인일 때 window.WS_URL 기반으로 올바른 auth URL 구성",
+          "status": "passed",
+          "evidence": "_get_server_http_base(): WS_URL present → replaces wss://→https://, splits at /ws → correct base. LoginScreen._on_login_pressed uses same pattern"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-22T11:38:17.488Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-22T11-38-17-488Z.log",
+      "validationFile": "validation-2026-04-22T11-38-17-488Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 - 미인증 상태로 앱 로드 시 LoginScreen이 표시됨",
+          "status": "passed",
+          "evidence": "Main.gd _on_auth_check_completed: result!=RESULT_SUCCESS or response_code==401 → _show_screen('login') → _login_screen.visible=true"
+        },
+        {
+          "criterion": "AC2 - 인증 상태로 앱 로드 시 CharacterListScreen이 바로 표시됨",
+          "status": "passed",
+          "evidence": "Main.gd _on_auth_check_completed: response_code==200 → _show_screen('char_list') → _char_list_screen.visible=true"
+        },
+        {
+          "criterion": "AC3 - LoginScreen에 'Google로 로그인' 버튼이 표시됨",
+          "status": "passed",
+          "evidence": "LoginScreen.gd btn.text = 'Google로 로그인' built in _build_ui() called from _ready()"
+        },
+        {
+          "criterion": "AC4 - 웹 빌드에서 버튼 클릭 시 /auth/google 경로로 리다이렉트 됨",
+          "status": "passed",
+          "evidence": "LoginScreen.gd _on_login_pressed: OS.has_feature('web') → builds auth_url with /auth/google suffix → JavaScriptBridge.eval('window.location.href = ...')"
+        },
+        {
+          "criterion": "AC5 - 로그인 성공 후 GameState.current_user에 user 정보 저장됨",
+          "status": "passed",
+          "evidence": "Main.gd _on_auth_check_completed: json.parse OK → GameState.current_user = json.data as Dictionary; GameState.gd declares current_user: Dictionary = {}"
+        },
+        {
+          "criterion": "AC6 - 서버가 별도 도메인일 때 window.WS_URL 기반으로 올바른 auth URL 구성",
+          "status": "passed",
+          "evidence": "_get_server_http_base(): WS_URL present → replaces wss://→https://, splits at /ws → correct base. LoginScreen._on_login_pressed uses same pattern"
+        }
+      ]
+    }
+  ]
+}

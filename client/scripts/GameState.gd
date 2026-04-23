@@ -41,6 +41,9 @@ var queue_participant_count: int = 0
 # Death tracking for rankings (list of {id, name, class, turn} in elimination order)
 var death_log: Array = []
 
+## 현재 로그인된 사용자 정보. /auth/me 응답 저장. 비로그인 시 빈 Dictionary.
+var current_user: Dictionary = {}
+
 func _ready() -> void:
 	WebSocketClient.message_received.connect(_on_message)
 	WebSocketClient.connected_to_server.connect(_on_connected)

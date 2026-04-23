@@ -1,0 +1,21 @@
+specId: game-onboarding
+status: done
+lastError: null
+retryCount: 0
+createdAt: 2026-04-15T00:00:00.000Z
+updatedAt: 2026-04-15T02:05:21.503Z
+notes: >
+  2026-04-15 태연 신규 draft:
+
+  - 현재 게임 진입 후 규칙/신탁 설명 없음 → 신규 유저 이탈 원인
+
+  - accounts 테이블에 onboarding_done 컬럼 추가 (마이그레이션)
+
+  - /auth/me에 onboardingDone 필드 추가, POST /auth/onboarding-done 신규 라우트
+
+  - OnboardingOverlay.gd 3단계 슬라이드 오버레이 신규 생성
+
+  - Main.gd에서 /auth/me 응답 후 조건부 표시
+
+  - 의존성: phase-5-client-godot, phase-1-infra-auth, character-class-guide 모두 done
+  ✓

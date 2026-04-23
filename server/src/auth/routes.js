@@ -22,8 +22,19 @@ router.get('/me', (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Not authenticated' });
   }
-  const { id, email, display_name, avatar_url, constellation_points, created_at } = req.user;
-  res.json({ id, email, displayName: display_name, avatarUrl: avatar_url, constellationPoints: constellation_points, createdAt: created_at });
+  const { id, email, display_name, avatar_url, constellation_points, created_at, onboarding_done } = req.user;
+  res.json({ id, email, displayName: display_name, avatarUrl: avatar_url, constellationPoints: constellation_points, createdAt: created_at, onboardingDone: onboarding_done ?? false });
+});
+
+// Mark onboarding as complete for the current user
+router.post('/onboarding-done', (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+  const { pool } = require('../db/pool');
+  pool.query('UPDATE accounts SET onboarding_done = TRUE WHERE id = $1', [req.user.id])
+    .then(() => res.json({ ok: true }))
+    .catch(next);
 });
 
 // Logout

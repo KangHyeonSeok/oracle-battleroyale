@@ -1,0 +1,157 @@
+{
+  "specId": "random-character",
+  "updatedAt": "2026-04-22T01:04:46.081Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC-1 버튼 노출",
+      "status": "passed",
+      "evidence": "CharacterCreateScreen.gd:130-151 — HBoxContainer btn_row holds both _analyze_btn and _random_btn with text '🎲 랜덤 생성'"
+    },
+    {
+      "criterion": "AC-2 WS 전송",
+      "status": "passed",
+      "evidence": "CharacterCreateScreen.gd:252 — WebSocketClient.send({\"type\": \"random_character\"}) in _on_random_pressed()"
+    },
+    {
+      "criterion": "AC-3 서버 응답",
+      "status": "passed",
+      "evidence": "server.js:207-225 — case 'random_character' calls generateRandomCharacter() then sends character_preview; gemini.js:87-108 — Korean fantasy Gemini prompt with fallback"
+    },
+    {
+      "criterion": "AC-4 자동 채워넣기",
+      "status": "passed",
+      "evidence": "CharacterCreateScreen.gd:289-300 — name_from_server extracted, _name_input.text and _pending_name set, _preview_panel.visible = true"
+    },
+    {
+      "criterion": "AC-5 저장 가능",
+      "status": "passed",
+      "evidence": "CharacterCreateScreen.gd:301 — _save_btn.visible = true; _pending_name set from server name for create_character WS send"
+    },
+    {
+      "criterion": "AC-6 로딩 표시",
+      "status": "passed",
+      "evidence": "CharacterCreateScreen.gd:245-251 — _random_btn.disabled=true, _analyze_btn.disabled=true, _loading_lbl.text='AI 생성 중...', _loading_lbl.visible=true"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-22T01:04:08.607Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-22T01-04-08-607Z.log",
+      "validationFile": "validation-2026-04-22T01-04-08-607Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC-1 버튼 노출: CharacterCreateScreen에 '🎲 랜덤 생성' 버튼이 'AI로 스탯 분석하기' 버튼 옆에 표시된다",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:130-151 — HBoxContainer btn_row holds both _analyze_btn and _random_btn with text '🎲 랜덤 생성'"
+        },
+        {
+          "criterion": "AC-2 WS 전송: 버튼 클릭 시 {type: 'random_character'} WebSocket 메시지를 서버로 전송한다",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:252 — WebSocketClient.send({\"type\": \"random_character\"}) in _on_random_pressed()"
+        },
+        {
+          "criterion": "AC-3 서버 응답: 서버가 random_character 메시지를 받으면 Gemini로 랜덤 성좌명+스탯을 생성하고 character_preview 형식으로 응답 (name 포함)",
+          "status": "passed",
+          "evidence": "server.js:207-225 — case 'random_character' calls generateRandomCharacter() then sends character_preview with name, class, hp, atk, def, tendency; gemini.js:87-108 — generateRandomCharacter() calls Gemini with Korean fantasy prompt"
+        },
+        {
+          "criterion": "AC-4 자동 채워넣기: character_preview 수신 시 _name_input에 name 자동 입력, 미리보기 패널 표시",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:289-300 — name_from_server extracted from preview_data, _name_input.text and _pending_name set if non-empty, _preview_panel.visible = true"
+        },
+        {
+          "criterion": "AC-5 저장 가능: 랜덤 생성 후 '성좌 저장하기' 버튼 활성화, 정상 저장",
+          "status": "passed",
+          "evidence": "_save_btn.visible = true set in character_preview branch (line 301); _pending_name set from server name so create_character WS send uses it"
+        },
+        {
+          "criterion": "AC-6 로딩 표시: 랜덤 생성 중 'AI 생성 중...' 레이블 표시, 버튼 비활성화",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:245-251 — _random_btn.disabled=true, _analyze_btn.disabled=true, _loading_lbl.text='AI 생성 중...', _loading_lbl.visible=true"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-22T01:04:29.421Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-22T01-04-29-421Z.log",
+      "validationFile": "validation-2026-04-22T01-04-29-421Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC-1 버튼 노출: HBoxContainer에 🎲 랜덤 생성 버튼이 AI로 스탯 분석하기 옆에 표시",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:130-151 — HBoxContainer btn_row holds both _analyze_btn and _random_btn with text '🎲 랜덤 생성'"
+        },
+        {
+          "criterion": "AC-2 WS 전송: 클릭 시 {type: 'random_character'} 전송",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:252 — WebSocketClient.send({\"type\": \"random_character\"}) in _on_random_pressed()"
+        },
+        {
+          "criterion": "AC-3 서버 응답: random_character 수신 시 Gemini로 랜덤 성좌명+스탯 생성 후 character_preview(name 포함) 응답",
+          "status": "passed",
+          "evidence": "server.js:207-225 — case 'random_character' calls generateRandomCharacter() then sends character_preview; gemini.js:87-108 — Korean fantasy Gemini prompt with fallback"
+        },
+        {
+          "criterion": "AC-4 자동 채워넣기: character_preview 수신 시 _name_input 자동 입력, 미리보기 패널 표시",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:289-300 — name_from_server extracted, _name_input.text and _pending_name set, _preview_panel.visible = true"
+        },
+        {
+          "criterion": "AC-5 저장 가능: 랜덤 생성 후 성좌 저장하기 버튼 활성화 및 정상 저장",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:301 — _save_btn.visible = true; _pending_name set from server name for create_character WS send"
+        },
+        {
+          "criterion": "AC-6 로딩 표시: AI 생성 중... 레이블 표시, 버튼 비활성화",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:245-251 — _random_btn.disabled=true, _analyze_btn.disabled=true, _loading_lbl.text='AI 생성 중...', _loading_lbl.visible=true"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-22T01:04:46.081Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-22T01-04-46-081Z.log",
+      "validationFile": "validation-2026-04-22T01-04-46-081Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC-1 버튼 노출",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:130-151 — HBoxContainer btn_row holds both _analyze_btn and _random_btn with text '🎲 랜덤 생성'"
+        },
+        {
+          "criterion": "AC-2 WS 전송",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:252 — WebSocketClient.send({\"type\": \"random_character\"}) in _on_random_pressed()"
+        },
+        {
+          "criterion": "AC-3 서버 응답",
+          "status": "passed",
+          "evidence": "server.js:207-225 — case 'random_character' calls generateRandomCharacter() then sends character_preview; gemini.js:87-108 — Korean fantasy Gemini prompt with fallback"
+        },
+        {
+          "criterion": "AC-4 자동 채워넣기",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:289-300 — name_from_server extracted, _name_input.text and _pending_name set, _preview_panel.visible = true"
+        },
+        {
+          "criterion": "AC-5 저장 가능",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:301 — _save_btn.visible = true; _pending_name set from server name for create_character WS send"
+        },
+        {
+          "criterion": "AC-6 로딩 표시",
+          "status": "passed",
+          "evidence": "CharacterCreateScreen.gd:245-251 — _random_btn.disabled=true, _analyze_btn.disabled=true, _loading_lbl.text='AI 생성 중...', _loading_lbl.visible=true"
+        }
+      ]
+    }
+  ]
+}
