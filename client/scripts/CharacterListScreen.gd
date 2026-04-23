@@ -64,26 +64,26 @@ func _build_ui() -> void:
 
 	var rank_btn := Button.new()
 	rank_btn.text = "랭킹 🏆"
-	rank_btn.custom_minimum_size = Vector2(90, 36)
-	rank_btn.add_theme_font_size_override("font_size", 14)
+	rank_btn.custom_minimum_size = Vector2(70, 44)
+	rank_btn.add_theme_font_size_override("font_size", 15)
 	rank_btn.modulate = ACCENT_PURPLE
 	_apply_font(rank_btn)
 	rank_btn.pressed.connect(func() -> void: leaderboard_requested.emit())
 	top_row.add_child(rank_btn)
 
 	var spectate_btn := Button.new()
-	spectate_btn.text = "관전하기 👁"
-	spectate_btn.custom_minimum_size = Vector2(110, 36)
-	spectate_btn.add_theme_font_size_override("font_size", 14)
+	spectate_btn.text = "관전 👁"
+	spectate_btn.custom_minimum_size = Vector2(70, 44)
+	spectate_btn.add_theme_font_size_override("font_size", 15)
 	spectate_btn.modulate = ACCENT_PURPLE
 	_apply_font(spectate_btn)
 	spectate_btn.pressed.connect(func() -> void: spectate_requested.emit())
 	top_row.add_child(spectate_btn)
 
 	var history_btn := Button.new()
-	history_btn.text = "경기 기록"
-	history_btn.custom_minimum_size = Vector2(90, 36)
-	history_btn.add_theme_font_size_override("font_size", 14)
+	history_btn.text = "기록"
+	history_btn.custom_minimum_size = Vector2(60, 44)
+	history_btn.add_theme_font_size_override("font_size", 15)
 	history_btn.modulate = ACCENT_PURPLE
 	_apply_font(history_btn)
 	history_btn.pressed.connect(func() -> void: history_requested.emit())
@@ -97,6 +97,16 @@ func _build_ui() -> void:
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_font(sub)
 	root.add_child(sub)
+
+	# Create button (above card list — avoids browser chrome overlap on mobile)
+	var create_btn := Button.new()
+	create_btn.text = "+ 새 성좌 만들기"
+	create_btn.custom_minimum_size = Vector2(0, 56)
+	create_btn.modulate = ACCENT_GOLD
+	create_btn.add_theme_font_size_override("font_size", 20)
+	_apply_font(create_btn)
+	create_btn.pressed.connect(func() -> void: create_character_requested.emit())
+	root.add_child(create_btn)
 
 	# Scroll area for cards
 	var scroll := ScrollContainer.new()
@@ -116,16 +126,6 @@ func _build_ui() -> void:
 	_empty_lbl.visible = false
 	_apply_font(_empty_lbl)
 	_card_container.add_child(_empty_lbl)
-
-	# Bottom button
-	var create_btn := Button.new()
-	create_btn.text = "+ 새 성좌 만들기"
-	create_btn.custom_minimum_size = Vector2(0, 56)
-	create_btn.modulate = ACCENT_GOLD
-	create_btn.add_theme_font_size_override("font_size", 20)
-	_apply_font(create_btn)
-	create_btn.pressed.connect(func() -> void: create_character_requested.emit())
-	root.add_child(create_btn)
 
 func refresh(chars: Array) -> void:
 	# Clear existing cards (keep _empty_lbl)

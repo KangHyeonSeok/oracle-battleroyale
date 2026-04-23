@@ -1,38 +1,53 @@
 {
   "specId": "oracle-ranking-leaderboard",
-  "updatedAt": "2026-04-12T04:35:44.283Z",
+  "updatedAt": "2026-04-15T00:18:21.516Z",
   "latestStatus": "completed",
   "latestAction": "completed-spec",
   "latestValidationChecks": [
     {
-      "criterion": "AC1 — GET /leaderboard returns oracle_points DESC top 20",
+      "criterion": "AC1: GET /leaderboard returns oracle_points DESC top 20",
       "status": "passed",
-      "evidence": "leaderboard.js queries ORDER BY constellation_points DESC LIMIT $1 (default 20); routes.js exposes GET /leaderboard; registered in app.js; node --check passed"
+      "evidence": "leaderboard.js ORDER BY constellation_points DESC, total_wins DESC, created_at ASC LIMIT $1 (default 20); routes.js exposes GET /leaderboard; registered in app.js"
     },
     {
-      "criterion": "AC2 — match win increments player_stats.total_wins+1 and total_matches+1",
+      "criterion": "AC2: match win increments player_stats.total_wins+1 and total_matches+1",
       "status": "passed",
-      "evidence": "finaliseMatch in turn-scheduler.js upserts player_stats for every non-NPC participant: total_matches+1 always, total_wins+$isWinner; node --check passed"
+      "evidence": "turn-scheduler.js finaliseMatch upserts player_stats for every participant with total_matches+1 and total_wins+1 for winner"
     },
     {
-      "criterion": "AC3 — oracle send increments player_stats.oracle_sent+1",
+      "criterion": "AC3: oracle send increments player_stats.oracle_sent+1",
       "status": "passed",
-      "evidence": "oracle/routes.js step 10 does INSERT ... ON CONFLICT DO UPDATE SET oracle_sent+1 immediately after point deduction; node --check passed"
+      "evidence": "oracle/routes.js step 10 upserts oracle_sent+1 on successful oracle send"
     },
     {
-      "criterion": "AC4 — LeaderboardScreen rank-1 entry shows accent-gold badge",
+      "criterion": "AC4: LeaderboardScreen rank-1 shows accent-gold badge",
       "status": "passed",
-      "evidence": "LeaderboardScreen.gd: is_top3 = rank<=3 sets border_color=ACCENT_GOLD, bg_color=Color(ACCENT_GOLD,0.12), rank emoji badge [🥇,🥈,🥉]"
+      "evidence": "LeaderboardScreen.gd is_top3 = rank<=3 sets border_color=ACCENT_GOLD with gold badge emoji"
     },
     {
-      "criterion": "AC5 — logged-in player row highlighted with accent-purple border",
+      "criterion": "AC5: logged-in player row highlighted with accent-purple border",
       "status": "passed",
-      "evidence": "LeaderboardScreen.gd: is_mine = entry.accountId==my_account_id → style.border_color=ACCENT_PURPLE, bg_color=Color(ACCENT_PURPLE,0.12)"
+      "evidence": "LeaderboardScreen.gd is_mine = entry.accountId==my_account_id sets ACCENT_PURPLE border; my_account_id injected via AC8"
     },
     {
-      "criterion": "AC6 — 랭킹 보기 navigates to LeaderboardScreen; 돌아가기 returns to CharacterListScreen",
+      "criterion": "AC6: 랭킹 보기 navigates to LeaderboardScreen; 돌아가기 returns to CharacterListScreen",
       "status": "passed",
-      "evidence": "CharacterListScreen.gd emits leaderboard_requested signal via 랭킹 🏆 button; LeaderboardScreen.gd emits back_requested signal via 돌아가기 button — matches signal-based navigation pattern used throughout project"
+      "evidence": "CharacterListScreen.gd emits leaderboard_requested; LeaderboardScreen.gd emits back_requested; both wired in Main.gd via AC7"
+    },
+    {
+      "criterion": "AC7: Main.gd LeaderboardScreen init + leaderboard_requested signal + _show_screen routing",
+      "status": "passed",
+      "evidence": "LEADERBOARD_SCRIPT preload, _leaderboard_screen Control instance added in _build_ui(), signal connections and _show_screen visibility branch all implemented"
+    },
+    {
+      "criterion": "AC8: Main.gd injects /auth/me id into LeaderboardScreen.my_account_id",
+      "status": "passed",
+      "evidence": "_fetch_my_account_id() called after _leaderboard_screen init; _on_me_response sets my_account_id=data.id on 200, -1 on 401/other"
+    },
+    {
+      "criterion": "AC9: tiebreak ORDER BY constellation_points DESC → total_wins DESC → created_at ASC",
+      "status": "passed",
+      "evidence": "leaderboard.js ORDER BY u.constellation_points DESC, COALESCE(ps.total_wins,0) DESC, u.created_at ASC; test cases 2 and 3 confirm tiebreak; 20/20 assertions pass"
     }
   ],
   "entries": [
@@ -150,6 +165,168 @@
           "criterion": "AC6 — 랭킹 보기 navigates to LeaderboardScreen; 돌아가기 returns to CharacterListScreen",
           "status": "passed",
           "evidence": "CharacterListScreen.gd emits leaderboard_requested signal via 랭킹 🏆 button; LeaderboardScreen.gd emits back_requested signal via 돌아가기 button — matches signal-based navigation pattern used throughout project"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:17:48.849Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-15T00-17-48-849Z.log",
+      "validationFile": "validation-2026-04-15T00-17-48-849Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: GET /leaderboard returns oracle_points DESC top 20",
+          "status": "passed",
+          "evidence": "leaderboard.js ORDER BY constellation_points DESC, total_wins DESC, created_at ASC LIMIT $1 (default 20); routes.js exposes GET /leaderboard; registered in app.js"
+        },
+        {
+          "criterion": "AC2: match win increments player_stats.total_wins+1 and total_matches+1",
+          "status": "passed",
+          "evidence": "turn-scheduler.js finaliseMatch upserts player_stats for every participant; previously validated"
+        },
+        {
+          "criterion": "AC3: oracle send increments player_stats.oracle_sent+1",
+          "status": "passed",
+          "evidence": "oracle/routes.js step 10 upserts oracle_sent+1; previously validated"
+        },
+        {
+          "criterion": "AC4: LeaderboardScreen rank-1 shows accent-gold badge",
+          "status": "passed",
+          "evidence": "LeaderboardScreen.gd is_top3 = rank<=3 sets border_color=ACCENT_GOLD with 🥇 badge"
+        },
+        {
+          "criterion": "AC5: logged-in player row highlighted with accent-purple border",
+          "status": "passed",
+          "evidence": "LeaderboardScreen.gd is_mine = entry.accountId==my_account_id sets ACCENT_PURPLE border; my_account_id now injected via AC8"
+        },
+        {
+          "criterion": "AC6: 랭킹 보기 navigates to LeaderboardScreen; 돌아가기 returns to CharacterListScreen",
+          "status": "passed",
+          "evidence": "CharacterListScreen.gd emits leaderboard_requested; LeaderboardScreen.gd emits back_requested — both signals now wired in Main.gd via AC7"
+        },
+        {
+          "criterion": "AC7: Main.gd LeaderboardScreen init + leaderboard_requested signal + _show_screen routing",
+          "status": "passed",
+          "evidence": "Added LEADERBOARD_SCRIPT preload, _leaderboard_screen var, Control instance in _build_ui() after MatchDetailScreen, leaderboard_requested.connect, _leaderboard_screen.visible in _show_screen(), _on_leaderboard_requested() and _on_leaderboard_back() handlers"
+        },
+        {
+          "criterion": "AC8: Main.gd injects /auth/me id into LeaderboardScreen.my_account_id",
+          "status": "passed",
+          "evidence": "Added _fetch_my_account_id() called after _leaderboard_screen init; _on_me_response sets my_account_id=data.id on 200, -1 otherwise"
+        },
+        {
+          "criterion": "AC9: tiebreak ORDER BY constellation_points DESC → total_wins DESC → created_at ASC",
+          "status": "passed",
+          "evidence": "leaderboard.js line 29-31: ORDER BY u.constellation_points DESC, COALESCE(ps.total_wins,0) DESC, u.created_at ASC; test cases 2 and 3 confirm tiebreak behavior — 20/20 assertions pass"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:18:04.799Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-15T00-18-04-799Z.log",
+      "validationFile": "validation-2026-04-15T00-18-04-799Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: GET /leaderboard returns oracle_points DESC top 20",
+          "status": "passed",
+          "evidence": "leaderboard.js ORDER BY constellation_points DESC, total_wins DESC, created_at ASC LIMIT $1 (default 20); routes.js exposes GET /leaderboard; registered in app.js"
+        },
+        {
+          "criterion": "AC2: match win increments player_stats.total_wins+1 and total_matches+1",
+          "status": "passed",
+          "evidence": "turn-scheduler.js finaliseMatch upserts player_stats for every participant with total_matches+1 and total_wins+1 for winner"
+        },
+        {
+          "criterion": "AC3: oracle send increments player_stats.oracle_sent+1",
+          "status": "passed",
+          "evidence": "oracle/routes.js step 10 upserts oracle_sent+1 on successful oracle send"
+        },
+        {
+          "criterion": "AC4: LeaderboardScreen rank-1 shows accent-gold badge",
+          "status": "passed",
+          "evidence": "LeaderboardScreen.gd is_top3 = rank<=3 sets border_color=ACCENT_GOLD with gold badge emoji"
+        },
+        {
+          "criterion": "AC5: logged-in player row highlighted with accent-purple border",
+          "status": "passed",
+          "evidence": "LeaderboardScreen.gd is_mine = entry.accountId==my_account_id sets ACCENT_PURPLE border; my_account_id now injected via AC8"
+        },
+        {
+          "criterion": "AC6: 랭킹 보기 navigates to LeaderboardScreen; 돌아가기 returns to CharacterListScreen",
+          "status": "passed",
+          "evidence": "CharacterListScreen.gd emits leaderboard_requested; LeaderboardScreen.gd emits back_requested; both wired in Main.gd via AC7"
+        },
+        {
+          "criterion": "AC7: Main.gd LeaderboardScreen init + leaderboard_requested signal + _show_screen routing",
+          "status": "passed",
+          "evidence": "LEADERBOARD_SCRIPT preload, _leaderboard_screen Control instance added in _build_ui(), signal connections and _show_screen visibility branch all implemented"
+        },
+        {
+          "criterion": "AC8: Main.gd injects /auth/me id into LeaderboardScreen.my_account_id",
+          "status": "passed",
+          "evidence": "_fetch_my_account_id() called after _leaderboard_screen init; _on_me_response sets my_account_id=data.id on 200, -1 on 401/other"
+        },
+        {
+          "criterion": "AC9: tiebreak ORDER BY constellation_points DESC → total_wins DESC → created_at ASC",
+          "status": "passed",
+          "evidence": "leaderboard.js ORDER BY u.constellation_points DESC, COALESCE(ps.total_wins,0) DESC, u.created_at ASC; test cases 2 and 3 confirm tiebreak; 20/20 assertions pass"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:18:21.516Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-15T00-18-21-516Z.log",
+      "validationFile": "validation-2026-04-15T00-18-21-516Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1: GET /leaderboard returns oracle_points DESC top 20",
+          "status": "passed",
+          "evidence": "leaderboard.js ORDER BY constellation_points DESC, total_wins DESC, created_at ASC LIMIT $1 (default 20); routes.js exposes GET /leaderboard; registered in app.js"
+        },
+        {
+          "criterion": "AC2: match win increments player_stats.total_wins+1 and total_matches+1",
+          "status": "passed",
+          "evidence": "turn-scheduler.js finaliseMatch upserts player_stats for every participant with total_matches+1 and total_wins+1 for winner"
+        },
+        {
+          "criterion": "AC3: oracle send increments player_stats.oracle_sent+1",
+          "status": "passed",
+          "evidence": "oracle/routes.js step 10 upserts oracle_sent+1 on successful oracle send"
+        },
+        {
+          "criterion": "AC4: LeaderboardScreen rank-1 shows accent-gold badge",
+          "status": "passed",
+          "evidence": "LeaderboardScreen.gd is_top3 = rank<=3 sets border_color=ACCENT_GOLD with gold badge emoji"
+        },
+        {
+          "criterion": "AC5: logged-in player row highlighted with accent-purple border",
+          "status": "passed",
+          "evidence": "LeaderboardScreen.gd is_mine = entry.accountId==my_account_id sets ACCENT_PURPLE border; my_account_id injected via AC8"
+        },
+        {
+          "criterion": "AC6: 랭킹 보기 navigates to LeaderboardScreen; 돌아가기 returns to CharacterListScreen",
+          "status": "passed",
+          "evidence": "CharacterListScreen.gd emits leaderboard_requested; LeaderboardScreen.gd emits back_requested; both wired in Main.gd via AC7"
+        },
+        {
+          "criterion": "AC7: Main.gd LeaderboardScreen init + leaderboard_requested signal + _show_screen routing",
+          "status": "passed",
+          "evidence": "LEADERBOARD_SCRIPT preload, _leaderboard_screen Control instance added in _build_ui(), signal connections and _show_screen visibility branch all implemented"
+        },
+        {
+          "criterion": "AC8: Main.gd injects /auth/me id into LeaderboardScreen.my_account_id",
+          "status": "passed",
+          "evidence": "_fetch_my_account_id() called after _leaderboard_screen init; _on_me_response sets my_account_id=data.id on 200, -1 on 401/other"
+        },
+        {
+          "criterion": "AC9: tiebreak ORDER BY constellation_points DESC → total_wins DESC → created_at ASC",
+          "status": "passed",
+          "evidence": "leaderboard.js ORDER BY u.constellation_points DESC, COALESCE(ps.total_wins,0) DESC, u.created_at ASC; test cases 2 and 3 confirm tiebreak; 20/20 assertions pass"
         }
       ]
     }

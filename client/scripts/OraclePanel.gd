@@ -61,8 +61,8 @@ func _build_ui() -> void:
 	vbox.add_child(_hp_lbl)
 
 	_oracle_btn = Button.new()
-	_oracle_btn.text = "신탁 발동 (-5 포인트)"
-	_oracle_btn.custom_minimum_size = Vector2(0, 36)
+	_oracle_btn.text = "신탁 발동 (-%d 포인트)" % GameState.ORACLE_COST
+	_oracle_btn.custom_minimum_size = Vector2(240, 36)
 	_apply_font(_oracle_btn)
 	_oracle_btn.pressed.connect(_on_oracle_pressed)
 	vbox.add_child(_oracle_btn)

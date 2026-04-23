@@ -1,0 +1,137 @@
+{
+  "specId": "character-class-guide",
+  "updatedAt": "2026-04-15T00:07:02.506Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1 — 💨 속도: X.X displayed after character_preview received",
+      "status": "passed",
+      "evidence": "_populate_preview() calls _update_class_guide(d.get('class','')) which sets _guide_spd_lbl.text = '💨 속도: %.1f' % cd['spd'] for known classes"
+    },
+    {
+      "criterion": "AC2 — class description with autowrap displayed in preview panel",
+      "status": "passed",
+      "evidence": "_guide_desc_lbl created with autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; cd['desc'] assigned in _update_class_guide()"
+    },
+    {
+      "criterion": "AC3 — unknown class key handled without crash",
+      "status": "passed",
+      "evidence": "_update_class_guide() opens with 'if not CLASS_DATA.has(cls)' guard → sets both labels to '' and returns early"
+    },
+    {
+      "criterion": "AC4 — existing character creation flow unchanged",
+      "status": "passed",
+      "evidence": "No existing lines removed; _populate_preview() only gains one appended call; _build_ui(), WS handler, and save flow untouched"
+    },
+    {
+      "criterion": "AC5 — TEXT_SECONDARY colour and _apply_font() applied to guide labels",
+      "status": "passed",
+      "evidence": "Both _guide_spd_lbl and _guide_desc_lbl have modulate = TEXT_SECONDARY and _apply_font() called before pvbox.add_child()"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-15T00:06:33.372Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-15T00-06-33-372Z.log",
+      "validationFile": "validation-2026-04-15T00-06-33-372Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 — speed shown after character_preview received",
+          "status": "passed",
+          "evidence": "_populate_preview() now calls _update_class_guide(d.get('class','')) which sets _guide_spd_lbl.text = '💨 속도: %.1f' % cd['spd'] for known classes"
+        },
+        {
+          "criterion": "AC2 — class description with autowrap in preview panel",
+          "status": "passed",
+          "evidence": "_guide_desc_lbl created with autowrap_mode = TextServer.AUTOWRAP_WORD_SMART and cd['desc'] assigned in _update_class_guide()"
+        },
+        {
+          "criterion": "AC3 — unknown class key handled without crash",
+          "status": "passed",
+          "evidence": "_update_class_guide() opens with 'if not CLASS_DATA.has(cls)' guard → sets both labels to '' and returns"
+        },
+        {
+          "criterion": "AC4 — existing flow unchanged",
+          "status": "passed",
+          "evidence": "No existing lines removed; _populate_preview() only gains one appended call; _build_ui() / WS handler / save flow untouched"
+        },
+        {
+          "criterion": "AC5 — TEXT_SECONDARY colour and _apply_font() applied",
+          "status": "passed",
+          "evidence": "Both _guide_spd_lbl and _guide_desc_lbl have modulate = TEXT_SECONDARY and _apply_font() called before vbox.add_child()"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:06:48.817Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-15T00-06-48-817Z.log",
+      "validationFile": "validation-2026-04-15T00-06-48-817Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 — 💨 속도: X.X displayed after character_preview received",
+          "status": "passed",
+          "evidence": "_populate_preview() calls _update_class_guide(d.get('class','')) which sets _guide_spd_lbl.text = '💨 속도: %.1f' % cd['spd'] for known classes"
+        },
+        {
+          "criterion": "AC2 — class description with autowrap displayed in preview panel",
+          "status": "passed",
+          "evidence": "_guide_desc_lbl created with autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; cd['desc'] assigned in _update_class_guide()"
+        },
+        {
+          "criterion": "AC3 — unknown class key handled without crash",
+          "status": "passed",
+          "evidence": "_update_class_guide() opens with 'if not CLASS_DATA.has(cls)' guard → sets both labels to '' and returns early"
+        },
+        {
+          "criterion": "AC4 — existing character creation flow unchanged",
+          "status": "passed",
+          "evidence": "No existing lines removed; _populate_preview() only gains one appended call; _build_ui(), WS handler, and save flow untouched"
+        },
+        {
+          "criterion": "AC5 — TEXT_SECONDARY colour and _apply_font() applied to guide labels",
+          "status": "passed",
+          "evidence": "Both _guide_spd_lbl and _guide_desc_lbl have modulate = TEXT_SECONDARY and _apply_font() called before vbox.add_child()"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:07:02.506Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-15T00-07-02-506Z.log",
+      "validationFile": "validation-2026-04-15T00-07-02-506Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 — 💨 속도: X.X displayed after character_preview received",
+          "status": "passed",
+          "evidence": "_populate_preview() calls _update_class_guide(d.get('class','')) which sets _guide_spd_lbl.text = '💨 속도: %.1f' % cd['spd'] for known classes"
+        },
+        {
+          "criterion": "AC2 — class description with autowrap displayed in preview panel",
+          "status": "passed",
+          "evidence": "_guide_desc_lbl created with autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; cd['desc'] assigned in _update_class_guide()"
+        },
+        {
+          "criterion": "AC3 — unknown class key handled without crash",
+          "status": "passed",
+          "evidence": "_update_class_guide() opens with 'if not CLASS_DATA.has(cls)' guard → sets both labels to '' and returns early"
+        },
+        {
+          "criterion": "AC4 — existing character creation flow unchanged",
+          "status": "passed",
+          "evidence": "No existing lines removed; _populate_preview() only gains one appended call; _build_ui(), WS handler, and save flow untouched"
+        },
+        {
+          "criterion": "AC5 — TEXT_SECONDARY colour and _apply_font() applied to guide labels",
+          "status": "passed",
+          "evidence": "Both _guide_spd_lbl and _guide_desc_lbl have modulate = TEXT_SECONDARY and _apply_font() called before pvbox.add_child()"
+        }
+      ]
+    }
+  ]
+}

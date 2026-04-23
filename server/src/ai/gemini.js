@@ -80,4 +80,30 @@ async function extractRulesTable(characterPrompt) {
   }
 }
 
-module.exports = { extractRulesTable };
+const RANDOM_CHARACTER_PROMPT = `Create a random battle arena character with a Korean fantasy name.
+Return ONLY a valid JSON object (no markdown fences, no explanation):
+{ "name": "캐릭터명", "class": "warrior|archer|mage|berserk|assassin|healer", "hp": <number 80-120>, "atk": <number 10-25>, "def": <number 5-20>, "tendency": "한 줄 설명" }`;
+
+async function generateRandomCharacter() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.warn('[gemini] GEMINI_API_KEY not set — returning fallback random character');
+    return { name: '철혈 검사', class: 'warrior', hp: 100, atk: 20, def: 12, tendency: '가장 가까운 적에게 돌진' };
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const model = genAI.getGenerativeModel({ model: modelName });
+
+    const result = await model.generateContent([{ text: RANDOM_CHARACTER_PROMPT }]);
+    const raw = result.response.text().trim();
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    return JSON.parse(cleaned);
+  } catch (err) {
+    console.error('[gemini] random character generation failed:', err.message);
+    return { name: '신비한 성좌', class: 'mage', hp: 85, atk: 22, def: 8, tendency: '원거리 마법 공격 선호' };
+  }
+}
+
+module.exports = { extractRulesTable, generateRandomCharacter };

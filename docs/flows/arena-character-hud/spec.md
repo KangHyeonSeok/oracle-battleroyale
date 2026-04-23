@@ -1,7 +1,7 @@
 ---
 specId: arena-character-hud
 title: 아레나 캐릭터 상태 HUD
-status: in-flight
+status: queued
 owner: partner
 runnerProfile: developer
 runnerExecution: assistant

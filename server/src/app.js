@@ -78,6 +78,7 @@ app.use('/matches', require('./game/match-routes').router);
 app.use('/oracle', require('./oracle/routes').router);
 app.use('/spectate', require('./game/spectate-routes').router);
 app.use('/leaderboard', require('./leaderboard/routes'));
+app.use('/history', require('./history/routes'));
 
 // Health check
 app.get('/health', (req, res) => {

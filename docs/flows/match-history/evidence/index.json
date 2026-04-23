@@ -1,0 +1,227 @@
+{
+  "specId": "match-history",
+  "updatedAt": "2026-04-15T00:15:28.236Z",
+  "latestStatus": "completed",
+  "latestAction": "completed-spec",
+  "latestValidationChecks": [
+    {
+      "criterion": "AC1 — GET /history returns recent matches with matchId, myRank, participantCount, winner",
+      "status": "passed",
+      "evidence": "routes.js + queries.js: requireAuth, limit clamped 1-50, offset≥0, joins matches→match_participants→characters filtering by user_id and status='finished', returns all required fields"
+    },
+    {
+      "criterion": "AC2 — GET /history/:matchId returns participants ranked + oracle messages time-ordered",
+      "status": "passed",
+      "evidence": "queries.js getMatchDetail: participants ORDER BY placement ASC; oracles via DESC LIMIT 100 subquery re-sorted ASC for time-order"
+    },
+    {
+      "criterion": "AC3 — MatchHistoryScreen card list + '더 보기' loads next 20",
+      "status": "passed",
+      "evidence": "MatchHistoryScreen.gd: PAGE_SIZE=20, _offset incremented on _on_more_pressed, _more_btn shown when _offset < _total"
+    },
+    {
+      "criterion": "AC4 — Card click → MatchDetailScreen with participants + oracle feed",
+      "status": "passed",
+      "evidence": "_make_card emits detail_requested(match_id); Main.gd _on_match_detail_requested calls load_match then _show_screen('match_detail'); MatchDetailScreen._render() builds both panels"
+    },
+    {
+      "criterion": "AC5 — 1등 카드 accent-gold, 내 참가자 행 accent-purple 강조",
+      "status": "passed",
+      "evidence": "MatchHistoryScreen._make_card: is_winner → border_width_left=4 + ACCENT_GOLD; MatchDetailScreen._make_participant_row: is_me → ACCENT_PURPLE bg, rank==1 → ACCENT_GOLD bg"
+    },
+    {
+      "criterion": "AC6 — CharacterListScreen '경기 기록' 버튼 → MatchHistoryScreen",
+      "status": "passed",
+      "evidence": "CharacterListScreen.gd: signal history_requested added, history_btn emits it; Main.gd connects to _on_history_requested → _show_screen('match_history')"
+    },
+    {
+      "criterion": "AC7 — 경기 기록 없을 때 빈 상태 메시지",
+      "status": "passed",
+      "evidence": "MatchHistoryScreen._on_request_completed: offset==0 && matches.is_empty() → _empty_lbl.visible=true, text='아직 경기 기록이 없습니다.'"
+    },
+    {
+      "criterion": "AC8 — isMe=true 신탁 메시지 accent-purple 배경",
+      "status": "passed",
+      "evidence": "MatchDetailScreen._make_oracle_card: is_me → style.bg_color=Color(ACCENT_PURPLE, 0.18)"
+    },
+    {
+      "criterion": "AC9 — GET /history/:matchId 응답에 oracleCount 필드",
+      "status": "passed",
+      "evidence": "queries.js getMatchDetail: SELECT COUNT(*) from oracle_invocations returned as oracleCount in response object"
+    }
+  ],
+  "entries": [
+    {
+      "tickAt": "2026-04-15T00:14:47.375Z",
+      "action": "selected-spec",
+      "status": "selected-for-work",
+      "logFile": "tick-2026-04-15T00-14-47-375Z.log",
+      "validationFile": "validation-2026-04-15T00-14-47-375Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 — GET /history returns authenticated user's recent matches with matchId, myRank, participantCount, winner",
+          "status": "passed",
+          "evidence": "server/src/history/routes.js GET / with requireAuth, clamp limit 1-50, offset>=0; queries.js getMatchList joins matches→match_participants→characters filtering mc.user_id=$1 and status='finished', returns matchId/myRank/participantCount/winner fields"
+        },
+        {
+          "criterion": "AC2 — GET /history/:matchId returns full participants ranked + oracle messages time-ordered",
+          "status": "passed",
+          "evidence": "queries.js getMatchDetail returns participants ORDER BY placement ASC and oracles ORDER BY invoked_at ASC (latest 100 via DESC LIMIT 100 subquery then re-sorted ASC)"
+        },
+        {
+          "criterion": "AC3 — MatchHistoryScreen shows card list, '더 보기' loads next 20",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen.gd: _load_page() uses PAGE_SIZE=20 + _offset; _more_btn shown when _offset < _total; _on_more_pressed increments offset"
+        },
+        {
+          "criterion": "AC4 — Card click → MatchDetailScreen with participants + oracle feed",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen _make_card emits detail_requested(match_id); Main.gd _on_match_detail_requested calls load_match then _show_screen('match_detail'); MatchDetailScreen._render() builds both panels"
+        },
+        {
+          "criterion": "AC5 — 1등 카드 accent-gold 강조, 내 참가자 행 accent-purple 강조",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen._make_card: is_winner sets border_width_left=4 + border_color=ACCENT_GOLD; MatchDetailScreen._make_participant_row: is_me sets bg Color(ACCENT_PURPLE,0.2), rank==1 sets bg Color(ACCENT_GOLD,0.15)"
+        },
+        {
+          "criterion": "AC6 — CharacterListScreen '경기 기록' 버튼 → MatchHistoryScreen",
+          "status": "passed",
+          "evidence": "CharacterListScreen.gd: signal history_requested added; history_btn created in _build_ui emitting history_requested; Main.gd connects history_requested to _on_history_requested which calls fetch_history and _show_screen('match_history')"
+        },
+        {
+          "criterion": "AC7 — 경기 기록 없을 때 '아직 경기 기록이 없습니다' 빈 상태 메시지",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen._on_request_completed: when offset==0 and matches.is_empty(), sets _empty_lbl.visible=true with text '아직 경기 기록이 없습니다.'"
+        },
+        {
+          "criterion": "AC8 — isMe=true 신탁 메시지 accent-purple 배경",
+          "status": "passed",
+          "evidence": "MatchDetailScreen._make_oracle_card: is_me sets style.bg_color=Color(ACCENT_PURPLE,0.18)"
+        },
+        {
+          "criterion": "AC9 — GET /history/:matchId 응답에 oracleCount 필드",
+          "status": "passed",
+          "evidence": "queries.js getMatchDetail: SELECT COUNT(*) from oracle_invocations for the match, returned as oracleCount in response object"
+        },
+        {
+          "criterion": "Server module syntax validation",
+          "status": "passed",
+          "evidence": "node -e require('./src/history/routes') and require('./src/app') both print OK; Redis ECONNREFUSED is environment-only, not a code error"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:15:07.960Z",
+      "action": "advanced-spec",
+      "status": "validation-pending",
+      "logFile": "tick-2026-04-15T00-15-07-960Z.log",
+      "validationFile": "validation-2026-04-15T00-15-07-960Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 — GET /history returns recent matches with matchId, myRank, participantCount, winner",
+          "status": "passed",
+          "evidence": "server/src/history/routes.js + queries.js: requireAuth, limit clamped 1-50, offset≥0, joins matches→match_participants→characters filtering by user_id and status='finished', returns all required fields"
+        },
+        {
+          "criterion": "AC2 — GET /history/:matchId returns participants ranked + oracle messages time-ordered",
+          "status": "passed",
+          "evidence": "queries.js getMatchDetail: participants ORDER BY placement ASC; oracles via DESC LIMIT 100 subquery re-sorted ASC for time-order"
+        },
+        {
+          "criterion": "AC3 — MatchHistoryScreen card list + '더 보기' loads next 20",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen.gd: PAGE_SIZE=20, _offset incremented on _on_more_pressed, _more_btn shown when _offset < _total"
+        },
+        {
+          "criterion": "AC4 — Card click → MatchDetailScreen with participants + oracle feed",
+          "status": "passed",
+          "evidence": "_make_card emits detail_requested(match_id); Main.gd _on_match_detail_requested calls load_match then _show_screen('match_detail'); MatchDetailScreen._render() builds both panels"
+        },
+        {
+          "criterion": "AC5 — 1등 카드 accent-gold, 내 참가자 행 accent-purple 강조",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen._make_card: is_winner → border_width_left=4 + ACCENT_GOLD; MatchDetailScreen._make_participant_row: is_me → ACCENT_PURPLE bg, rank==1 → ACCENT_GOLD bg"
+        },
+        {
+          "criterion": "AC6 — CharacterListScreen '경기 기록' 버튼 → MatchHistoryScreen",
+          "status": "passed",
+          "evidence": "CharacterListScreen.gd: signal history_requested added, history_btn emits it; Main.gd connects to _on_history_requested → _show_screen('match_history')"
+        },
+        {
+          "criterion": "AC7 — 경기 기록 없을 때 빈 상태 메시지",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen._on_request_completed: offset==0 && matches.is_empty() → _empty_lbl.visible=true, text='아직 경기 기록이 없습니다.'"
+        },
+        {
+          "criterion": "AC8 — isMe=true 신탁 메시지 accent-purple 배경",
+          "status": "passed",
+          "evidence": "MatchDetailScreen._make_oracle_card: is_me → style.bg_color=Color(ACCENT_PURPLE, 0.18)"
+        },
+        {
+          "criterion": "AC9 — GET /history/:matchId 응답에 oracleCount 필드",
+          "status": "passed",
+          "evidence": "queries.js getMatchDetail: SELECT COUNT(*) from oracle_invocations returned as oracleCount in response object"
+        },
+        {
+          "criterion": "Server module syntax validation",
+          "status": "passed",
+          "evidence": "node -e require('./src/history/routes') and require('./src/app') both return OK; Redis ECONNREFUSED is runtime-env only, not a code defect"
+        }
+      ]
+    },
+    {
+      "tickAt": "2026-04-15T00:15:28.236Z",
+      "action": "completed-spec",
+      "status": "completed",
+      "logFile": "tick-2026-04-15T00-15-28-236Z.log",
+      "validationFile": "validation-2026-04-15T00-15-28-236Z.md",
+      "validationChecks": [
+        {
+          "criterion": "AC1 — GET /history returns recent matches with matchId, myRank, participantCount, winner",
+          "status": "passed",
+          "evidence": "routes.js + queries.js: requireAuth, limit clamped 1-50, offset≥0, joins matches→match_participants→characters filtering by user_id and status='finished', returns all required fields"
+        },
+        {
+          "criterion": "AC2 — GET /history/:matchId returns participants ranked + oracle messages time-ordered",
+          "status": "passed",
+          "evidence": "queries.js getMatchDetail: participants ORDER BY placement ASC; oracles via DESC LIMIT 100 subquery re-sorted ASC for time-order"
+        },
+        {
+          "criterion": "AC3 — MatchHistoryScreen card list + '더 보기' loads next 20",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen.gd: PAGE_SIZE=20, _offset incremented on _on_more_pressed, _more_btn shown when _offset < _total"
+        },
+        {
+          "criterion": "AC4 — Card click → MatchDetailScreen with participants + oracle feed",
+          "status": "passed",
+          "evidence": "_make_card emits detail_requested(match_id); Main.gd _on_match_detail_requested calls load_match then _show_screen('match_detail'); MatchDetailScreen._render() builds both panels"
+        },
+        {
+          "criterion": "AC5 — 1등 카드 accent-gold, 내 참가자 행 accent-purple 강조",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen._make_card: is_winner → border_width_left=4 + ACCENT_GOLD; MatchDetailScreen._make_participant_row: is_me → ACCENT_PURPLE bg, rank==1 → ACCENT_GOLD bg"
+        },
+        {
+          "criterion": "AC6 — CharacterListScreen '경기 기록' 버튼 → MatchHistoryScreen",
+          "status": "passed",
+          "evidence": "CharacterListScreen.gd: signal history_requested added, history_btn emits it; Main.gd connects to _on_history_requested → _show_screen('match_history')"
+        },
+        {
+          "criterion": "AC7 — 경기 기록 없을 때 빈 상태 메시지",
+          "status": "passed",
+          "evidence": "MatchHistoryScreen._on_request_completed: offset==0 && matches.is_empty() → _empty_lbl.visible=true, text='아직 경기 기록이 없습니다.'"
+        },
+        {
+          "criterion": "AC8 — isMe=true 신탁 메시지 accent-purple 배경",
+          "status": "passed",
+          "evidence": "MatchDetailScreen._make_oracle_card: is_me → style.bg_color=Color(ACCENT_PURPLE, 0.18)"
+        },
+        {
+          "criterion": "AC9 — GET /history/:matchId 응답에 oracleCount 필드",
+          "status": "passed",
+          "evidence": "queries.js getMatchDetail: SELECT COUNT(*) from oracle_invocations returned as oracleCount in response object"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+specId: connection-resilience
+status: done
+lastError: null
+retryCount: 0
+createdAt: 2026-04-15T00:00:00.000Z
+updatedAt: 2026-04-15T02:03:02.480Z
+notes: |
+  2026-04-15 태연 신규 draft:
+  - 현재 WS 끊김 시 자동 복구 없음 → 게임 포기 강제 (안정성 결함)
+  - WebSocketClient.gd 지수 백오프 재연결, MAX_RETRY=5, 2→32초
+  - Main.gd reconnect_failed 시그널 연결 + 에러 팝업
+  - 서버 변경 없음 (Redis 세션 이미 구현됨)
+  - 의존성: phase-5-client-godot, phase-3-game-server 모두 done ✓
